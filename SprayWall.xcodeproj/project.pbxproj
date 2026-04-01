@@ -1,0 +1,567 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 46;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		09F7017BF6A4C75B40A94C2D /* RouteEditorView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 07E696930022F50E1CF168CF /* RouteEditorView.swift */; };
+		155C29E123500AE1A1586FB1 /* HoldDetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E5987DDEDDF5A8277B80B84A /* HoldDetailView.swift */; };
+		21068F46CD4A3992873E4B20 /* HoldEditorView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 11256870117C001CB59C57ED /* HoldEditorView.swift */; };
+		23FB099A9F4C6BA5B5F73045 /* UserAccount.swift in Sources */ = {isa = PBXBuildFile; fileRef = B2250C6A81B9F7D0E1C4DF24 /* UserAccount.swift */; };
+		277FA35587DEB6120C81B042 /* ImageRectificationServiceTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = AF0996D7A5A45A2827542A6E /* ImageRectificationServiceTests.swift */; };
+		34227E00706096C5F2D4A449 /* SprayWallApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = C0637ACD334DB9BD95FD84E6 /* SprayWallApp.swift */; };
+		3741A6F32326FE46D0157532 /* AuthService.swift in Sources */ = {isa = PBXBuildFile; fileRef = F08C80FF59F373B39F11CC1E /* AuthService.swift */; };
+		3F65B7B608D11C3D9E26F9A0 /* Route.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5A21C0869A3FC3CBAF3B6A4B /* Route.swift */; };
+		41FDF4978FE6F3F5CFABF845 /* AttemptLoggerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8B5D1180805B0CF7C79AE8FE /* AttemptLoggerView.swift */; };
+		4879F9E86D893ED88A6D9E7C /* CSVIntCodec.swift in Sources */ = {isa = PBXBuildFile; fileRef = EDEEA88A69EE73D44EB12D1E /* CSVIntCodec.swift */; };
+		56C9507389377D73646EEE1C /* Attempt.swift in Sources */ = {isa = PBXBuildFile; fileRef = 67395567C5C228C4451D8B04 /* Attempt.swift */; };
+		5C6B786391A01E4E76A0EA2F /* WallCalibration.swift in Sources */ = {isa = PBXBuildFile; fileRef = 94C1374EDB1F35CC9AAB29D7 /* WallCalibration.swift */; };
+		5DFDABD9F20395133141300A /* CSVIntCodecTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6D3F506FFF1DB3F251771040 /* CSVIntCodecTests.swift */; };
+		63ECF255D739FD64D173A41C /* IDService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 15117529C0CBE8AC8E6BBF46 /* IDService.swift */; };
+		67980D80AA507D4C532242F9 /* CalibrationPoint.swift in Sources */ = {isa = PBXBuildFile; fileRef = 739BB619FE3755E4B37A8F36 /* CalibrationPoint.swift */; };
+		731A3ED0CDA21F5721EA7C1C /* RouteDetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = ED868BE0F4C29D46BA6B0A3C /* RouteDetailView.swift */; };
+		7455877B696BE99536648491 /* RootView.swift in Sources */ = {isa = PBXBuildFile; fileRef = EE51F5CA074C9F89713BB800 /* RootView.swift */; };
+		857A1482770B5F6CCF3D6E54 /* ModelIdentifiableExtensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = BFFD925500184E90743FCEF8 /* ModelIdentifiableExtensions.swift */; };
+		884DD4BF5579257C2E59D18C /* ImageRectificationService.swift in Sources */ = {isa = PBXBuildFile; fileRef = EF6394385675475F083462E8 /* ImageRectificationService.swift */; };
+		8FEB98F755B2B0FB6AD9CA31 /* SettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4F4718E0494424E660831AC1 /* SettingsView.swift */; };
+		9D03B8EE80407081E21893A9 /* AuthView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 49C8A9663F5AD303D42E2F4A /* AuthView.swift */; };
+		9D401DFC277CA969555FD773 /* HoldMarkerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 35CBDE0DC68F3DCE1AAF330F /* HoldMarkerView.swift */; };
+		A76485104B2946D1842C37DE /* CalibrationView.swift in Sources */ = {isa = PBXBuildFile; fileRef = D7715D50A5C652FE456FD69D /* CalibrationView.swift */; };
+		B73436C823217DA580B7F462 /* WallSpec.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9AEDAD48A4D415EC8A60A0D8 /* WallSpec.swift */; };
+		C627B1F49A7F833336844323 /* Hold.swift in Sources */ = {isa = PBXBuildFile; fileRef = B85B0DB76CBBD5F1625EE4DD /* Hold.swift */; };
+		D60E7827714AECBE519A8DF1 /* AppTabView.swift in Sources */ = {isa = PBXBuildFile; fileRef = CEBF5D0F2E0D1749D891F7BB /* AppTabView.swift */; };
+		E0D4AD3679D02A4F7F386045 /* AppModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3BBAB4C421D859BC040BE38A /* AppModel.swift */; };
+		E787CD941B0001E0B39AC73B /* ProjectArchiveService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8CE562AD7B5A971F2D2E46C4 /* ProjectArchiveService.swift */; };
+		E94B02CA041A23245E7391B1 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D78A0B555AA5A6C05A2E0923 /* Foundation.framework */; };
+		F02666E481ED48527775C3C5 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D78A0B555AA5A6C05A2E0923 /* Foundation.framework */; };
+		F5814AF0D557AB33F94E474E /* WallProjectPaths.swift in Sources */ = {isa = PBXBuildFile; fileRef = CCA3BA80FAEDAD5A46A1DBB7 /* WallProjectPaths.swift */; };
+		F9A14CD12211962DDAAB224A /* DomainEnums.swift in Sources */ = {isa = PBXBuildFile; fileRef = A72C2BF3C1C31A4617FCC041 /* DomainEnums.swift */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXContainerItemProxy section */
+		155D9767BAB9B84353AC2681 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = E61CA0EC7E7101F762E60417 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = D3318BC92C1DFC6642D57755;
+			remoteInfo = SprayWall;
+		};
+/* End PBXContainerItemProxy section */
+
+/* Begin PBXFileReference section */
+		07E696930022F50E1CF168CF /* RouteEditorView.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = RouteEditorView.swift; path = Sources/SprayWall/Views/Routes/RouteEditorView.swift; sourceTree = "<group>"; };
+		11256870117C001CB59C57ED /* HoldEditorView.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = HoldEditorView.swift; path = Sources/SprayWall/Views/Holds/HoldEditorView.swift; sourceTree = "<group>"; };
+		15117529C0CBE8AC8E6BBF46 /* IDService.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = IDService.swift; path = Sources/SprayWall/Services/IDService.swift; sourceTree = "<group>"; };
+		2901E16777C4F6BA5596EDC1 /* SprayWallTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = SprayWallTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		35CBDE0DC68F3DCE1AAF330F /* HoldMarkerView.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = HoldMarkerView.swift; path = Sources/SprayWall/Views/Shared/HoldMarkerView.swift; sourceTree = "<group>"; };
+		3BBAB4C421D859BC040BE38A /* AppModel.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = AppModel.swift; path = Sources/SprayWall/App/AppModel.swift; sourceTree = "<group>"; };
+		49C8A9663F5AD303D42E2F4A /* AuthView.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = AuthView.swift; path = Sources/SprayWall/Views/Authentication/AuthView.swift; sourceTree = "<group>"; };
+		4F4718E0494424E660831AC1 /* SettingsView.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = SettingsView.swift; path = Sources/SprayWall/Views/Settings/SettingsView.swift; sourceTree = "<group>"; };
+		5A21C0869A3FC3CBAF3B6A4B /* Route.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = Route.swift; path = Sources/SprayWall/Models/Route.swift; sourceTree = "<group>"; };
+		67395567C5C228C4451D8B04 /* Attempt.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = Attempt.swift; path = Sources/SprayWall/Models/Attempt.swift; sourceTree = "<group>"; };
+		6D3F506FFF1DB3F251771040 /* CSVIntCodecTests.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = CSVIntCodecTests.swift; path = Tests/SprayWallTests/CSVIntCodecTests.swift; sourceTree = "<group>"; };
+		739BB619FE3755E4B37A8F36 /* CalibrationPoint.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = CalibrationPoint.swift; path = Sources/SprayWall/Models/CalibrationPoint.swift; sourceTree = "<group>"; };
+		8B5D1180805B0CF7C79AE8FE /* AttemptLoggerView.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = AttemptLoggerView.swift; path = Sources/SprayWall/Views/Attempts/AttemptLoggerView.swift; sourceTree = "<group>"; };
+		8CE562AD7B5A971F2D2E46C4 /* ProjectArchiveService.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = ProjectArchiveService.swift; path = Sources/SprayWall/Services/ProjectArchiveService.swift; sourceTree = "<group>"; };
+		94C1374EDB1F35CC9AAB29D7 /* WallCalibration.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = WallCalibration.swift; path = Sources/SprayWall/Models/WallCalibration.swift; sourceTree = "<group>"; };
+		9AEDAD48A4D415EC8A60A0D8 /* WallSpec.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = WallSpec.swift; path = Sources/SprayWall/Utilities/WallSpec.swift; sourceTree = "<group>"; };
+		A72C2BF3C1C31A4617FCC041 /* DomainEnums.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = DomainEnums.swift; path = Sources/SprayWall/Models/DomainEnums.swift; sourceTree = "<group>"; };
+		AF0996D7A5A45A2827542A6E /* ImageRectificationServiceTests.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = ImageRectificationServiceTests.swift; path = Tests/SprayWallTests/ImageRectificationServiceTests.swift; sourceTree = "<group>"; };
+		B2250C6A81B9F7D0E1C4DF24 /* UserAccount.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = UserAccount.swift; path = Sources/SprayWall/Models/UserAccount.swift; sourceTree = "<group>"; };
+		B85B0DB76CBBD5F1625EE4DD /* Hold.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = Hold.swift; path = Sources/SprayWall/Models/Hold.swift; sourceTree = "<group>"; };
+		BFFD925500184E90743FCEF8 /* ModelIdentifiableExtensions.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = ModelIdentifiableExtensions.swift; path = Sources/SprayWall/Models/ModelIdentifiableExtensions.swift; sourceTree = "<group>"; };
+		C0637ACD334DB9BD95FD84E6 /* SprayWallApp.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = SprayWallApp.swift; path = Sources/SprayWall/App/SprayWallApp.swift; sourceTree = "<group>"; };
+		C0C0303E19FA8DBA93B8CC05 /* SprayWall.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = SprayWall.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		CCA3BA80FAEDAD5A46A1DBB7 /* WallProjectPaths.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = WallProjectPaths.swift; path = Sources/SprayWall/Utilities/WallProjectPaths.swift; sourceTree = "<group>"; };
+		CEBF5D0F2E0D1749D891F7BB /* AppTabView.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = AppTabView.swift; path = Sources/SprayWall/App/AppTabView.swift; sourceTree = "<group>"; };
+		D7715D50A5C652FE456FD69D /* CalibrationView.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = CalibrationView.swift; path = Sources/SprayWall/Views/Calibration/CalibrationView.swift; sourceTree = "<group>"; };
+		D78A0B555AA5A6C05A2E0923 /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS18.0.sdk/System/Library/Frameworks/Foundation.framework; sourceTree = DEVELOPER_DIR; };
+		E5987DDEDDF5A8277B80B84A /* HoldDetailView.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = HoldDetailView.swift; path = Sources/SprayWall/Views/Holds/HoldDetailView.swift; sourceTree = "<group>"; };
+		ED868BE0F4C29D46BA6B0A3C /* RouteDetailView.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = RouteDetailView.swift; path = Sources/SprayWall/Views/Routes/RouteDetailView.swift; sourceTree = "<group>"; };
+		EDEEA88A69EE73D44EB12D1E /* CSVIntCodec.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = CSVIntCodec.swift; path = Sources/SprayWall/Utilities/CSVIntCodec.swift; sourceTree = "<group>"; };
+		EE51F5CA074C9F89713BB800 /* RootView.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = RootView.swift; path = Sources/SprayWall/App/RootView.swift; sourceTree = "<group>"; };
+		EF6394385675475F083462E8 /* ImageRectificationService.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = ImageRectificationService.swift; path = Sources/SprayWall/Services/ImageRectificationService.swift; sourceTree = "<group>"; };
+		F08C80FF59F373B39F11CC1E /* AuthService.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = AuthService.swift; path = Sources/SprayWall/Services/AuthService.swift; sourceTree = "<group>"; };
+/* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		392CF10BA07895D9B374C557 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				F02666E481ED48527775C3C5 /* Foundation.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		54AB027CAC2543BF54F6D1B9 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				E94B02CA041A23245E7391B1 /* Foundation.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		5526B106C278FC3F52E639B2 = {
+			isa = PBXGroup;
+			children = (
+				823130E17C67DC0367AE5A74 /* Products */,
+				563EACDCEB8B2B6FAAEAF845 /* Frameworks */,
+				762FF324936A3C56519C44AA /* Sources */,
+				9ADCC2267B8307178669FF45 /* Tests */,
+				3BBAB4C421D859BC040BE38A /* AppModel.swift */,
+				CEBF5D0F2E0D1749D891F7BB /* AppTabView.swift */,
+				EE51F5CA074C9F89713BB800 /* RootView.swift */,
+				C0637ACD334DB9BD95FD84E6 /* SprayWallApp.swift */,
+				67395567C5C228C4451D8B04 /* Attempt.swift */,
+				739BB619FE3755E4B37A8F36 /* CalibrationPoint.swift */,
+				A72C2BF3C1C31A4617FCC041 /* DomainEnums.swift */,
+				B85B0DB76CBBD5F1625EE4DD /* Hold.swift */,
+				BFFD925500184E90743FCEF8 /* ModelIdentifiableExtensions.swift */,
+				5A21C0869A3FC3CBAF3B6A4B /* Route.swift */,
+				B2250C6A81B9F7D0E1C4DF24 /* UserAccount.swift */,
+				94C1374EDB1F35CC9AAB29D7 /* WallCalibration.swift */,
+				F08C80FF59F373B39F11CC1E /* AuthService.swift */,
+				15117529C0CBE8AC8E6BBF46 /* IDService.swift */,
+				EF6394385675475F083462E8 /* ImageRectificationService.swift */,
+				8CE562AD7B5A971F2D2E46C4 /* ProjectArchiveService.swift */,
+				EDEEA88A69EE73D44EB12D1E /* CSVIntCodec.swift */,
+				CCA3BA80FAEDAD5A46A1DBB7 /* WallProjectPaths.swift */,
+				9AEDAD48A4D415EC8A60A0D8 /* WallSpec.swift */,
+				8B5D1180805B0CF7C79AE8FE /* AttemptLoggerView.swift */,
+				49C8A9663F5AD303D42E2F4A /* AuthView.swift */,
+				D7715D50A5C652FE456FD69D /* CalibrationView.swift */,
+				E5987DDEDDF5A8277B80B84A /* HoldDetailView.swift */,
+				11256870117C001CB59C57ED /* HoldEditorView.swift */,
+				ED868BE0F4C29D46BA6B0A3C /* RouteDetailView.swift */,
+				07E696930022F50E1CF168CF /* RouteEditorView.swift */,
+				4F4718E0494424E660831AC1 /* SettingsView.swift */,
+				35CBDE0DC68F3DCE1AAF330F /* HoldMarkerView.swift */,
+				6D3F506FFF1DB3F251771040 /* CSVIntCodecTests.swift */,
+				AF0996D7A5A45A2827542A6E /* ImageRectificationServiceTests.swift */,
+			);
+			sourceTree = "<group>";
+		};
+		563EACDCEB8B2B6FAAEAF845 /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				85ACFF29FE8AAD9B82AB5F7B /* iOS */,
+			);
+			name = Frameworks;
+			sourceTree = "<group>";
+		};
+		762FF324936A3C56519C44AA /* Sources */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			name = Sources;
+			sourceTree = "<group>";
+		};
+		823130E17C67DC0367AE5A74 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				C0C0303E19FA8DBA93B8CC05 /* SprayWall.app */,
+				2901E16777C4F6BA5596EDC1 /* SprayWallTests.xctest */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		85ACFF29FE8AAD9B82AB5F7B /* iOS */ = {
+			isa = PBXGroup;
+			children = (
+				D78A0B555AA5A6C05A2E0923 /* Foundation.framework */,
+			);
+			name = iOS;
+			sourceTree = "<group>";
+		};
+		9ADCC2267B8307178669FF45 /* Tests */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			name = Tests;
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		89DA974062B5072B8702C56D /* SprayWallTests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 13AED2D38346D7CC78108F5C /* Build configuration list for PBXNativeTarget "SprayWallTests" */;
+			buildPhases = (
+				8D50DB552D37D181216A14F7 /* Sources */,
+				54AB027CAC2543BF54F6D1B9 /* Frameworks */,
+				8C081D6CEA3A9D98A0780F8A /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				1711D9323339CFE5A72C6E59 /* PBXTargetDependency */,
+			);
+			name = SprayWallTests;
+			productName = SprayWallTests;
+			productReference = 2901E16777C4F6BA5596EDC1 /* SprayWallTests.xctest */;
+			productType = "com.apple.product-type.bundle.unit-test";
+		};
+		D3318BC92C1DFC6642D57755 /* SprayWall */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = ED8C7D250967560FC742F86C /* Build configuration list for PBXNativeTarget "SprayWall" */;
+			buildPhases = (
+				89B54CD3AE3F85A03E0879FF /* Sources */,
+				392CF10BA07895D9B374C557 /* Frameworks */,
+				3D64CF1BE24BE2140CA41747 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = SprayWall;
+			productName = SprayWall;
+			productReference = C0C0303E19FA8DBA93B8CC05 /* SprayWall.app */;
+			productType = "com.apple.product-type.application";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		E61CA0EC7E7101F762E60417 /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				LastSwiftUpdateCheck = 2640;
+				LastUpgradeCheck = 2640;
+			};
+			buildConfigurationList = C94D4CEDD783A540BDDDF42F /* Build configuration list for PBXProject "SprayWall" */;
+			compatibilityVersion = "Xcode 3.2";
+			developmentRegion = en;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				en,
+				Base,
+			);
+			mainGroup = 5526B106C278FC3F52E639B2;
+			minimizedProjectReferenceProxies = 0;
+			preferredProjectObjectVersion = 77;
+			productRefGroup = 823130E17C67DC0367AE5A74 /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				D3318BC92C1DFC6642D57755 /* SprayWall */,
+				89DA974062B5072B8702C56D /* SprayWallTests */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		3D64CF1BE24BE2140CA41747 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		8C081D6CEA3A9D98A0780F8A /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		89B54CD3AE3F85A03E0879FF /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				E0D4AD3679D02A4F7F386045 /* AppModel.swift in Sources */,
+				D60E7827714AECBE519A8DF1 /* AppTabView.swift in Sources */,
+				7455877B696BE99536648491 /* RootView.swift in Sources */,
+				34227E00706096C5F2D4A449 /* SprayWallApp.swift in Sources */,
+				56C9507389377D73646EEE1C /* Attempt.swift in Sources */,
+				67980D80AA507D4C532242F9 /* CalibrationPoint.swift in Sources */,
+				F9A14CD12211962DDAAB224A /* DomainEnums.swift in Sources */,
+				C627B1F49A7F833336844323 /* Hold.swift in Sources */,
+				857A1482770B5F6CCF3D6E54 /* ModelIdentifiableExtensions.swift in Sources */,
+				3F65B7B608D11C3D9E26F9A0 /* Route.swift in Sources */,
+				23FB099A9F4C6BA5B5F73045 /* UserAccount.swift in Sources */,
+				5C6B786391A01E4E76A0EA2F /* WallCalibration.swift in Sources */,
+				3741A6F32326FE46D0157532 /* AuthService.swift in Sources */,
+				63ECF255D739FD64D173A41C /* IDService.swift in Sources */,
+				884DD4BF5579257C2E59D18C /* ImageRectificationService.swift in Sources */,
+				E787CD941B0001E0B39AC73B /* ProjectArchiveService.swift in Sources */,
+				4879F9E86D893ED88A6D9E7C /* CSVIntCodec.swift in Sources */,
+				F5814AF0D557AB33F94E474E /* WallProjectPaths.swift in Sources */,
+				B73436C823217DA580B7F462 /* WallSpec.swift in Sources */,
+				41FDF4978FE6F3F5CFABF845 /* AttemptLoggerView.swift in Sources */,
+				9D03B8EE80407081E21893A9 /* AuthView.swift in Sources */,
+				A76485104B2946D1842C37DE /* CalibrationView.swift in Sources */,
+				155C29E123500AE1A1586FB1 /* HoldDetailView.swift in Sources */,
+				21068F46CD4A3992873E4B20 /* HoldEditorView.swift in Sources */,
+				731A3ED0CDA21F5721EA7C1C /* RouteDetailView.swift in Sources */,
+				09F7017BF6A4C75B40A94C2D /* RouteEditorView.swift in Sources */,
+				8FEB98F755B2B0FB6AD9CA31 /* SettingsView.swift in Sources */,
+				9D401DFC277CA969555FD773 /* HoldMarkerView.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		8D50DB552D37D181216A14F7 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				5DFDABD9F20395133141300A /* CSVIntCodecTests.swift in Sources */,
+				277FA35587DEB6120C81B042 /* ImageRectificationServiceTests.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin PBXTargetDependency section */
+		1711D9323339CFE5A72C6E59 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			name = SprayWall;
+			target = D3318BC92C1DFC6642D57755 /* SprayWall */;
+			targetProxy = 155D9767BAB9B84353AC2681 /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
+
+/* Begin XCBuildConfiguration section */
+		2506C3D5211E5D7C511E2A7C /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				ENABLE_NS_ASSERTIONS = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				MTL_ENABLE_DEBUG_INFO = NO;
+				MTL_FAST_MATH = YES;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_COMPILATION_MODE = wholemodule;
+				SWIFT_OPTIMIZATION_LEVEL = "-O";
+				SWIFT_VERSION = 5.0;
+			};
+			name = Release;
+		};
+		42DB4F21C54288A25E9E4060 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CLANG_ENABLE_OBJC_WEAK = NO;
+				CODE_SIGN_STYLE = Automatic;
+				GENERATE_INFOPLIST_FILE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
+				PRODUCT_BUNDLE_IDENTIFIER = com.spraywall.app.tests;
+				PRODUCT_NAME = SprayWallTests;
+				SDKROOT = iphoneos;
+				SWIFT_VERSION = 6.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/SprayWall.app/SprayWall";
+				VALIDATE_PRODUCT = YES;
+			};
+			name = Release;
+		};
+		92B1004465B69302C696826F /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CLANG_ENABLE_OBJC_WEAK = NO;
+				CODE_SIGN_STYLE = Automatic;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
+				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
+				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
+				PRODUCT_BUNDLE_IDENTIFIER = com.spraywall.app;
+				PRODUCT_NAME = SprayWall;
+				SDKROOT = iphoneos;
+				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 6.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				VALIDATE_PRODUCT = YES;
+			};
+			name = Release;
+		};
+		B9DECBE3F83B0CB0538D2FCC /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CLANG_ENABLE_OBJC_WEAK = NO;
+				CODE_SIGN_STYLE = Automatic;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
+				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
+				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
+				PRODUCT_BUNDLE_IDENTIFIER = com.spraywall.app;
+				PRODUCT_NAME = SprayWall;
+				SDKROOT = iphoneos;
+				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 6.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Debug;
+		};
+		E6ED92CCFFDCA707F5C8E3E4 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CLANG_ENABLE_OBJC_WEAK = NO;
+				CODE_SIGN_STYLE = Automatic;
+				GENERATE_INFOPLIST_FILE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
+				PRODUCT_BUNDLE_IDENTIFIER = com.spraywall.app.tests;
+				PRODUCT_NAME = SprayWallTests;
+				SDKROOT = iphoneos;
+				SWIFT_VERSION = 6.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/SprayWall.app/SprayWall";
+			};
+			name = Debug;
+		};
+		E84D653EA029B143FACE3AB0 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_TESTABILITY = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
+				MTL_FAST_MATH = YES;
+				ONLY_ACTIVE_ARCH = YES;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = DEBUG;
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+				SWIFT_VERSION = 5.0;
+			};
+			name = Debug;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		13AED2D38346D7CC78108F5C /* Build configuration list for PBXNativeTarget "SprayWallTests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				42DB4F21C54288A25E9E4060 /* Release */,
+				E6ED92CCFFDCA707F5C8E3E4 /* Debug */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		C94D4CEDD783A540BDDDF42F /* Build configuration list for PBXProject "SprayWall" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				E84D653EA029B143FACE3AB0 /* Debug */,
+				2506C3D5211E5D7C511E2A7C /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		ED8C7D250967560FC742F86C /* Build configuration list for PBXNativeTarget "SprayWall" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				92B1004465B69302C696826F /* Release */,
+				B9DECBE3F83B0CB0538D2FCC /* Debug */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+/* End XCConfigurationList section */
+	};
+	rootObject = E61CA0EC7E7101F762E60417 /* Project object */;
+}

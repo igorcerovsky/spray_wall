@@ -7,6 +7,10 @@ This repository now contains an initial SwiftUI + SwiftData scaffold for the Spr
 - iOS-first SwiftUI app architecture (package scaffold)
 - Multi-user auth (register/login)
 - Wall calibration screen with 8 reference points
+- In-app photo picking from the device photo library (imports to `wall_project/photo_original.jpg`)
+- Real image rectification pipeline:
+  - Perspective correction for main wall and kickboard using calibration points
+  - Output files: `main_wall_rectified.png` and `kickboard_rectified.png`
 - Hold editor:
   - Tap canvas to add hold
   - Drag hold to move
@@ -22,11 +26,15 @@ This repository now contains an initial SwiftUI + SwiftData scaffold for the Spr
   - JSON export/import for project data
   - Logout
 - SwiftData persistence (SQLite-backed)
+- Native Xcode project generator: `Tools/generate_xcodeproj.rb`
 
 ## Notes
 
-- Current environment has Xcode Command Line Tools only, so iOS simulator builds were not executed here.
-- Open in Xcode and run on iOS 17+ target.
+- Generate the native Xcode project with:
+  - `gem install --user-install xcodeproj` (or `bundle install`)
+  - `ruby Tools/generate_xcodeproj.rb`
+- Open `SprayWall.xcodeproj` in Xcode and run on iOS 17+ target.
+- `swift test` passes in this repository.
 
 ## Data model highlights
 
