@@ -33,6 +33,11 @@ This repository now contains an initial SwiftUI + SwiftData scaffold for the Spr
 - Generate the native Xcode project with:
   - `gem install --user-install xcodeproj` (or `bundle install`)
   - `ruby Tools/generate_xcodeproj.rb`
+- Build/test shortcuts:
+  - `make ios-build`
+  - `make ios-test`
+  - `make ios-destinations`
+  - CLI targets disable code signing (`CODE_SIGNING_ALLOWED=NO`) for local/CI validation.
 - Open `SprayWall.xcodeproj` in Xcode and run on iOS 17+ target.
 - `swift test` passes in this repository.
 
