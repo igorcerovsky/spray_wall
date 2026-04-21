@@ -6,8 +6,14 @@ struct HoldMarkerView: View {
     var size: CGFloat = 20
 
     var body: some View {
-        marker
-            .frame(width: markerSize.width, height: markerSize.height)
+        ZStack {
+            marker
+            RotationIndicatorShape(angleDeg: rotationIndicatorAngle)
+                .stroke(indicatorColor, style: StrokeStyle(lineWidth: 1.8, lineCap: .round))
+            RotationIndicatorTipShape(angleDeg: rotationIndicatorAngle)
+                .fill(indicatorColor)
+        }
+        .frame(width: markerSize.width, height: markerSize.height)
     }
 
     private var markerSize: CGSize {
@@ -21,7 +27,7 @@ struct HoldMarkerView: View {
                 .fill(fillColor)
                 .overlay {
                     RoundedRectangle(cornerRadius: 4)
-                        .stroke(.black.opacity(0.7), lineWidth: 1)
+                        .stroke(strokeColor, lineWidth: 1.2)
                 }
                 .rotationEffect(.degrees(90))
         } else if hold.isTop {
@@ -29,7 +35,7 @@ struct HoldMarkerView: View {
                 .fill(fillColor)
                 .overlay {
                     RoundedRectangle(cornerRadius: 4)
-                        .stroke(.black.opacity(0.7), lineWidth: 1)
+                        .stroke(strokeColor, lineWidth: 1.2)
                 }
         } else {
             switch hold.role {
@@ -37,44 +43,65 @@ struct HoldMarkerView: View {
                 Circle()
                     .fill(fillColor)
                     .overlay {
-                        Circle().stroke(.black.opacity(0.7), lineWidth: 1)
+                        Circle().stroke(strokeColor, lineWidth: 1.2)
                     }
             case .foot:
                 Triangle()
                     .fill(fillColor)
                     .overlay {
-                        Triangle().stroke(.black.opacity(0.7), lineWidth: 1)
+                        Triangle().stroke(strokeColor, lineWidth: 1.2)
                     }
             case .microFoot:
                 Circle()
                     .fill(fillColor)
                     .overlay {
-                        Circle().stroke(.black.opacity(0.7), lineWidth: 1)
+                        Circle().stroke(strokeColor, lineWidth: 1.2)
                     }
             }
         }
     }
 
     private var fillColor: Color {
+        let baseColor: Color
         if colorBlindMode {
-            return .white
+            baseColor = .white
+        } else if hold.isStart {
+            baseColor = .green
+        } else if hold.isTop {
+            baseColor = .red
+        } else {
+            switch hold.role {
+            case .hand:
+                baseColor = .blue
+            case .foot:
+                baseColor = .yellow
+            case .microFoot:
+                baseColor = .orange
+            }
         }
 
-        if hold.isStart {
-            return .green
-        }
+        return baseColor.opacity(0.18)
+    }
 
-        if hold.isTop {
-            return .red
+    private var strokeColor: Color {
+        colorBlindMode ? .black.opacity(0.75) : .white.opacity(0.85)
+    }
+
+    private var indicatorColor: Color {
+        colorBlindMode ? .black.opacity(0.9) : .white.opacity(0.95)
+    }
+
+    private var rotationIndicatorAngle: Double {
+        let orderedGrips = hold.grips.sorted { $0.createdAt < $1.createdAt }
+        if let primaryGrip = orderedGrips.first {
+            return primaryGrip.angleDeg
         }
 
         switch hold.role {
         case .hand:
-            return .blue
-        case .foot:
-            return .yellow
-        case .microFoot:
-            return .orange
+            return 210
+        case .foot, .microFoot:
+            return 180
         }
     }
 }
@@ -87,5 +114,46 @@ private struct Triangle: Shape {
         path.addLine(to: CGPoint(x: rect.minX, y: rect.maxY))
         path.closeSubpath()
         return path
+    }
+}
+
+private struct RotationIndicatorShape: Shape {
+    let angleDeg: Double
+
+    func path(in rect: CGRect) -> Path {
+        let center = CGPoint(x: rect.midX, y: rect.midY)
+        let radius = min(rect.width, rect.height) * 0.32
+        let radians = angleDeg * .pi / 180
+        let end = CGPoint(
+            x: center.x + cos(radians) * radius,
+            y: center.y - sin(radians) * radius
+        )
+
+        var path = Path()
+        path.move(to: center)
+        path.addLine(to: end)
+        return path
+    }
+}
+
+private struct RotationIndicatorTipShape: Shape {
+    let angleDeg: Double
+
+    func path(in rect: CGRect) -> Path {
+        let center = CGPoint(x: rect.midX, y: rect.midY)
+        let radius = min(rect.width, rect.height) * 0.32
+        let radians = angleDeg * .pi / 180
+        let tipCenter = CGPoint(
+            x: center.x + cos(radians) * radius,
+            y: center.y - sin(radians) * radius
+        )
+        let tipRadius = max(1.8, min(rect.width, rect.height) * 0.08)
+
+        return Path(ellipseIn: CGRect(
+            x: tipCenter.x - tipRadius,
+            y: tipCenter.y - tipRadius,
+            width: tipRadius * 2,
+            height: tipRadius * 2
+        ))
     }
 }

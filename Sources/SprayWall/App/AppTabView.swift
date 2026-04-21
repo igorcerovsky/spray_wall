@@ -17,17 +17,11 @@ struct AppTabView: View {
                 }
                 .tag(AppModel.AppTab.holds)
 
-            RouteEditorView()
+            BoulderListView()
                 .tabItem {
-                    Label(AppModel.AppTab.routes.title, systemImage: AppModel.AppTab.routes.systemImage)
+                    Label(AppModel.AppTab.boulder.title, systemImage: AppModel.AppTab.boulder.systemImage)
                 }
-                .tag(AppModel.AppTab.routes)
-
-            AttemptLoggerView()
-                .tabItem {
-                    Label(AppModel.AppTab.attempts.title, systemImage: AppModel.AppTab.attempts.systemImage)
-                }
-                .tag(AppModel.AppTab.attempts)
+                .tag(AppModel.AppTab.boulder)
 
             SettingsView()
                 .tabItem {

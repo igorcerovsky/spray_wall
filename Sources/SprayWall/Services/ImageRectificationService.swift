@@ -12,6 +12,7 @@ struct RectificationOutput {
 
 enum ImageRectificationError: Error, LocalizedError {
     case missingPoint(String)
+    case invalidWorldMapping(String)
     case invalidImage(URL)
     case filterFailure(String)
     case renderFailure(String)
@@ -21,6 +22,8 @@ enum ImageRectificationError: Error, LocalizedError {
         switch self {
         case let .missingPoint(id):
             return "Missing calibration point: \(id)"
+        case let .invalidWorldMapping(message):
+            return "Invalid world coordinate mapping: \(message)"
         case let .invalidImage(url):
             return "Could not load image from: \(url.path)"
         case let .filterFailure(message):
@@ -34,36 +37,54 @@ enum ImageRectificationError: Error, LocalizedError {
 }
 
 enum ImageRectificationService {
+    private typealias Quad = (
+        topLeft: CGPoint,
+        topRight: CGPoint,
+        bottomLeft: CGPoint,
+        bottomRight: CGPoint
+    )
+
+    private struct RectificationPair {
+        var image: CGPoint
+        var world: CGPoint
+    }
+
+    private struct RectificationMapping {
+        var quad: Quad
+        var targetSize: CGSize
+    }
+
     static func rectify(
         photoURL: URL,
         points: [CalibrationPoint],
         outputDirectory: URL
     ) throws -> RectificationOutput {
         let inputImage = try loadImage(at: photoURL)
-        let imageHeight = inputImage.extent.height
 
         let pointLookup = Dictionary(uniqueKeysWithValues: points.map { ($0.id, $0) })
 
-        let kickboardQuad = try quad(
-            topLeft: point(id: "kb_tl", from: pointLookup, imageHeight: imageHeight),
-            topRight: point(id: "kb_tr", from: pointLookup, imageHeight: imageHeight),
-            bottomLeft: point(id: "kb_bl", from: pointLookup, imageHeight: imageHeight),
-            bottomRight: point(id: "kb_br", from: pointLookup, imageHeight: imageHeight)
+        let kickboardMapping = try mapping(
+            from: pairs(
+                ids: ["kb_tl", "kb_tr", "kb_bl", "kb_br"],
+                from: pointLookup
+            ),
+            label: "kickboard"
         )
 
-        let mainWallQuad = try quad(
-            topLeft: point(id: "mw_tl", from: pointLookup, imageHeight: imageHeight),
-            topRight: point(id: "mw_tr", from: pointLookup, imageHeight: imageHeight),
-            bottomLeft: point(id: "mw_bl", from: pointLookup, imageHeight: imageHeight),
-            bottomRight: point(id: "mw_br", from: pointLookup, imageHeight: imageHeight)
+        let mainWallMapping = try mapping(
+            from: pairs(
+                ids: ["mw_tl", "mw_tr", "mw_bl", "mw_br"],
+                from: pointLookup
+            ),
+            label: "main wall"
         )
 
         try FileManager.default.createDirectory(at: outputDirectory, withIntermediateDirectories: true)
 
         let context = CIContext(options: [.cacheIntermediates: false])
 
-        let mainWallCorrected = try perspectiveCorrected(inputImage: inputImage, quad: mainWallQuad)
-        let kickboardCorrected = try perspectiveCorrected(inputImage: inputImage, quad: kickboardQuad)
+        let mainWallCorrected = try perspectiveCorrected(inputImage: inputImage, quad: mainWallMapping.quad)
+        let kickboardCorrected = try perspectiveCorrected(inputImage: inputImage, quad: kickboardMapping.quad)
 
         let mainWallURL = outputDirectory.appendingPathComponent("main_wall_rectified.png")
         let kickboardURL = outputDirectory.appendingPathComponent("kickboard_rectified.png")
@@ -73,20 +94,14 @@ enum ImageRectificationService {
 
         let mainWallImage = try renderAndResize(
             image: mainWallCorrected,
-            targetSize: CGSize(
-                width: WallSpec.widthCm * WallSpec.rectifiedPixelsPerCm,
-                height: WallSpec.mainWallHeightCm * WallSpec.rectifiedPixelsPerCm
-            ),
+            targetSize: mainWallMapping.targetSize,
             context: context,
             label: "main wall"
         )
 
         let kickboardImage = try renderAndResize(
             image: kickboardCorrected,
-            targetSize: CGSize(
-                width: WallSpec.widthCm * WallSpec.rectifiedPixelsPerCm,
-                height: WallSpec.kickboardHeightCm * WallSpec.rectifiedPixelsPerCm
-            ),
+            targetSize: kickboardMapping.targetSize,
             context: context,
             label: "kickboard"
         )
@@ -109,30 +124,94 @@ enum ImageRectificationService {
         return image
     }
 
-    private static func point(
+    private static func pairs(
+        ids: [String],
+        from lookup: [String: CalibrationPoint]
+    ) throws -> [RectificationPair] {
+        try ids.map { id in
+            try pair(id: id, from: lookup)
+        }
+    }
+
+    private static func pair(
         id: String,
-        from lookup: [String: CalibrationPoint],
-        imageHeight: CGFloat
-    ) throws -> CGPoint {
+        from lookup: [String: CalibrationPoint]
+    ) throws -> RectificationPair {
         guard let point = lookup[id] else {
             throw ImageRectificationError.missingPoint(id)
         }
 
-        return CGPoint(x: point.xPx, y: imageHeight - point.yPx)
+        return RectificationPair(
+            image: CGPoint(x: point.xPx, y: point.yPx),
+            world: CGPoint(x: point.xCm, y: point.yCm)
+        )
     }
 
-    private static func quad(
-        topLeft: CGPoint,
-        topRight: CGPoint,
-        bottomLeft: CGPoint,
-        bottomRight: CGPoint
-    ) throws -> (topLeft: CGPoint, topRight: CGPoint, bottomLeft: CGPoint, bottomRight: CGPoint) {
-        (topLeft, topRight, bottomLeft, bottomRight)
+    private static func mapping(from pairs: [RectificationPair], label: String) throws -> RectificationMapping {
+        guard pairs.count == 4 else {
+            throw ImageRectificationError.invalidWorldMapping("Expected 4 points for \(label)")
+        }
+
+        let worldX = pairs.map(\.world.x)
+        let worldY = pairs.map(\.world.y)
+
+        guard let minX = worldX.min(),
+              let maxX = worldX.max(),
+              let minY = worldY.min(),
+              let maxY = worldY.max()
+        else {
+            throw ImageRectificationError.invalidWorldMapping("Missing world coordinates for \(label)")
+        }
+
+        let widthCm = maxX - minX
+        let heightCm = maxY - minY
+        guard widthCm > 0, heightCm > 0 else {
+            throw ImageRectificationError.invalidWorldMapping("Non-positive world area for \(label)")
+        }
+
+        var remaining = pairs
+        let topLeft = try popClosestPair(to: CGPoint(x: minX, y: maxY), from: &remaining, label: label)
+        let topRight = try popClosestPair(to: CGPoint(x: maxX, y: maxY), from: &remaining, label: label)
+        let bottomLeft = try popClosestPair(to: CGPoint(x: minX, y: minY), from: &remaining, label: label)
+        let bottomRight = try popClosestPair(to: CGPoint(x: maxX, y: minY), from: &remaining, label: label)
+
+        return RectificationMapping(
+            quad: (
+                topLeft: topLeft.image,
+                topRight: topRight.image,
+                bottomLeft: bottomLeft.image,
+                bottomRight: bottomRight.image
+            ),
+            targetSize: CGSize(
+                width: widthCm * WallSpec.rectifiedPixelsPerCm,
+                height: heightCm * WallSpec.rectifiedPixelsPerCm
+            )
+        )
+    }
+
+    private static func popClosestPair(
+        to target: CGPoint,
+        from pairs: inout [RectificationPair],
+        label: String
+    ) throws -> RectificationPair {
+        guard let closestIndex = pairs.indices.min(by: { left, right in
+            squaredDistance(from: pairs[left].world, to: target) < squaredDistance(from: pairs[right].world, to: target)
+        }) else {
+            throw ImageRectificationError.invalidWorldMapping("Could not resolve corners for \(label)")
+        }
+
+        return pairs.remove(at: closestIndex)
+    }
+
+    private static func squaredDistance(from lhs: CGPoint, to rhs: CGPoint) -> CGFloat {
+        let dx = lhs.x - rhs.x
+        let dy = lhs.y - rhs.y
+        return dx * dx + dy * dy
     }
 
     private static func perspectiveCorrected(
         inputImage: CIImage,
-        quad: (topLeft: CGPoint, topRight: CGPoint, bottomLeft: CGPoint, bottomRight: CGPoint)
+        quad: Quad
     ) throws -> CIImage {
         guard let filter = CIFilter(name: "CIPerspectiveCorrection") else {
             throw ImageRectificationError.filterFailure("CIPerspectiveCorrection unavailable")

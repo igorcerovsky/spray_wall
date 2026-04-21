@@ -5,6 +5,17 @@ import SwiftData
 @MainActor
 @Observable
 final class AppModel {
+    private static let lastLoggedInEmailKey = "spraywall.last_logged_in_email"
+    private static let lastLoggedInUserSnapshotKey = "spraywall.last_logged_in_user_snapshot"
+
+    private struct PersistedUserSnapshot: Codable {
+        var id: UUID
+        var email: String
+        var displayName: String
+        var passwordHash: String
+        var createdAt: Date
+    }
+
     enum AuthMode: String, CaseIterable, Identifiable {
         case login
         case register
@@ -15,8 +26,7 @@ final class AppModel {
     enum AppTab: String, CaseIterable, Identifiable {
         case calibration
         case holds
-        case routes
-        case attempts
+        case boulder
         case settings
 
         var id: String { rawValue }
@@ -27,10 +37,8 @@ final class AppModel {
                 return "Calibration"
             case .holds:
                 return "Holds"
-            case .routes:
-                return "Routes"
-            case .attempts:
-                return "Attempts"
+            case .boulder:
+                return "Boulder"
             case .settings:
                 return "Settings"
             }
@@ -42,10 +50,8 @@ final class AppModel {
                 return "viewfinder"
             case .holds:
                 return "circle.grid.cross"
-            case .routes:
-                return "point.topleft.down.curvedto.point.bottomright.up"
-            case .attempts:
-                return "checklist"
+            case .boulder:
+                return "slider.horizontal.3"
             case .settings:
                 return "gear"
             }
@@ -54,6 +60,8 @@ final class AppModel {
 
     var authMode: AuthMode = .login
     var selectedTab: AppTab = .calibration
+
+    var didBootstrap = true
 
     var currentUser: UserAccount?
     var authErrorMessage: String?
@@ -72,6 +80,7 @@ final class AppModel {
                 context: context
             )
             authErrorMessage = nil
+            persistLoggedInUser()
         } catch {
             authErrorMessage = error.localizedDescription
         }
@@ -81,6 +90,7 @@ final class AppModel {
         do {
             currentUser = try AuthService.login(email: email, password: password, context: context)
             authErrorMessage = nil
+            persistLoggedInUser()
         } catch {
             authErrorMessage = error.localizedDescription
         }
@@ -93,13 +103,47 @@ final class AppModel {
 
     func bootstrap(context: ModelContext) {
         if currentUser != nil {
+            didBootstrap = true
             return
         }
 
-        let descriptor = FetchDescriptor<UserAccount>(sortBy: [SortDescriptor(\.createdAt)])
-        if let first = try? context.fetch(descriptor).first {
-            currentUser = first
+        try? HoldMigrationService.migrateToCurrentVersion(context: context)
+
+        let persistedEmail = UserDefaults.standard.string(forKey: Self.lastLoggedInEmailKey)?
+            .trimmingCharacters(in: .whitespacesAndNewlines)
+            .lowercased()
+
+        if let persistedEmail, !persistedEmail.isEmpty {
+            let descriptor = FetchDescriptor<UserAccount>(sortBy: [SortDescriptor(\.createdAt)])
+            if let account = try? context.fetch(descriptor).first(where: { $0.email == persistedEmail }) {
+                currentUser = account
+                persistLoggedInUser()
+                return
+            }
+
+            if let restored = restoreLastUserSnapshotIfNeeded(email: persistedEmail, context: context) {
+                currentUser = restored
+                persistLoggedInUser()
+                return
+            }
         }
+
+        // Migration fallback for older installs that don't have persisted login key yet.
+        let fallbackDescriptor = FetchDescriptor<UserAccount>(sortBy: [SortDescriptor(\.createdAt, order: .reverse)])
+        if let fallbackUser = try? context.fetch(fallbackDescriptor).first {
+            currentUser = fallbackUser
+            persistLoggedInUser()
+            didBootstrap = true
+            return
+        }
+
+        // Last resort: restore from snapshot even if persisted email key is missing.
+        if let restored = restoreLastUserSnapshotIfNeeded(email: nil, context: context) {
+            currentUser = restored
+            persistLoggedInUser()
+        }
+
+        didBootstrap = true
     }
 
     func ensureCalibrationExists(context: ModelContext) {
@@ -109,5 +153,70 @@ final class AppModel {
             context.insert(calibration)
             try? context.save()
         }
+    }
+
+    private func persistLoggedInUser() {
+        guard let user = currentUser else {
+            return
+        }
+
+        let email = user.email.trimmingCharacters(in: .whitespacesAndNewlines).lowercased()
+        guard !email.isEmpty else {
+            return
+        }
+
+        let snapshot = PersistedUserSnapshot(
+            id: user.id,
+            email: email,
+            displayName: user.displayName,
+            passwordHash: user.passwordHash,
+            createdAt: user.createdAt
+        )
+
+        guard let encodedSnapshot = try? JSONEncoder().encode(snapshot) else {
+            UserDefaults.standard.set(email, forKey: Self.lastLoggedInEmailKey)
+            return
+        }
+
+        UserDefaults.standard.set(email, forKey: Self.lastLoggedInEmailKey)
+        UserDefaults.standard.set(encodedSnapshot, forKey: Self.lastLoggedInUserSnapshotKey)
+    }
+
+    private func restoreLastUserSnapshotIfNeeded(email: String?, context: ModelContext) -> UserAccount? {
+        guard let snapshotData = UserDefaults.standard.data(forKey: Self.lastLoggedInUserSnapshotKey),
+              let snapshot = try? JSONDecoder().decode(PersistedUserSnapshot.self, from: snapshotData)
+        else {
+            return nil
+        }
+
+        let normalizedSnapshotEmail = snapshot.email.trimmingCharacters(in: .whitespacesAndNewlines).lowercased()
+        guard !normalizedSnapshotEmail.isEmpty else {
+            return nil
+        }
+
+        if let email, normalizedSnapshotEmail != email {
+            return nil
+        }
+
+        let descriptor = FetchDescriptor<UserAccount>(sortBy: [SortDescriptor(\.createdAt)])
+        if let existing = try? context.fetch(descriptor).first(where: { $0.email == normalizedSnapshotEmail }) {
+            return existing
+        }
+
+        let restored = UserAccount(
+            id: snapshot.id,
+            email: normalizedSnapshotEmail,
+            displayName: snapshot.displayName,
+            passwordHash: snapshot.passwordHash,
+            createdAt: snapshot.createdAt
+        )
+        context.insert(restored)
+        try? context.save()
+        return restored
+    }
+
+    private func clearPersistedLogin() {
+        UserDefaults.standard.removeObject(forKey: Self.lastLoggedInEmailKey)
+        UserDefaults.standard.removeObject(forKey: Self.lastLoggedInUserSnapshotKey)
     }
 }

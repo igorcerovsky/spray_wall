@@ -43,3 +43,36 @@ enum AttemptResult: String, Codable, CaseIterable, Identifiable {
         rawValue.capitalized
     }
 }
+
+enum BoulderStatus: String, Codable, CaseIterable, Identifiable {
+    case draft
+    case established
+
+    var id: String { rawValue }
+
+    var displayName: String {
+        rawValue.capitalized
+    }
+}
+
+enum BoulderHoldGroup: String, Codable, CaseIterable, Identifiable {
+    case start
+    case hold
+    case foothold
+    case top
+
+    var id: String { rawValue }
+
+    var displayName: String {
+        switch self {
+        case .start:
+            return "Start"
+        case .hold:
+            return "Hold"
+        case .foothold:
+            return "Foothold"
+        case .top:
+            return "Top"
+        }
+    }
+}

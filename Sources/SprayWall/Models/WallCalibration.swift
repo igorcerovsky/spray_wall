@@ -3,6 +3,8 @@ import SwiftData
 
 @Model
 final class WallCalibration {
+    static let defaultPhotoPath = "/Users/igorcerovsky/Documents/spray_wall/wall.jpg"
+
     @Attribute(.unique) var id: UUID
     var photoPath: String
     var pointsJSON: String
@@ -11,7 +13,7 @@ final class WallCalibration {
 
     init(
         id: UUID = UUID(),
-        photoPath: String = "",
+        photoPath: String = WallCalibration.defaultPhotoPath,
         points: [CalibrationPoint] = CalibrationPointTemplates.all,
         createdAt: Date = .now,
         updatedAt: Date = .now
@@ -46,6 +48,6 @@ final class WallCalibration {
         else {
             return CalibrationPointTemplates.all
         }
-        return points
+        return CalibrationPointTemplates.normalized(points)
     }
 }

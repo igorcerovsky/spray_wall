@@ -16,14 +16,14 @@ func rectificationWritesExpectedSizes() throws {
     try makeSyntheticImage(at: inputPhotoURL, size: CGSize(width: 1200, height: 900))
 
     let points: [CalibrationPoint] = [
-        CalibrationPoint(id: "kb_bl", label: "", xPx: 110, yPx: 790),
-        CalibrationPoint(id: "kb_br", label: "", xPx: 1090, yPx: 780),
-        CalibrationPoint(id: "kb_tl", label: "", xPx: 130, yPx: 700),
-        CalibrationPoint(id: "kb_tr", label: "", xPx: 1070, yPx: 695),
-        CalibrationPoint(id: "mw_bl", label: "", xPx: 130, yPx: 700),
-        CalibrationPoint(id: "mw_br", label: "", xPx: 1070, yPx: 695),
-        CalibrationPoint(id: "mw_tl", label: "", xPx: 260, yPx: 120),
-        CalibrationPoint(id: "mw_tr", label: "", xPx: 900, yPx: 118)
+        CalibrationPoint(id: "kb_bl", label: "", xPx: 110, yPx: 790, xCm: 0, yCm: 0),
+        CalibrationPoint(id: "kb_br", label: "", xPx: 1090, yPx: 780, xCm: 360, yCm: 0),
+        CalibrationPoint(id: "kb_tl", label: "", xPx: 130, yPx: 700, xCm: 0, yCm: 40),
+        CalibrationPoint(id: "kb_tr", label: "", xPx: 1070, yPx: 695, xCm: 360, yCm: 40),
+        CalibrationPoint(id: "mw_bl", label: "", xPx: 130, yPx: 700, xCm: 0, yCm: 40),
+        CalibrationPoint(id: "mw_br", label: "", xPx: 1070, yPx: 695, xCm: 360, yCm: 40),
+        CalibrationPoint(id: "mw_tl", label: "", xPx: 260, yPx: 120, xCm: 0, yCm: 360),
+        CalibrationPoint(id: "mw_tr", label: "", xPx: 900, yPx: 118, xCm: 360, yCm: 360)
     ]
 
     let output = try ImageRectificationService.rectify(
@@ -40,6 +40,42 @@ func rectificationWritesExpectedSizes() throws {
 
     #expect(kickboardSize.width == Int(WallSpec.widthCm * WallSpec.rectifiedPixelsPerCm))
     #expect(kickboardSize.height == Int(WallSpec.kickboardHeightCm * WallSpec.rectifiedPixelsPerCm))
+}
+
+@Test("Rectification dimensions follow world coordinate spans")
+func rectificationUsesWorldCoordinatePairs() throws {
+    let root = URL(fileURLWithPath: NSTemporaryDirectory(), isDirectory: true)
+        .appendingPathComponent("spraywall-rectification-world-\(UUID().uuidString)", isDirectory: true)
+    let outputDirectory = root.appendingPathComponent("wall_project", isDirectory: true)
+    let inputPhotoURL = root.appendingPathComponent("photo.png")
+
+    try FileManager.default.createDirectory(at: root, withIntermediateDirectories: true)
+    try makeSyntheticImage(at: inputPhotoURL, size: CGSize(width: 1200, height: 900))
+
+    let points: [CalibrationPoint] = [
+        CalibrationPoint(id: "kb_bl", label: "", xPx: 110, yPx: 790, xCm: 0, yCm: 0),
+        CalibrationPoint(id: "kb_br", label: "", xPx: 1090, yPx: 780, xCm: 180, yCm: 0),
+        CalibrationPoint(id: "kb_tl", label: "", xPx: 130, yPx: 700, xCm: 0, yCm: 20),
+        CalibrationPoint(id: "kb_tr", label: "", xPx: 1070, yPx: 695, xCm: 180, yCm: 20),
+        CalibrationPoint(id: "mw_bl", label: "", xPx: 130, yPx: 700, xCm: 0, yCm: 20),
+        CalibrationPoint(id: "mw_br", label: "", xPx: 1070, yPx: 695, xCm: 180, yCm: 20),
+        CalibrationPoint(id: "mw_tl", label: "", xPx: 260, yPx: 120, xCm: 0, yCm: 180),
+        CalibrationPoint(id: "mw_tr", label: "", xPx: 900, yPx: 118, xCm: 180, yCm: 180)
+    ]
+
+    let output = try ImageRectificationService.rectify(
+        photoURL: inputPhotoURL,
+        points: points,
+        outputDirectory: outputDirectory
+    )
+
+    let mainSize = try imageSize(at: output.mainWallURL)
+    let kickboardSize = try imageSize(at: output.kickboardURL)
+
+    #expect(mainSize.width == Int(180 * WallSpec.rectifiedPixelsPerCm))
+    #expect(mainSize.height == Int(160 * WallSpec.rectifiedPixelsPerCm))
+    #expect(kickboardSize.width == Int(180 * WallSpec.rectifiedPixelsPerCm))
+    #expect(kickboardSize.height == Int(20 * WallSpec.rectifiedPixelsPerCm))
 }
 
 @Test("Rectification fails if calibration points are missing")
