@@ -20,7 +20,6 @@ struct BoulderEditorView: View {
     var body: some View {
         List {
             Section("Boulder") {
-                LabeledContent("ID", value: "#\(boulder.boulderID)")
                 TextField("Name", text: $name)
                 TextField("Grade", text: $grade)
                 LabeledContent("Setter", value: setter.isEmpty ? "-" : setter)
@@ -99,7 +98,7 @@ struct BoulderEditorView: View {
                 }
             }
         }
-        .navigationTitle("Boulder #\(boulder.boulderID)")
+        .navigationTitle("Boulder")
         .task {
             load()
         }
