@@ -8,6 +8,7 @@ struct ProjectArchive: Codable {
     var calibration: CalibrationDTO?
     var users: [UserAccountDTO]
     var holds: [HoldDTO]
+    var boulders: [BoulderDTO]
     var routes: [RouteDTO]
     var attempts: [AttemptDTO]
 }
@@ -57,6 +58,26 @@ struct GripDTO: Codable {
     var createdAt: Date
 }
 
+struct BoulderDTO: Codable {
+    var boulderID: Int
+    var name: String
+    var status: String
+    var startHoldIDs: [Int]
+    var holdIDs: [Int]
+    var footholdIDs: [Int]
+    var topHoldIDs: [Int]
+    var grade: String
+    var setter: String
+    var tags: String
+    var notes: String
+    var rating: Int?
+    var attemptCount: Int
+    var ascentLogged: Bool
+    var ascentLoggedAt: Date?
+    var createdAt: Date
+    var updatedAt: Date
+}
+
 struct RouteDTO: Codable {
     var routeID: Int
     var name: String
@@ -97,12 +118,13 @@ enum ProjectArchiveService {
     static func exportArchive(context: ModelContext) throws -> ProjectArchive {
         let users = try context.fetch(FetchDescriptor<UserAccount>())
         let holds = try context.fetch(FetchDescriptor<Hold>())
+        let boulders = try context.fetch(FetchDescriptor<Boulder>())
         let routes = try context.fetch(FetchDescriptor<Route>())
         let attempts = try context.fetch(FetchDescriptor<Attempt>())
         let calibration = try context.fetch(FetchDescriptor<WallCalibration>()).first
 
         return ProjectArchive(
-            version: 1,
+            version: 2,
             exportedAt: .now,
             geometry: GeometryDTO(
                 wallWidthCm: WallSpec.widthCm,
@@ -149,6 +171,27 @@ enum ProjectArchiveService {
                             createdAt: $0.createdAt
                         )
                     }
+                )
+            },
+            boulders: boulders.map {
+                BoulderDTO(
+                    boulderID: $0.boulderID,
+                    name: $0.name,
+                    status: $0.statusRaw,
+                    startHoldIDs: $0.startHoldIDs,
+                    holdIDs: $0.holdIDs,
+                    footholdIDs: $0.footholdIDs,
+                    topHoldIDs: $0.topHoldIDs,
+                    grade: $0.grade,
+                    setter: $0.setter,
+                    tags: $0.tags,
+                    notes: $0.notes,
+                    rating: $0.rating,
+                    attemptCount: $0.attemptCount,
+                    ascentLogged: $0.ascentLogged,
+                    ascentLoggedAt: $0.ascentLoggedAt,
+                    createdAt: $0.createdAt,
+                    updatedAt: $0.updatedAt
                 )
             },
             routes: routes.map {
@@ -257,6 +300,54 @@ enum ProjectArchiveService {
                     context.insert(grip)
                     hold.grips.append(grip)
                 }
+            }
+        }
+
+        for dto in archive.boulders {
+            let id = dto.boulderID
+            let descriptor = FetchDescriptor<Boulder>(
+                predicate: #Predicate<Boulder> { boulder in
+                    boulder.boulderID == id
+                }
+            )
+
+            if let boulder = try context.fetch(descriptor).first {
+                boulder.name = dto.name
+                boulder.statusRaw = dto.status
+                boulder.startHoldIDs = dto.startHoldIDs
+                boulder.holdIDs = dto.holdIDs
+                boulder.footholdIDs = dto.footholdIDs
+                boulder.topHoldIDs = dto.topHoldIDs
+                boulder.grade = dto.grade
+                boulder.setter = dto.setter
+                boulder.tags = dto.tags
+                boulder.notes = dto.notes
+                boulder.rating = Boulder.clampedRating(dto.rating ?? 0)
+                boulder.attemptCount = dto.attemptCount
+                boulder.ascentLogged = dto.ascentLogged
+                boulder.ascentLoggedAt = dto.ascentLoggedAt
+                boulder.updatedAt = dto.updatedAt
+            } else {
+                let boulder = Boulder(
+                    boulderID: dto.boulderID,
+                    name: dto.name,
+                    status: BoulderStatus(rawValue: dto.status) ?? .draft,
+                    startHoldIDs: dto.startHoldIDs,
+                    holdIDs: dto.holdIDs,
+                    footholdIDs: dto.footholdIDs,
+                    topHoldIDs: dto.topHoldIDs,
+                    grade: dto.grade,
+                    setter: dto.setter,
+                    tags: dto.tags,
+                    notes: dto.notes,
+                    rating: Boulder.clampedRating(dto.rating ?? 0),
+                    attemptCount: dto.attemptCount,
+                    ascentLogged: dto.ascentLogged,
+                    ascentLoggedAt: dto.ascentLoggedAt,
+                    createdAt: dto.createdAt,
+                    updatedAt: dto.updatedAt
+                )
+                context.insert(boulder)
             }
         }
 

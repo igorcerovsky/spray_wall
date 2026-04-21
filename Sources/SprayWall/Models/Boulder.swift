@@ -17,6 +17,8 @@ final class Boulder {
     var setter: String
     var tags: String
     var notes: String
+    // Optional backing value keeps store migration lightweight for older DBs.
+    var ratingValue: Int?
     var attemptCount: Int
     var ascentLogged: Bool
     var ascentLoggedAt: Date?
@@ -36,6 +38,7 @@ final class Boulder {
         setter: String = "",
         tags: String = "",
         notes: String = "",
+        rating: Int = 0,
         attemptCount: Int = 0,
         ascentLogged: Bool = false,
         ascentLoggedAt: Date? = nil,
@@ -53,6 +56,7 @@ final class Boulder {
         self.setter = setter
         self.tags = tags
         self.notes = notes
+        self.ratingValue = Self.clampedRating(rating)
         self.attemptCount = attemptCount
         self.ascentLogged = ascentLogged
         self.ascentLoggedAt = ascentLoggedAt
@@ -96,6 +100,14 @@ final class Boulder {
         get { CSVIntCodec.decode(topHoldIDsCSV) }
         set {
             topHoldIDsCSV = CSVIntCodec.encode(newValue)
+            touch()
+        }
+    }
+
+    var rating: Int {
+        get { Self.clampedRating(ratingValue ?? 0) }
+        set {
+            ratingValue = Self.clampedRating(newValue)
             touch()
         }
     }
@@ -264,5 +276,9 @@ final class Boulder {
 
     private func touch() {
         updatedAt = .now
+    }
+
+    static func clampedRating(_ value: Int) -> Int {
+        min(max(value, 0), 5)
     }
 }

@@ -41,7 +41,7 @@ struct BoulderListView: View {
                                 }
 
                                 HStack {
-                                    Text("Difficulty: \(displayDifficulty(for: boulder))")
+                                    Text(displayDifficulty(for: boulder))
                                         .font(.footnote.weight(.bold))
                                     Spacer()
                                     Text("Ascents: \(totalAscents(for: boulder))")
@@ -49,9 +49,9 @@ struct BoulderListView: View {
                                         .foregroundStyle(.secondary)
                                 }
 
-                                Text("#\(boulder.boulderID)")
+                                Text(stars(for: boulder.rating))
                                     .font(.footnote)
-                                    .foregroundStyle(.secondary)
+                                    .foregroundStyle(.yellow)
                             }
                         }
                     }
@@ -93,6 +93,11 @@ struct BoulderListView: View {
 
     private func totalAscents(for boulder: Boulder) -> Int {
         boulder.ascentLogged ? 1 : 0
+    }
+
+    private func stars(for rating: Int) -> String {
+        let clamped = Boulder.clampedRating(rating)
+        return String(repeating: "★", count: clamped) + String(repeating: "☆", count: 5 - clamped)
     }
 
     private func addBoulder() {

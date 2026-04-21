@@ -1,3 +1,4 @@
+import Foundation
 import SwiftData
 import SwiftUI
 
@@ -16,15 +17,23 @@ struct SprayWallApp: App {
         ])
 
         let fallbackDirectory = URL(fileURLWithPath: NSTemporaryDirectory(), isDirectory: true)
-        let projectDirectory = (try? WallProjectPaths.ensureProjectDirectory()) ?? fallbackDirectory
-        let storeURL = projectDirectory.appendingPathComponent("spraywall.sqlite")
-        let configuration = ModelConfiguration(url: storeURL, cloudKitDatabase: .none)
+        let primaryStoreURL = (try? WallProjectPaths.primaryModelStoreURL()) ?? fallbackDirectory.appendingPathComponent("spraywall.sqlite")
 
-        do {
-            return try ModelContainer(for: schema, configurations: [configuration])
-        } catch {
-            fatalError("Failed to create model container at \(storeURL.path): \(error)")
+        if let primary = createContainer(schema: schema, storeURL: primaryStoreURL) {
+            return primary
         }
+
+        // Legacy fallback: open the default SwiftData store path so old data remains available.
+        if let legacy = try? ModelContainer(for: schema) {
+            return legacy
+        }
+
+        let fallbackStoreURL = fallbackDirectory.appendingPathComponent("spraywall-fallback.sqlite")
+        if let fallback = createContainer(schema: schema, storeURL: fallbackStoreURL) {
+            return fallback
+        }
+
+        fatalError("Failed to create model container at primary, legacy, and fallback locations.")
     }()
 
     var body: some Scene {
@@ -33,5 +42,10 @@ struct SprayWallApp: App {
                 .environment(appModel)
         }
         .modelContainer(sharedModelContainer)
+    }
+
+    private static func createContainer(schema: Schema, storeURL: URL) -> ModelContainer? {
+        let configuration = ModelConfiguration(url: storeURL, cloudKitDatabase: .none)
+        return try? ModelContainer(for: schema, configurations: [configuration])
     }
 }

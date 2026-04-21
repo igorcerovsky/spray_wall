@@ -70,4 +70,8 @@ enum WallProjectPaths {
     static func defaultKickboardRectifiedURL() throws -> URL {
         try projectDirectory().appendingPathComponent("kickboard_rectified.png")
     }
+
+    static func primaryModelStoreURL() throws -> URL {
+        try projectDirectory().appendingPathComponent("spraywall.sqlite")
+    }
 }

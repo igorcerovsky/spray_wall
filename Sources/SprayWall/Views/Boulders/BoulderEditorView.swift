@@ -13,6 +13,7 @@ struct BoulderEditorView: View {
     @State private var setter = ""
     @State private var tags = ""
     @State private var notes = ""
+    @State private var rating = 0
 
     @State private var selectedGroup: BoulderHoldGroup = .hold
     @State private var editingHoldDetails: Hold?
@@ -22,6 +23,11 @@ struct BoulderEditorView: View {
             Section("Boulder") {
                 TextField("Name", text: $name)
                 TextField("Grade", text: $grade)
+                HStack {
+                    Text("Rating")
+                    Spacer()
+                    starRatingPicker
+                }
                 LabeledContent("Setter", value: setter.isEmpty ? "-" : setter)
                 TextField("Tags (comma-separated)", text: $tags)
                 TextField("Notes", text: $notes, axis: .vertical)
@@ -162,6 +168,7 @@ struct BoulderEditorView: View {
     private func load() {
         name = boulder.name
         grade = boulder.grade
+        rating = Boulder.clampedRating(boulder.rating)
         setter = resolvedSetter()
         tags = boulder.tags
         notes = boulder.notes
@@ -191,10 +198,25 @@ struct BoulderEditorView: View {
     private func updateModelFromForm() {
         boulder.name = name.trimmingCharacters(in: .whitespacesAndNewlines)
         boulder.grade = grade.trimmingCharacters(in: .whitespacesAndNewlines)
+        boulder.rating = Boulder.clampedRating(rating)
         boulder.setter = resolvedSetter()
         setter = boulder.setter
         boulder.tags = tags.trimmingCharacters(in: .whitespacesAndNewlines)
         boulder.notes = notes.trimmingCharacters(in: .whitespacesAndNewlines)
+    }
+
+    private var starRatingPicker: some View {
+        HStack(spacing: 6) {
+            ForEach(1...5, id: \.self) { value in
+                Button {
+                    rating = (rating == value) ? 0 : value
+                } label: {
+                    Image(systemName: value <= rating ? "star.fill" : "star")
+                        .foregroundStyle(value <= rating ? .yellow : .secondary)
+                }
+                .buttonStyle(.plain)
+            }
+        }
     }
 
     private func removeFromDraftIfAllowed(holdID: Int) {
@@ -369,33 +391,33 @@ private struct BoulderWallHoldMarker: View {
         switch role {
         case .start:
             RoundedRectangle(cornerRadius: 2)
-                .fill(markerColor)
+                .fill(markerColor.opacity(0.22))
                 .overlay {
-                    RoundedRectangle(cornerRadius: 2).stroke(Color.black.opacity(0.8), lineWidth: 1)
+                    RoundedRectangle(cornerRadius: 2).stroke(markerColor, lineWidth: 2)
                 }
         case .hold:
             Circle()
-                .fill(markerColor)
+                .fill(markerColor.opacity(0.22))
                 .overlay {
-                    Circle().stroke(Color.black.opacity(0.8), lineWidth: 1)
+                    Circle().stroke(markerColor, lineWidth: 2)
                 }
         case .foothold:
             Diamond()
-                .fill(markerColor)
+                .fill(markerColor.opacity(0.22))
                 .overlay {
-                    Diamond().stroke(Color.black.opacity(0.8), lineWidth: 1)
+                    Diamond().stroke(markerColor, lineWidth: 2)
                 }
         case .top:
             RoundedRectangle(cornerRadius: 2)
-                .fill(markerColor)
+                .fill(markerColor.opacity(0.22))
                 .overlay {
-                    RoundedRectangle(cornerRadius: 2).stroke(Color.black.opacity(0.8), lineWidth: 1)
+                    RoundedRectangle(cornerRadius: 2).stroke(markerColor, lineWidth: 2)
                 }
         case .none:
             Circle()
-                .fill(markerColor)
+                .fill(markerColor.opacity(0.22))
                 .overlay {
-                    Circle().stroke(Color.black.opacity(0.8), lineWidth: 1)
+                    Circle().stroke(markerColor, lineWidth: 2)
                 }
         }
     }
@@ -403,15 +425,15 @@ private struct BoulderWallHoldMarker: View {
     private var markerColor: Color {
         switch role {
         case .start:
-            return .green.opacity(0.32)
+            return .green
         case .hold:
-            return .blue.opacity(0.32)
+            return .blue
         case .foothold:
-            return .yellow.opacity(0.32)
+            return .yellow
         case .top:
-            return .red.opacity(0.32)
+            return .red
         case .none:
-            return .white.opacity(0.25)
+            return .white
         }
     }
 }
