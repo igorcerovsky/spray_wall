@@ -383,10 +383,10 @@ private struct HoldPositionDotView: View {
     var body: some View {
         ZStack(alignment: .top) {
             Circle()
-                .fill(Color.white.opacity(0.28))
+                .fill(Color.purple.opacity(0.22))
                 .frame(width: 10, height: 10)
                 .overlay {
-                    Circle().stroke(Color.white.opacity(0.9), lineWidth: 1)
+                    Circle().stroke(Color.purple, lineWidth: 1)
                 }
 
             Text("\(holdID)")
