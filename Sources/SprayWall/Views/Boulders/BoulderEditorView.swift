@@ -19,93 +19,112 @@ struct BoulderEditorView: View {
     @State private var editingHoldDetails: Hold?
 
     var body: some View {
-        List {
-            Section("Boulder") {
-                TextField("Name", text: $name)
-                Picker("Grade", selection: $grade) {
-                    ForEach(Boulder.availableGrades, id: \.self) { grade in
-                        Text(grade).tag(grade)
-                    }
-                }
-                HStack {
-                    Text("Rating")
-                    Spacer()
-                    starRatingPicker
-                }
-                LabeledContent("Setter", value: setter.isEmpty ? "-" : setter)
-                TextField("Tags (comma-separated)", text: $tags)
-                TextField("Notes", text: $notes, axis: .vertical)
-                    .lineLimit(3...6)
-
-                if canEditDraft {
-                    LabeledContent("Status", value: boulder.status.displayName)
-                }
-            }
-            .disabled(!canEditDraft)
-
+        Group {
             if canEditDraft {
-                Section("Role") {
-                    roleButtons
-                    Text("Role-first mode: select a role, then click a hold to assign it.")
-                        .font(.footnote)
-                        .foregroundStyle(.secondary)
-                }
-            }
-
-            Section("Wall") {
-                wallPreview
-                    .frame(maxWidth: .infinity)
-                    .aspectRatio(WallSpec.widthCm / WallSpec.totalHeightCm, contentMode: .fit)
-            }
-
-            if canEditDraft {
-                Section("Summary") {
-                    LabeledContent("Start", value: listText(boulder.startHoldIDs))
-                    LabeledContent("Holds", value: listText(boulder.holdIDs))
-                    LabeledContent("Footholds", value: listText(boulder.footholdIDs))
-                    LabeledContent("Top", value: listText(boulder.topHoldIDs))
-                }
-            }
-
-            if canEditDraft {
-                Section {
-                    Button("Save Draft") {
-                        saveDraft()
-                    }
-
-                    Button("Mark Established") {
-                        establish()
-                    }
-                    .buttonStyle(.borderedProminent)
-                }
-            }
-
-            if !canEditDraft {
-                Section("Ascent") {
-                    HStack {
-                        LabeledContent("Attempts", value: "\(boulder.attemptCount)")
-                        Spacer()
-                        Button("Log Attempt") {
-                            logAttempt()
+                List {
+                    Section("Boulder") {
+                        TextField("Name", text: $name)
+                        Picker("Grade", selection: $grade) {
+                            ForEach(Boulder.availableGrades, id: \.self) { grade in
+                                Text(grade).tag(grade)
+                            }
                         }
-                        .disabled(boulder.ascentLogged)
+                        HStack {
+                            Text("Rating")
+                            Spacer()
+                            starRatingPicker
+                        }
+                        LabeledContent("Setter", value: setter.isEmpty ? "-" : setter)
+                        TextField("Tags (comma-separated)", text: $tags)
+                        TextField("Notes", text: $notes, axis: .vertical)
+                            .lineLimit(3...6)
+
+                        LabeledContent("Status", value: boulder.status.displayName)
                     }
 
-                    HStack {
-                        LabeledContent("Ascent", value: boulder.ascentLogged ? "Logged" : "Not logged")
-                        Spacer()
-                        Button("Log Ascent") {
-                            logAscent()
+                    Section("Role") {
+                        roleButtons
+                        Text("Role-first mode: select a role, then click a hold to assign it.")
+                            .font(.footnote)
+                            .foregroundStyle(.secondary)
+                    }
+
+                    Section("Wall") {
+                        wallPreview
+                            .frame(maxWidth: .infinity)
+                            .aspectRatio(WallSpec.widthCm / WallSpec.totalHeightCm, contentMode: .fit)
+                    }
+
+                    Section("Summary") {
+                        LabeledContent("Start", value: listText(boulder.startHoldIDs))
+                        LabeledContent("Holds", value: listText(boulder.holdIDs))
+                        LabeledContent("Footholds", value: listText(boulder.footholdIDs))
+                        LabeledContent("Top", value: listText(boulder.topHoldIDs))
+                    }
+
+                    Section {
+                        Button("Save Draft") {
+                            saveDraft()
+                        }
+
+                        Button("Mark Established") {
+                            establish()
                         }
                         .buttonStyle(.borderedProminent)
-                        .disabled(boulder.ascentLogged)
-                    }
-
-                    if let loggedAt = boulder.ascentLoggedAt {
-                        LabeledContent("Ascent Time", value: loggedAt.formatted(date: .abbreviated, time: .shortened))
-                            .font(.footnote)
                     }
                 }
+            } else {
+                VStack(alignment: .leading, spacing: 12) {
+                    HStack(spacing: 8) {
+                        Text(displayName)
+                            .font(.headline.weight(.semibold))
+                            .lineLimit(1)
+                            .truncationMode(.tail)
+                        Text(displayGrade)
+                            .font(.subheadline.weight(.semibold))
+                            .foregroundStyle(.secondary)
+                        Text(displaySetter)
+                            .font(.subheadline)
+                            .foregroundStyle(.secondary)
+                            .lineLimit(1)
+                            .truncationMode(.tail)
+                        Text(starsText(for: boulder.rating))
+                            .font(.subheadline)
+                            .foregroundStyle(.yellow)
+                        Spacer(minLength: 0)
+                    }
+
+                    wallPreview
+                        .frame(maxWidth: .infinity)
+                        .aspectRatio(WallSpec.widthCm / WallSpec.totalHeightCm, contentMode: .fit)
+
+                    Spacer(minLength: 0)
+
+                    VStack(spacing: 8) {
+                        HStack {
+                            Button("Log Attempt") {
+                                logAttempt()
+                            }
+                            .disabled(boulder.ascentLogged)
+
+                            Spacer()
+
+                            Button("Log Ascent") {
+                                logAscent()
+                            }
+                            .buttonStyle(.borderedProminent)
+                            .disabled(boulder.ascentLogged)
+                        }
+
+                        if let loggedAt = boulder.ascentLoggedAt {
+                            Text("Ascent: \(loggedAt.formatted(date: .abbreviated, time: .shortened))")
+                                .font(.footnote)
+                                .foregroundStyle(.secondary)
+                                .frame(maxWidth: .infinity, alignment: .trailing)
+                        }
+                    }
+                }
+                .padding()
             }
         }
         .navigationTitle("Boulder")
@@ -258,6 +277,25 @@ struct BoulderEditorView: View {
         }
 
         return boulder.setter.trimmingCharacters(in: .whitespacesAndNewlines)
+    }
+
+    private var displayName: String {
+        let trimmed = boulder.name.trimmingCharacters(in: .whitespacesAndNewlines)
+        return trimmed.isEmpty ? "Untitled" : trimmed
+    }
+
+    private var displayGrade: String {
+        Boulder.normalizedGrade(boulder.grade)
+    }
+
+    private var displaySetter: String {
+        let trimmed = boulder.setter.trimmingCharacters(in: .whitespacesAndNewlines)
+        return trimmed.isEmpty ? "-" : trimmed
+    }
+
+    private func starsText(for rating: Int) -> String {
+        let clamped = Boulder.clampedRating(rating)
+        return String(repeating: "★", count: clamped) + String(repeating: "☆", count: 5 - clamped)
     }
 
     private func groupColor(for group: BoulderHoldGroup) -> Color {

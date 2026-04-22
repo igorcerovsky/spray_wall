@@ -8,8 +8,8 @@ struct BoulderListView: View {
     @Query(sort: \Boulder.updatedAt, order: .reverse) private var boulders: [Boulder]
 
     @State private var filterEstablishedOnly = false
-    @State private var minDifficultyIndex = 0
-    @State private var maxDifficultyIndex = Boulder.availableGrades.count - 1
+    @AppStorage("spraywall.boulder_filter_min_difficulty_index") private var minDifficultyIndex = 0
+    @AppStorage("spraywall.boulder_filter_max_difficulty_index") private var maxDifficultyIndex = 25
     @State private var boulderToOpen: Boulder?
 
     var body: some View {
@@ -53,6 +53,19 @@ struct BoulderListView: View {
                                 Text(displayDifficulty(for: boulder))
                                     .font(.subheadline.weight(.semibold))
                                     .foregroundStyle(.secondary)
+                                Text(displaySetter(for: boulder))
+                                    .font(.subheadline)
+                                    .foregroundStyle(.secondary)
+                                    .lineLimit(1)
+                                    .truncationMode(.tail)
+                                if boulder.status == .draft {
+                                    Text("Draft")
+                                        .font(.caption.weight(.semibold))
+                                        .padding(.horizontal, 6)
+                                        .padding(.vertical, 2)
+                                        .background(Color.orange.opacity(0.2))
+                                        .clipShape(RoundedRectangle(cornerRadius: 4))
+                                }
                                 Spacer()
                                 if boulder.hasAscent(by: appModel.currentUser?.id) {
                                     Image(systemName: "checkmark")
@@ -67,6 +80,9 @@ struct BoulderListView: View {
             .navigationTitle("Boulders")
             .navigationDestination(item: $boulderToOpen) { boulder in
                 BoulderEditorView(boulder: boulder)
+            }
+            .onAppear {
+                normalizeDifficultyFilterBounds()
             }
             .toolbar {
                 ToolbarItem(placement: .primaryAction) {
@@ -101,6 +117,11 @@ struct BoulderListView: View {
 
     private func displayDifficulty(for boulder: Boulder) -> String {
         Boulder.normalizedGrade(boulder.grade)
+    }
+
+    private func displaySetter(for boulder: Boulder) -> String {
+        let trimmed = boulder.setter.trimmingCharacters(in: .whitespacesAndNewlines)
+        return trimmed.isEmpty ? "-" : trimmed
     }
 
     private func difficultyIndex(for boulder: Boulder) -> Int? {
@@ -146,6 +167,15 @@ struct BoulderListView: View {
             try modelContext.save()
         } catch {
             appModel.globalMessage = "Could not delete boulder: \(error.localizedDescription)"
+        }
+    }
+
+    private func normalizeDifficultyFilterBounds() {
+        let maxAllowed = Boulder.availableGrades.count - 1
+        minDifficultyIndex = max(0, min(minDifficultyIndex, maxAllowed))
+        maxDifficultyIndex = max(0, min(maxDifficultyIndex, maxAllowed))
+        if minDifficultyIndex > maxDifficultyIndex {
+            maxDifficultyIndex = minDifficultyIndex
         }
     }
 }
