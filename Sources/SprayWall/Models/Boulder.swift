@@ -3,6 +3,15 @@ import SwiftData
 
 @Model
 final class Boulder {
+    static let availableGrades: [String] = [
+        "1", "2", "3", "4",
+        "5a", "5b", "5c",
+        "6a", "6a+", "6b", "6b+", "6c", "6c+",
+        "7a", "7a+", "7b", "7b+", "7c", "7c+",
+        "8a", "8a+", "8b", "8b+", "8c", "8c+",
+        "9a"
+    ]
+
     @Attribute(.unique) var boulderID: Int
     var name: String
 
@@ -19,6 +28,8 @@ final class Boulder {
     var notes: String
     // Optional backing value keeps store migration lightweight for older DBs.
     var ratingValue: Int?
+    // Optional for lightweight migration from older stores.
+    var ascendedByUserIDsCSV: String?
     var attemptCount: Int
     var ascentLogged: Bool
     var ascentLoggedAt: Date?
@@ -39,6 +50,7 @@ final class Boulder {
         tags: String = "",
         notes: String = "",
         rating: Int = 0,
+        ascendedByUserIDs: [UUID] = [],
         attemptCount: Int = 0,
         ascentLogged: Bool = false,
         ascentLoggedAt: Date? = nil,
@@ -52,11 +64,12 @@ final class Boulder {
         self.holdIDsCSV = CSVIntCodec.encode(holdIDs)
         self.footholdIDsCSV = CSVIntCodec.encode(footholdIDs)
         self.topHoldIDsCSV = CSVIntCodec.encode(topHoldIDs)
-        self.grade = grade
+        self.grade = Self.normalizedGrade(grade)
         self.setter = setter
         self.tags = tags
         self.notes = notes
         self.ratingValue = Self.clampedRating(rating)
+        self.ascendedByUserIDsCSV = Self.encodeUUIDs(ascendedByUserIDs)
         self.attemptCount = attemptCount
         self.ascentLogged = ascentLogged
         self.ascentLoggedAt = ascentLoggedAt
@@ -110,6 +123,21 @@ final class Boulder {
             ratingValue = Self.clampedRating(newValue)
             touch()
         }
+    }
+
+    var ascendedByUserIDs: [UUID] {
+        get { Self.decodeUUIDs(ascendedByUserIDsCSV ?? "") }
+        set {
+            ascendedByUserIDsCSV = Self.encodeUUIDs(newValue)
+            touch()
+        }
+    }
+
+    func hasAscent(by userID: UUID?) -> Bool {
+        guard let userID else {
+            return false
+        }
+        return ascendedByUserIDs.contains(userID)
     }
 
     func contains(_ holdID: Int) -> Bool {
@@ -217,17 +245,24 @@ final class Boulder {
     }
 
     @discardableResult
-    func logAscent() -> String? {
+    func logAscent(by userID: UUID?) -> String? {
         guard status == .established else {
             return "Ascent can be logged only for established boulders."
         }
 
-        guard !ascentLogged else {
-            return "Ascent already logged."
+        if let userID, ascendedByUserIDs.contains(userID) {
+            return "Ascent already logged for this user."
         }
 
         ascentLogged = true
         ascentLoggedAt = .now
+        if let userID {
+            var ids = ascendedByUserIDs
+            if !ids.contains(userID) {
+                ids.append(userID)
+                ascendedByUserIDs = ids
+            }
+        }
         touch()
         return nil
     }
@@ -280,5 +315,23 @@ final class Boulder {
 
     static func clampedRating(_ value: Int) -> Int {
         min(max(value, 0), 5)
+    }
+
+    static func normalizedGrade(_ value: String) -> String {
+        let normalized = value.trimmingCharacters(in: .whitespacesAndNewlines).lowercased()
+        if availableGrades.contains(normalized) {
+            return normalized
+        }
+        return availableGrades.first ?? "1"
+    }
+
+    private static func encodeUUIDs(_ values: [UUID]) -> String {
+        values.map(\.uuidString).joined(separator: ",")
+    }
+
+    private static func decodeUUIDs(_ value: String) -> [UUID] {
+        value
+            .split(separator: ",")
+            .compactMap { UUID(uuidString: String($0)) }
     }
 }

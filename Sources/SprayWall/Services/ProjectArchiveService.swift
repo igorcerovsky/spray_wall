@@ -71,6 +71,7 @@ struct BoulderDTO: Codable {
     var tags: String
     var notes: String
     var rating: Int?
+    var ascendedByUserIDs: [UUID]?
     var attemptCount: Int
     var ascentLogged: Bool
     var ascentLoggedAt: Date?
@@ -187,6 +188,7 @@ enum ProjectArchiveService {
                     tags: $0.tags,
                     notes: $0.notes,
                     rating: $0.rating,
+                    ascendedByUserIDs: $0.ascendedByUserIDs,
                     attemptCount: $0.attemptCount,
                     ascentLogged: $0.ascentLogged,
                     ascentLoggedAt: $0.ascentLoggedAt,
@@ -323,6 +325,9 @@ enum ProjectArchiveService {
                 boulder.tags = dto.tags
                 boulder.notes = dto.notes
                 boulder.rating = Boulder.clampedRating(dto.rating ?? 0)
+                if let ascendedByUserIDs = dto.ascendedByUserIDs {
+                    boulder.ascendedByUserIDs = ascendedByUserIDs
+                }
                 boulder.attemptCount = dto.attemptCount
                 boulder.ascentLogged = dto.ascentLogged
                 boulder.ascentLoggedAt = dto.ascentLoggedAt
@@ -341,6 +346,7 @@ enum ProjectArchiveService {
                     tags: dto.tags,
                     notes: dto.notes,
                     rating: Boulder.clampedRating(dto.rating ?? 0),
+                    ascendedByUserIDs: dto.ascendedByUserIDs ?? [],
                     attemptCount: dto.attemptCount,
                     ascentLogged: dto.ascentLogged,
                     ascentLoggedAt: dto.ascentLoggedAt,

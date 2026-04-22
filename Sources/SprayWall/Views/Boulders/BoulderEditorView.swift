@@ -22,7 +22,11 @@ struct BoulderEditorView: View {
         List {
             Section("Boulder") {
                 TextField("Name", text: $name)
-                TextField("Grade", text: $grade)
+                Picker("Grade", selection: $grade) {
+                    ForEach(Boulder.availableGrades, id: \.self) { grade in
+                        Text(grade).tag(grade)
+                    }
+                }
                 HStack {
                     Text("Rating")
                     Spacer()
@@ -167,7 +171,7 @@ struct BoulderEditorView: View {
 
     private func load() {
         name = boulder.name
-        grade = boulder.grade
+        grade = Boulder.normalizedGrade(boulder.grade)
         rating = Boulder.clampedRating(boulder.rating)
         setter = resolvedSetter()
         tags = boulder.tags
@@ -197,7 +201,7 @@ struct BoulderEditorView: View {
 
     private func updateModelFromForm() {
         boulder.name = name.trimmingCharacters(in: .whitespacesAndNewlines)
-        boulder.grade = grade.trimmingCharacters(in: .whitespacesAndNewlines)
+        boulder.grade = Boulder.normalizedGrade(grade)
         boulder.rating = Boulder.clampedRating(rating)
         boulder.setter = resolvedSetter()
         setter = boulder.setter
@@ -239,7 +243,7 @@ struct BoulderEditorView: View {
     }
 
     private func logAscent() {
-        if let message = boulder.logAscent() {
+        if let message = boulder.logAscent(by: appModel.currentUser?.id) {
             appModel.globalMessage = message
             return
         }

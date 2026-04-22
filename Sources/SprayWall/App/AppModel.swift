@@ -253,12 +253,15 @@ final class AppModel {
     private func migrateLegacyHoldsAndBouldersIfNeeded(context: ModelContext) throws {
         let key = "spraywall.legacy_holds_boulders_migration_v1"
         let defaults = UserDefaults.standard
-        if defaults.bool(forKey: key) {
+        let currentHoldsCount = try context.fetchCount(FetchDescriptor<Hold>())
+        let currentBouldersCount = try context.fetchCount(FetchDescriptor<Boulder>())
+
+        // If migration was already completed and data exists, no work needed.
+        if defaults.bool(forKey: key), (currentHoldsCount > 0 || currentBouldersCount > 0) {
             return
         }
 
-        let currentHoldsCount = try context.fetchCount(FetchDescriptor<Hold>())
-        let currentBouldersCount = try context.fetchCount(FetchDescriptor<Boulder>())
+        // If migrated data is already present, mark complete.
         if currentHoldsCount > 0 || currentBouldersCount > 0 {
             defaults.set(true, forKey: key)
             return
@@ -275,7 +278,7 @@ final class AppModel {
         ])
 
         guard let legacyContainer = try? ModelContainer(for: schema) else {
-            defaults.set(true, forKey: key)
+            // Keep retrying on next startup; do not permanently mark as completed.
             return
         }
 
@@ -284,7 +287,7 @@ final class AppModel {
         let legacyBoulders = try legacyContext.fetch(FetchDescriptor<Boulder>(sortBy: [SortDescriptor(\.boulderID)]))
 
         if legacyHolds.isEmpty && legacyBoulders.isEmpty {
-            defaults.set(true, forKey: key)
+            // Keep retrying on next startup; user might restore old store later.
             return
         }
 
