@@ -222,15 +222,11 @@ enum ProjectArchiveService {
     }
 
     static func importArchive(_ archive: ProjectArchive, context: ModelContext) throws {
+        let existingUsers = try context.fetch(FetchDescriptor<UserAccount>())
+        let usersDict = Dictionary(uniqueKeysWithValues: existingUsers.map { ($0.email.lowercased(), $0) })
         for dto in archive.users {
             let normalizedEmail = dto.email.lowercased()
-            let descriptor = FetchDescriptor<UserAccount>(
-                predicate: #Predicate<UserAccount> { account in
-                    account.email == normalizedEmail
-                }
-            )
-
-            if let existing = try context.fetch(descriptor).first {
+            if let existing = usersDict[normalizedEmail] {
                 existing.displayName = dto.displayName
                 existing.passwordHash = dto.passwordHash
             } else {
@@ -245,16 +241,11 @@ enum ProjectArchiveService {
             }
         }
 
+        let existingHolds = try context.fetch(FetchDescriptor<Hold>())
+        let holdsDict = Dictionary(uniqueKeysWithValues: existingHolds.map { ($0.holdID, $0) })
         for dto in archive.holds {
-            let id = dto.holdID
-            let descriptor = FetchDescriptor<Hold>(
-                predicate: #Predicate<Hold> { hold in
-                    hold.holdID == id
-                }
-            )
-
             let hold: Hold
-            if let existing = try context.fetch(descriptor).first {
+            if let existing = holdsDict[dto.holdID] {
                 hold = existing
             } else {
                 let created = Hold(
@@ -305,15 +296,10 @@ enum ProjectArchiveService {
             }
         }
 
+        let existingBoulders = try context.fetch(FetchDescriptor<Boulder>())
+        let bouldersDict = Dictionary(uniqueKeysWithValues: existingBoulders.map { ($0.boulderID, $0) })
         for dto in archive.boulders {
-            let id = dto.boulderID
-            let descriptor = FetchDescriptor<Boulder>(
-                predicate: #Predicate<Boulder> { boulder in
-                    boulder.boulderID == id
-                }
-            )
-
-            if let boulder = try context.fetch(descriptor).first {
+            if let boulder = bouldersDict[dto.boulderID] {
                 boulder.name = dto.name
                 boulder.statusRaw = dto.status
                 boulder.startHoldIDs = dto.startHoldIDs
@@ -357,15 +343,10 @@ enum ProjectArchiveService {
             }
         }
 
+        let existingRoutes = try context.fetch(FetchDescriptor<Route>())
+        let routesDict = Dictionary(uniqueKeysWithValues: existingRoutes.map { ($0.routeID, $0) })
         for dto in archive.routes {
-            let id = dto.routeID
-            let descriptor = FetchDescriptor<Route>(
-                predicate: #Predicate<Route> { route in
-                    route.routeID == id
-                }
-            )
-
-            if let route = try context.fetch(descriptor).first {
+            if let route = routesDict[dto.routeID] {
                 route.name = dto.name
                 route.startHoldIDs = dto.startHolds
                 route.startFootIDs = dto.startFeet
@@ -387,15 +368,10 @@ enum ProjectArchiveService {
             }
         }
 
+        let existingAttempts = try context.fetch(FetchDescriptor<Attempt>())
+        let attemptsDict = Dictionary(uniqueKeysWithValues: existingAttempts.map { ($0.attemptID, $0) })
         for dto in archive.attempts {
-            let id = dto.attemptID
-            let descriptor = FetchDescriptor<Attempt>(
-                predicate: #Predicate<Attempt> { attempt in
-                    attempt.attemptID == id
-                }
-            )
-
-            if let attempt = try context.fetch(descriptor).first {
+            if let attempt = attemptsDict[dto.attemptID] {
                 attempt.routeID = dto.routeID
                 attempt.climberID = dto.climberID
                 attempt.date = dto.date
@@ -415,14 +391,9 @@ enum ProjectArchiveService {
         }
 
         if let calibrationDTO = archive.calibration {
-            let id = calibrationDTO.id
-            let descriptor = FetchDescriptor<WallCalibration>(
-                predicate: #Predicate<WallCalibration> { calibration in
-                    calibration.id == id
-                }
-            )
-
-            if let calibration = try context.fetch(descriptor).first {
+            let existingCalibrations = try context.fetch(FetchDescriptor<WallCalibration>())
+            let calibrationsDict = Dictionary(uniqueKeysWithValues: existingCalibrations.map { ($0.id, $0) })
+            if let calibration = calibrationsDict[calibrationDTO.id] {
                 calibration.photoPath = calibrationDTO.photoPath
                 calibration.points = calibrationDTO.points
             } else {

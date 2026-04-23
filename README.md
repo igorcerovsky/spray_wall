@@ -27,6 +27,7 @@ This repository now contains an initial SwiftUI + SwiftData scaffold for the Spr
   - Logout
 - SwiftData persistence (SQLite-backed)
 - Native Xcode project generator: `Tools/generate_xcodeproj.rb`
+- App model and architecture refactored for security (Keychain), performance (batched archive imports), and modern data typing (native `[Int]` properties instead of CSV strings).
 
 ## Notes
 

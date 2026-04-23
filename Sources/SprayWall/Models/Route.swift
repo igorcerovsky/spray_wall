@@ -11,6 +11,11 @@ final class Route {
     var sequenceIDsCSV: String
     var topHoldIDsCSV: String
 
+    var startHoldIDsArray: [Int]?
+    var startFootIDsArray: [Int]?
+    var sequenceIDsArray: [Int]?
+    var topHoldIDsArray: [Int]?
+
     var topModeRaw: String
     var createdAt: Date
 
@@ -35,23 +40,35 @@ final class Route {
     }
 
     var startHoldIDs: [Int] {
-        get { CSVIntCodec.decode(startHoldIDsCSV) }
-        set { startHoldIDsCSV = CSVIntCodec.encode(newValue) }
+        get { startHoldIDsArray ?? CSVIntCodec.decode(startHoldIDsCSV) }
+        set {
+            startHoldIDsArray = newValue
+            startHoldIDsCSV = CSVIntCodec.encode(newValue)
+        }
     }
 
     var startFootIDs: [Int] {
-        get { CSVIntCodec.decode(startFootIDsCSV) }
-        set { startFootIDsCSV = CSVIntCodec.encode(newValue) }
+        get { startFootIDsArray ?? CSVIntCodec.decode(startFootIDsCSV) }
+        set {
+            startFootIDsArray = newValue
+            startFootIDsCSV = CSVIntCodec.encode(newValue)
+        }
     }
 
     var sequenceIDs: [Int] {
-        get { CSVIntCodec.decode(sequenceIDsCSV) }
-        set { sequenceIDsCSV = CSVIntCodec.encode(newValue) }
+        get { sequenceIDsArray ?? CSVIntCodec.decode(sequenceIDsCSV) }
+        set {
+            sequenceIDsArray = newValue
+            sequenceIDsCSV = CSVIntCodec.encode(newValue)
+        }
     }
 
     var topHoldIDs: [Int] {
-        get { CSVIntCodec.decode(topHoldIDsCSV) }
-        set { topHoldIDsCSV = CSVIntCodec.encode(newValue) }
+        get { topHoldIDsArray ?? CSVIntCodec.decode(topHoldIDsCSV) }
+        set {
+            topHoldIDsArray = newValue
+            topHoldIDsCSV = CSVIntCodec.encode(newValue)
+        }
     }
 
     var topMode: TopMode {

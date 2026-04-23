@@ -22,6 +22,11 @@ final class Boulder {
     var footholdIDsCSV: String
     var topHoldIDsCSV: String
 
+    var startHoldIDsArray: [Int]?
+    var holdIDsArray: [Int]?
+    var footholdIDsArray: [Int]?
+    var topHoldIDsArray: [Int]?
+
     var grade: String
     var setter: String
     var tags: String
@@ -30,6 +35,7 @@ final class Boulder {
     var ratingValue: Int?
     // Optional for lightweight migration from older stores.
     var ascendedByUserIDsCSV: String?
+    var ascendedByUserIDsArray: [UUID]?
     var attemptCount: Int
     var ascentLogged: Bool
     var ascentLoggedAt: Date?
@@ -70,6 +76,7 @@ final class Boulder {
         self.notes = notes
         self.ratingValue = Self.clampedRating(rating)
         self.ascendedByUserIDsCSV = Self.encodeUUIDs(ascendedByUserIDs)
+        self.ascendedByUserIDsArray = ascendedByUserIDs
         self.attemptCount = attemptCount
         self.ascentLogged = ascentLogged
         self.ascentLoggedAt = ascentLoggedAt
@@ -86,32 +93,36 @@ final class Boulder {
     }
 
     var startHoldIDs: [Int] {
-        get { CSVIntCodec.decode(startHoldIDsCSV) }
+        get { startHoldIDsArray ?? CSVIntCodec.decode(startHoldIDsCSV) }
         set {
+            startHoldIDsArray = newValue
             startHoldIDsCSV = CSVIntCodec.encode(newValue)
             touch()
         }
     }
 
     var holdIDs: [Int] {
-        get { CSVIntCodec.decode(holdIDsCSV) }
+        get { holdIDsArray ?? CSVIntCodec.decode(holdIDsCSV) }
         set {
+            holdIDsArray = newValue
             holdIDsCSV = CSVIntCodec.encode(newValue)
             touch()
         }
     }
 
     var footholdIDs: [Int] {
-        get { CSVIntCodec.decode(footholdIDsCSV) }
+        get { footholdIDsArray ?? CSVIntCodec.decode(footholdIDsCSV) }
         set {
+            footholdIDsArray = newValue
             footholdIDsCSV = CSVIntCodec.encode(newValue)
             touch()
         }
     }
 
     var topHoldIDs: [Int] {
-        get { CSVIntCodec.decode(topHoldIDsCSV) }
+        get { topHoldIDsArray ?? CSVIntCodec.decode(topHoldIDsCSV) }
         set {
+            topHoldIDsArray = newValue
             topHoldIDsCSV = CSVIntCodec.encode(newValue)
             touch()
         }
@@ -126,8 +137,9 @@ final class Boulder {
     }
 
     var ascendedByUserIDs: [UUID] {
-        get { Self.decodeUUIDs(ascendedByUserIDsCSV ?? "") }
+        get { ascendedByUserIDsArray ?? Self.decodeUUIDs(ascendedByUserIDsCSV ?? "") }
         set {
+            ascendedByUserIDsArray = newValue
             ascendedByUserIDsCSV = Self.encodeUUIDs(newValue)
             touch()
         }
