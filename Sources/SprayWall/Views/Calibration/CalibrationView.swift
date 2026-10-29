@@ -14,6 +14,8 @@ struct CalibrationView: View {
     @State private var isRectifying = false
     @State private var isImportingPhoto = false
     @State private var selectedPhotoItem: PhotosPickerItem?
+    @State private var isShowingInteractiveEditor = false
+    @State private var previewId = UUID()
 
     var body: some View {
         NavigationStack {
@@ -28,7 +30,7 @@ struct CalibrationView: View {
                 Section("Photo") {
                     let pickerTitle = isImportingPhoto ? "Importing Photo..." : "Pick Photo from Library"
 
-                    TextField("photo_original.jpg", text: $photoPath)
+                    TextField("resources/281026_dd.jpeg", text: $photoPath)
                         .disabled(isImportingPhoto || isRectifying)
 
                     PhotosPicker(selection: $selectedPhotoItem, matching: .images) {
@@ -55,6 +57,15 @@ struct CalibrationView: View {
                 }
 
                 Section("Coordinate Pairs (Image px -> World cm)") {
+                    Button {
+                        isShowingInteractiveEditor = true
+                    } label: {
+                        Label("Edit Interactively", systemImage: "hand.draw")
+                            .frame(maxWidth: .infinity, alignment: .center)
+                    }
+                    .buttonStyle(.bordered)
+                    .padding(.vertical, 4)
+
                     ForEach($points) { $point in
                         VStack(alignment: .leading, spacing: 8) {
                             Text(point.label)
@@ -66,9 +77,9 @@ struct CalibrationView: View {
                                     .foregroundStyle(.secondary)
                                     .frame(width: 48, alignment: .leading)
 
-                                TextField("X px", value: $point.xPx, format: .number)
+                                TextField("X px", value: $point.xPx, format: .number.precision(.fractionLength(0)))
                                     .textFieldStyle(.roundedBorder)
-                                TextField("Y px", value: $point.yPx, format: .number)
+                                TextField("Y px", value: $point.yPx, format: .number.precision(.fractionLength(0)))
                                     .textFieldStyle(.roundedBorder)
                             }
 
@@ -135,6 +146,7 @@ struct CalibrationView: View {
                         .font(.footnote)
                         .foregroundStyle(.secondary)
                 }
+                .id(previewId)
 
                 Button("Save Calibration") {
                     save()
@@ -154,6 +166,19 @@ struct CalibrationView: View {
                 }
             }
         }
+        .sheet(isPresented: $isShowingInteractiveEditor) {
+            InteractiveCalibrationEditor(
+                points: $points,
+                photoURL: previewURL(for: photoPath),
+                onSave: {
+                    // Slight delay to allow the sheet to start dismissing
+                    Task {
+                        try? await Task.sleep(nanoseconds: 300_000_000)
+                        generateRectifiedImages()
+                    }
+                }
+            )
+        }
     }
 
     private func loadIfNeeded() {
@@ -172,7 +197,10 @@ struct CalibrationView: View {
             }
 
             let trimmedPhotoPath = calibration.photoPath.trimmingCharacters(in: .whitespacesAndNewlines)
-            if trimmedPhotoPath.isEmpty {
+            if trimmedPhotoPath.isEmpty
+                || trimmedPhotoPath.contains("photo_original.jpg")
+                || trimmedPhotoPath.contains("photo original.jpg")
+                || trimmedPhotoPath.hasSuffix("wall.jpg") {
                 photoPath = WallCalibration.defaultPhotoPath
                 calibration.photoPath = photoPath
                 needsMigrationSave = true
@@ -234,11 +262,14 @@ struct CalibrationView: View {
                 outputDirectory: outputDirectory
             )
 
-            photoPath = output.photoOriginalURL.path
+            if photoPath.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
+                photoPath = WallCalibration.defaultPhotoPath
+            }
             mainWallOutputPath = output.mainWallURL.path
             kickboardOutputPath = output.kickboardURL.path
 
             save(showMessage: false)
+            previewId = UUID()
             appModel.globalMessage = "Rectified images generated."
         } catch {
             appModel.globalMessage = "Rectification failed: \(error.localizedDescription)"
@@ -262,6 +293,10 @@ struct CalibrationView: View {
     private func previewURL(for path: String) -> URL? {
         let trimmed = path.trimmingCharacters(in: .whitespacesAndNewlines)
         guard !trimmed.isEmpty else { return nil }
+
+        if let resolved = try? WallProjectPaths.resolvePhotoURL(from: trimmed) {
+            return resolved
+        }
 
         let fileManager = FileManager.default
         let absolute = URL(fileURLWithPath: trimmed)
@@ -346,7 +381,6 @@ private struct FileImagePreview: View {
                             .resizable()
                             .scaledToFit()
                             .frame(maxWidth: .infinity)
-                            .frame(maxHeight: 220)
                             .clipShape(RoundedRectangle(cornerRadius: 8))
                     case .failure:
                         Text("Could not load image at \(fileURL.path)")

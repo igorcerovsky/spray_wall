@@ -10,6 +10,7 @@ struct HoldEditorView: View {
 
     @State private var showHoldList = false
     @State private var isEditingHolds = false
+    @State private var showDeleteAllConfirmation = false
     @State private var inlineStatusMessage: String?
     @State private var holds: [Hold] = []
 
@@ -41,6 +42,18 @@ struct HoldEditorView: View {
             .navigationTitle("Hold Positions")
             .task {
                 fetchHolds()
+            }
+            .confirmationDialog(
+                "Delete All Holds?",
+                isPresented: $showDeleteAllConfirmation,
+                titleVisibility: .visible
+            ) {
+                Button("Delete all and reset counter", role: .destructive) {
+                    deleteAllHoldsAndResetCounter()
+                }
+                Button("Cancel", role: .cancel) {}
+            } message: {
+                Text("This will delete all \(holds.count) holds from the wall and reset the hold ID counter back to 1. This action cannot be undone.")
             }
         }
     }
@@ -85,7 +98,7 @@ struct HoldEditorView: View {
 
     private var controls: some View {
         VStack(spacing: 8) {
-            HStack {
+            HStack(spacing: 12) {
                 Button(isEditingHolds ? "Done" : "Edit") {
                     if canEditWallLayout {
                         isEditingHolds.toggle()
@@ -96,6 +109,18 @@ struct HoldEditorView: View {
                     }
                 }
                 .buttonStyle(.borderedProminent)
+
+                Button("Delete all and reset counter", role: .destructive) {
+                    if canEditWallLayout {
+                        showDeleteAllConfirmation = true
+                    } else {
+                        appModel.globalMessage = "Wall layout can be edited only by admin."
+                        inlineStatusMessage = "Only admin can edit wall layout. Signed in as: \(effectiveUserEmail ?? "unknown")"
+                    }
+                }
+                .buttonStyle(.bordered)
+                .disabled(holds.isEmpty)
+
                 Spacer()
             }
 
@@ -283,6 +308,34 @@ struct HoldEditorView: View {
         }
     }
 
+    private func deleteAllHoldsAndResetCounter() {
+        guard canEditWallLayout else {
+            appModel.globalMessage = "Wall layout can be edited only by admin."
+            inlineStatusMessage = "Only admin can edit wall layout. Signed in as: \(effectiveUserEmail ?? "unknown")"
+            return
+        }
+
+        let writeContext = ModelContext(modelContext.container)
+        do {
+            let allHolds = try writeContext.fetch(FetchDescriptor<Hold>())
+            for hold in allHolds {
+                writeContext.delete(hold)
+            }
+            let allGrips = try writeContext.fetch(FetchDescriptor<Grip>())
+            for grip in allGrips {
+                writeContext.delete(grip)
+            }
+            try writeContext.save()
+
+            _ = fetchHoldsAndReturnCount()
+            inlineStatusMessage = "All holds deleted. Hold counter reset to 1."
+            appModel.globalMessage = "All holds deleted. Hold counter reset to 1."
+        } catch {
+            appModel.globalMessage = "Failed to delete holds: \(error.localizedDescription)"
+            inlineStatusMessage = "Failed to delete holds: \(error.localizedDescription)"
+        }
+    }
+
     @discardableResult
     private func persist(context: ModelContext) -> Bool {
         do {
@@ -354,7 +407,7 @@ struct HoldEditorView: View {
     }
 
     private var canEditWallLayout: Bool {
-        effectiveUserEmail == Self.adminEmail
+        appModel.isAdmin
     }
 
     private var effectiveUserEmail: String? {

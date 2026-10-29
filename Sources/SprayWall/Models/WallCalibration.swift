@@ -3,7 +3,7 @@ import SwiftData
 
 @Model
 final class WallCalibration {
-    static let defaultPhotoPath = "/Users/igorcerovsky/Documents/spray_wall/wall.jpg"
+    static let defaultPhotoPath = "resources/281026_dd.jpeg"
 
     @Attribute(.unique) var id: UUID
     var photoPath: String

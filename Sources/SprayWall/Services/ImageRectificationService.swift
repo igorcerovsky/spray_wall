@@ -295,6 +295,10 @@ enum ImageRectificationService {
     private static func copyOriginalPhoto(photoURL: URL, destinationURL: URL) throws {
         let manager = FileManager.default
 
+        if photoURL.standardizedFileURL == destinationURL.standardizedFileURL {
+            return
+        }
+
         if manager.fileExists(atPath: destinationURL.path) {
             try manager.removeItem(at: destinationURL)
         }

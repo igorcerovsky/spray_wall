@@ -11,6 +11,8 @@ struct BoulderListView: View {
     @AppStorage("spraywall.boulder_filter_min_difficulty_index") private var minDifficultyIndex = 0
     @AppStorage("spraywall.boulder_filter_max_difficulty_index") private var maxDifficultyIndex = 25
     @State private var boulderToOpen: Boulder?
+    @State private var boulderToDelete: Boulder?
+    @State private var showDeleteConfirmation = false
 
     var body: some View {
         NavigationStack {
@@ -73,6 +75,26 @@ struct BoulderListView: View {
                                 }
                             }
                         }
+                        .contextMenu {
+                            if appModel.isAdmin {
+                                Button(role: .destructive) {
+                                    boulderToDelete = boulder
+                                    showDeleteConfirmation = true
+                                } label: {
+                                    Label("Delete Boulder", systemImage: "trash")
+                                }
+                            }
+                        }
+                        .swipeActions(edge: .trailing, allowsFullSwipe: false) {
+                            if appModel.isAdmin {
+                                Button(role: .destructive) {
+                                    boulderToDelete = boulder
+                                    showDeleteConfirmation = true
+                                } label: {
+                                    Label("Delete", systemImage: "trash")
+                                }
+                            }
+                        }
                     }
                     .onDelete(perform: delete)
                 }
@@ -80,6 +102,23 @@ struct BoulderListView: View {
             .navigationTitle("Boulders")
             .navigationDestination(item: $boulderToOpen) { boulder in
                 BoulderEditorView(boulder: boulder)
+            }
+            .confirmationDialog(
+                "Delete Boulder?",
+                isPresented: $showDeleteConfirmation,
+                titleVisibility: .visible
+            ) {
+                Button("Delete Boulder", role: .destructive) {
+                    if let target = boulderToDelete {
+                        delete(boulder: target)
+                    }
+                    boulderToDelete = nil
+                }
+                Button("Cancel", role: .cancel) {
+                    boulderToDelete = nil
+                }
+            } message: {
+                Text("Are you sure you want to delete '\(displayName(for: boulderToDelete ?? Boulder(boulderID: 0, name: "")))'? This action cannot be undone.")
             }
             .onAppear {
                 normalizeDifficultyFilterBounds()
@@ -156,6 +195,11 @@ struct BoulderListView: View {
     }
 
     private func delete(at offsets: IndexSet) {
+        guard appModel.isAdmin else {
+            appModel.globalMessage = "Only admin (igor cerovsky) can delete boulders."
+            return
+        }
+
         let current = filteredBoulders
 
         for index in offsets {
@@ -165,6 +209,23 @@ struct BoulderListView: View {
 
         do {
             try modelContext.save()
+            appModel.globalMessage = "Boulder deleted."
+        } catch {
+            appModel.globalMessage = "Could not delete boulder: \(error.localizedDescription)"
+        }
+    }
+
+    private func delete(boulder: Boulder) {
+        guard appModel.isAdmin else {
+            appModel.globalMessage = "Only admin (igor cerovsky) can delete boulders."
+            return
+        }
+
+        let name = displayName(for: boulder)
+        modelContext.delete(boulder)
+        do {
+            try modelContext.save()
+            appModel.globalMessage = "Boulder '\(name)' deleted."
         } catch {
             appModel.globalMessage = "Could not delete boulder: \(error.localizedDescription)"
         }

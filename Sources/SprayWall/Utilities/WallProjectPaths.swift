@@ -31,6 +31,21 @@ enum WallProjectPaths {
         try documentsDirectory().appendingPathComponent(projectFolderName, isDirectory: true)
     }
 
+    static func currentProjectFolderURL() -> URL {
+        if let bundleResources = Bundle.main.resourceURL {
+            let bundleCandidate = bundleResources.appendingPathComponent("resources/281026_dd.jpeg")
+            if FileManager.default.fileExists(atPath: bundleCandidate.path) {
+                return bundleResources
+            }
+        }
+        let current = URL(fileURLWithPath: FileManager.default.currentDirectoryPath, isDirectory: true)
+        let candidate = current.appendingPathComponent("resources/281026_dd.jpeg")
+        if FileManager.default.fileExists(atPath: candidate.path) {
+            return current
+        }
+        return URL(fileURLWithPath: "/Users/igorcerovsky/Documents/spray_wall", isDirectory: true)
+    }
+
     @discardableResult
     static func ensureProjectDirectory() throws -> URL {
         let directory = try projectDirectory()
@@ -51,6 +66,18 @@ enum WallProjectPaths {
             return absolute
         }
 
+        let currentProjectRelative = currentProjectFolderURL().appendingPathComponent(trimmed)
+        if fileManager.fileExists(atPath: currentProjectRelative.path) {
+            return currentProjectRelative
+        }
+
+        if trimmed.contains("photo_original.jpg") || trimmed.contains("photo original.jpg") {
+            let modernPhoto = currentProjectFolderURL().appendingPathComponent("resources/281026_dd.jpeg")
+            if fileManager.fileExists(atPath: modernPhoto.path) {
+                return modernPhoto
+            }
+        }
+
         let projectRelative = try projectDirectory().appendingPathComponent(trimmed)
         if fileManager.fileExists(atPath: projectRelative.path) {
             return projectRelative
@@ -60,7 +87,11 @@ enum WallProjectPaths {
     }
 
     static func defaultPhotoOriginalURL() throws -> URL {
-        try projectDirectory().appendingPathComponent("photo_original.jpg")
+        let modernPhoto = currentProjectFolderURL().appendingPathComponent("resources/281026_dd.jpeg")
+        if FileManager.default.fileExists(atPath: modernPhoto.path) {
+            return modernPhoto
+        }
+        return try projectDirectory().appendingPathComponent("photo_original.jpg")
     }
 
     static func defaultMainWallRectifiedURL() throws -> URL {

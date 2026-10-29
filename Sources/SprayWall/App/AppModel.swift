@@ -5,8 +5,31 @@ import SwiftData
 @MainActor
 @Observable
 final class AppModel {
-    private static let lastLoggedInEmailKey = "spraywall.last_logged_in_email"
+    static let lastLoggedInEmailKey = "spraywall.last_logged_in_email"
+    static let adminEmail = "igor.cerovsky@gmail.com"
+    static let adminDisplayName = "igor cerovsky"
     private static let lastLoggedInUserSnapshotKey = "spraywall.last_logged_in_user_snapshot"
+
+    var isAdmin: Bool {
+        if let email = currentUser?.email.trimmingCharacters(in: .whitespacesAndNewlines).lowercased(),
+           email == Self.adminEmail || email.contains("igor.cerovsky") {
+            return true
+        }
+
+        if let name = currentUser?.displayName.trimmingCharacters(in: .whitespacesAndNewlines).lowercased(),
+           name == Self.adminDisplayName || name.contains("igor cerovsky") {
+            return true
+        }
+
+        let persistedEmail = UserDefaults.standard.string(forKey: Self.lastLoggedInEmailKey)?
+            .trimmingCharacters(in: .whitespacesAndNewlines)
+            .lowercased()
+        if let persistedEmail, persistedEmail == Self.adminEmail || persistedEmail.contains("igor.cerovsky") {
+            return true
+        }
+
+        return false
+    }
 
     private struct PersistedUserSnapshot: Codable {
         var id: UUID
