@@ -2,10 +2,6 @@ import CoreGraphics
 import Foundation
 import SwiftUI
 
-import CoreGraphics
-import Foundation
-import SwiftUI
-
 /// Configurable shape for the floating hold zoom loupe.
 enum HoldLoupeShape: String, CaseIterable, Codable, Sendable {
     case circle
@@ -15,6 +11,9 @@ enum HoldLoupeShape: String, CaseIterable, Codable, Sendable {
 /// Configuration options for the floating hold loupe preview.
 /// Shape, screen size, high-res crop span, and styling are easily customized.
 struct HoldLoupeConfig: Sendable, Equatable {
+    /// Whether the loupe preview is currently enabled.
+    var isEnabled: Bool
+
     /// Visual shape of the loupe. Default is circular.
     var shape: HoldLoupeShape
 
@@ -47,6 +46,7 @@ struct HoldLoupeConfig: Sendable, Equatable {
     var offsetFromMarker: CGSize
 
     init(
+        isEnabled: Bool = true,
         shape: HoldLoupeShape = .circle,
         size: CGSize = CGSize(width: 190, height: 190),
         cornerRadius: CGFloat = 18,
@@ -58,6 +58,7 @@ struct HoldLoupeConfig: Sendable, Equatable {
         showBadge: Bool = true,
         offsetFromMarker: CGSize = CGSize(width: 0, height: -125)
     ) {
+        self.isEnabled = isEnabled
         self.shape = shape
         self.size = size
         self.cornerRadius = cornerRadius
@@ -72,6 +73,7 @@ struct HoldLoupeConfig: Sendable, Equatable {
 
     /// Default circular loupe with clean white rim and crisp zoom.
     static let defaultCircle = HoldLoupeConfig(
+        isEnabled: true,
         shape: .circle,
         size: CGSize(width: 190, height: 190),
         cropPixelSpan: 380
@@ -79,6 +81,7 @@ struct HoldLoupeConfig: Sendable, Equatable {
 
     /// Larger circular loupe for inspecting micro-details.
     static let largeCircle = HoldLoupeConfig(
+        isEnabled: true,
         shape: .circle,
         size: CGSize(width: 240, height: 240),
         cropPixelSpan: 480,
@@ -87,6 +90,7 @@ struct HoldLoupeConfig: Sendable, Equatable {
 
     /// Rounded card preview variant.
     static let roundedCard = HoldLoupeConfig(
+        isEnabled: true,
         shape: .roundedRectangle,
         size: CGSize(width: 210, height: 190),
         cornerRadius: 16,
@@ -95,6 +99,7 @@ struct HoldLoupeConfig: Sendable, Equatable {
 
     /// Compact circular loupe.
     static let compactCircle = HoldLoupeConfig(
+        isEnabled: true,
         shape: .circle,
         size: CGSize(width: 150, height: 150),
         cropPixelSpan: 300,

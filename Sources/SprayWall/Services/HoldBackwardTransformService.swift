@@ -166,21 +166,30 @@ enum HoldBackwardTransformService {
         )
     }
 
-    /// Extracts a high-resolution sub-image centered at the hold's original photo position.
+    /// Extracts a high-resolution sub-image centered at the physical wall coordinate (xCm, yCm).
     ///
     /// - Parameters:
     ///   - cgImage: The decoded high-resolution original image.
-    ///   - hold: The hold to locate and crop.
+    ///   - xCm: Horizontal coordinate in centimeters.
+    ///   - yCm: Vertical coordinate from wall bottom in centimeters.
+    ///   - plane: Kickboard or main wall plane.
     ///   - calibrationPoints: Calibration points defining the geometric transform.
     ///   - cropSpan: Side length of the square cropped area in original photo pixels.
     /// - Returns: Cropped `CGImage` at native resolution, or nil if out of bounds or points missing.
-    static func cropHold(
+    static func cropLocation(
         from cgImage: CGImage,
-        hold: Hold,
+        xCm: Double,
+        yCm: Double,
+        plane: HoldPlane,
         calibrationPoints: [CalibrationPoint],
         cropSpan: CGFloat
     ) -> CGImage? {
-        guard let location = photoPixelLocation(for: hold, calibrationPoints: calibrationPoints) else {
+        guard let location = photoPixelLocation(
+            xCm: xCm,
+            yCm: yCm,
+            plane: plane,
+            calibrationPoints: calibrationPoints
+        ) else {
             return nil
         }
 
@@ -216,5 +225,29 @@ enum HoldBackwardTransformService {
 
         let cropRect = CGRect(x: originX, y: originY, width: effectiveWidth, height: effectiveHeight)
         return cgImage.cropping(to: cropRect)
+    }
+
+    /// Extracts a high-resolution sub-image centered at the hold's original photo position.
+    ///
+    /// - Parameters:
+    ///   - cgImage: The decoded high-resolution original image.
+    ///   - hold: The hold to locate and crop.
+    ///   - calibrationPoints: Calibration points defining the geometric transform.
+    ///   - cropSpan: Side length of the square cropped area in original photo pixels.
+    /// - Returns: Cropped `CGImage` at native resolution, or nil if out of bounds or points missing.
+    static func cropHold(
+        from cgImage: CGImage,
+        hold: Hold,
+        calibrationPoints: [CalibrationPoint],
+        cropSpan: CGFloat
+    ) -> CGImage? {
+        cropLocation(
+            from: cgImage,
+            xCm: hold.xCm,
+            yCm: hold.yCm,
+            plane: hold.plane,
+            calibrationPoints: calibrationPoints,
+            cropSpan: cropSpan
+        )
     }
 }

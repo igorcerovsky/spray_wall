@@ -138,14 +138,50 @@ struct HoldBackwardTransformServiceTests {
         #expect(roundedCard.shape == .roundedRectangle)
         #expect(roundedCard.size.width == 210)
         #expect(roundedCard.cornerRadius == 16)
+        #expect(roundedCard.isEnabled == true)
 
         var custom = HoldLoupeConfig()
         custom.shape = .roundedRectangle
         custom.size = CGSize(width: 250, height: 250)
         custom.cropPixelSpan = 500
+        custom.isEnabled = false
         #expect(custom.shape == .roundedRectangle)
         #expect(custom.size.width == 250)
         #expect(custom.cropPixelSpan == 500)
+        #expect(custom.isEnabled == false)
+    }
+
+    @Test("cropLocation crops arbitrary coordinate precisely")
+    func cropLocationCoordinate() {
+        let width = 4000
+        let height = 3000
+        let colorSpace = CGColorSpaceCreateDeviceRGB()
+        let bitmapInfo = CGBitmapInfo(rawValue: CGImageAlphaInfo.premultipliedLast.rawValue)
+        guard let context = CGContext(
+            data: nil,
+            width: width,
+            height: height,
+            bitsPerComponent: 8,
+            bytesPerRow: width * 4,
+            space: colorSpace,
+            bitmapInfo: bitmapInfo.rawValue
+        ), let testImage = context.makeImage() else {
+            Issue.record("Failed to create mock test image")
+            return
+        }
+
+        let cropped = HoldBackwardTransformService.cropLocation(
+            from: testImage,
+            xCm: 180,
+            yCm: 200,
+            plane: .main,
+            calibrationPoints: sampleCalibrationPoints,
+            cropSpan: 240
+        )
+
+        #expect(cropped != nil)
+        #expect(cropped?.width == 240)
+        #expect(cropped?.height == 240)
     }
 }
 

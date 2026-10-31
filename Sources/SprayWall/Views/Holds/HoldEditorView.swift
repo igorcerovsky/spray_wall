@@ -7,6 +7,7 @@ struct HoldEditorView: View {
 
     @Environment(\.modelContext) private var modelContext
     @Environment(AppModel.self) private var appModel
+    @Query(sort: \WallCalibration.updatedAt, order: .reverse) private var calibrations: [WallCalibration]
 
     @State private var showHoldList = false
     @State private var isEditingHolds = false
@@ -14,27 +15,54 @@ struct HoldEditorView: View {
     @State private var inlineStatusMessage: String?
     @State private var holds: [Hold] = []
 
+    // Zoom & Pan state
+    @State private var zoomScale: CGFloat = 1.0
+    @State private var baseZoomScale: CGFloat = 1.0
+    @State private var panOffset: CGSize = .zero
+    @State private var dragStartOffset: CGSize? = nil
+
+    // Loupe preview state
+    @State private var loupeConfig = HoldLoupeConfig.defaultCircle
+    @State private var hoveredHold: Hold?
+    @State private var draggedHold: Hold?
+    @State private var hoveredCropCGImage: CGImage?
+    @State private var originalPhotoCGImage: CGImage?
+    @State private var currentMouseLocation: CGPoint? = nil
+
     var body: some View {
         NavigationStack {
-            VStack(spacing: 12) {
+            VStack(spacing: 8) {
                 controls
 
-                wallPreview
-                    .frame(maxWidth: .infinity)
-                    .aspectRatio(WallSpec.widthCm / WallSpec.totalHeightCm, contentMode: .fit)
+                zoomableWallPreview
+                    .frame(maxWidth: .infinity, maxHeight: .infinity)
+
+                if let inlineStatusMessage, !inlineStatusMessage.isEmpty {
+                    Text(inlineStatusMessage)
+                        .font(.footnote)
+                        .foregroundStyle(inlineStatusMessage.contains("failed") || inlineStatusMessage.contains("Only admin") ? .red : .secondary)
+                        .frame(maxWidth: .infinity, alignment: .leading)
+                        .padding(.horizontal, 4)
+                }
 
                 DisclosureGroup("Holds (\(holds.count))", isExpanded: $showHoldList) {
-                    ForEach(holds.prefix(20)) { hold in
-                        HStack {
-                            Text("#\(hold.holdID)")
-                                .font(.headline.monospacedDigit())
-                            Text("\(Int(hold.xCm)), \(Int(hold.yCm)) cm")
-                                .font(.subheadline)
-                            Spacer()
-                            Text(hold.plane.rawValue.capitalized)
-                                .foregroundStyle(.secondary)
+                    ScrollView {
+                        LazyVStack(spacing: 4) {
+                            ForEach(holds) { hold in
+                                HStack {
+                                    Text("#\(hold.holdID)")
+                                        .font(.headline.monospacedDigit())
+                                    Text("\(Int(hold.xCm)), \(Int(hold.yCm)) cm")
+                                        .font(.subheadline)
+                                    Spacer()
+                                    Text(hold.plane.rawValue.capitalized)
+                                        .foregroundStyle(.secondary)
+                                }
+                                .padding(.vertical, 2)
+                            }
                         }
                     }
+                    .frame(maxHeight: 120)
                 }
                 .padding(.horizontal, 4)
             }
@@ -42,6 +70,7 @@ struct HoldEditorView: View {
             .navigationTitle("Hold Positions")
             .task {
                 fetchHolds()
+                loadOriginalPhoto()
             }
             .confirmationDialog(
                 "Delete All Holds?",
@@ -58,43 +87,311 @@ struct HoldEditorView: View {
         }
     }
 
-    private var wallPreview: some View {
-        GeometryReader { geometry in
-            ZStack {
-                wallBackground(size: geometry.size)
+    // MARK: - Zoomable Wall View with Exact Transformations & Loupe
 
-                ForEach(holds) { hold in
-                    HoldPositionDotView(holdID: hold.holdID)
-                        .position(position(for: hold, size: geometry.size))
-                        .gesture(
-                            DragGesture(minimumDistance: 0)
-                                .onChanged { value in
-                                    guard isEditingHolds else { return }
-                                    move(hold: hold, to: value.location, size: geometry.size)
-                                }
-                                .onEnded { _ in
-                                    guard isEditingHolds else { return }
-                                    persistMove(holdID: hold.holdID, xCm: hold.xCm, yCm: hold.yCm)
-                                }
+    private var zoomableWallPreview: some View {
+        GeometryReader { geometry in
+            let viewportSize = geometry.size
+            let fittedSize = WallZoomTransform.computeFittedSize(in: viewportSize)
+            let zoomTransform = WallZoomTransform(
+                fittedSize: fittedSize,
+                viewportSize: viewportSize,
+                zoomScale: zoomScale,
+                panOffset: panOffset
+            )
+
+            ZStack {
+                Color.clear
+
+                // Wall Canvas rendered with zoom scale and pan shift
+                ZStack {
+                    WallBackgroundView(size: fittedSize)
+
+                    // Visual hold markers rendered on the canvas
+                    ForEach(holds) { hold in
+                        let isHovered = (hoveredHold?.holdID == hold.holdID) || (draggedHold?.holdID == hold.holdID)
+                        let markerPos = zoomTransform.worldCmToWall(xCm: hold.xCm, yCm: hold.yCm)
+
+                        HoldPositionDotView(
+                            holdID: hold.holdID,
+                            xCm: hold.xCm,
+                            yCm: hold.yCm,
+                            isHovered: isHovered,
+                            isEditing: isEditingHolds
                         )
-                        .contextMenu {
-                            if isEditingHolds {
-                                Button("Delete Hold", role: .destructive) {
-                                    delete(hold: hold)
-                                }
-                            }
-                        }
+                        .position(markerPos)
+                        .allowsHitTesting(false)
+                    }
+                }
+                .frame(width: fittedSize.width, height: fittedSize.height)
+                .scaleEffect(zoomScale, anchor: .center)
+                .offset(panOffset)
+                .allowsHitTesting(false) // Let the outer viewport handle all mouse interaction using the transformation matrix
+
+                // Floating Loupe Preview
+                if loupeConfig.isEnabled, let activeHold = draggedHold ?? hoveredHold {
+                    let anchorScreenPt = zoomTransform.worldCmToViewport(xCm: activeHold.xCm, yCm: activeHold.yCm)
+                    let loupePosition = WallZoomTransform.computeLoupePosition(
+                        anchorPoint: currentMouseLocation ?? anchorScreenPt,
+                        loupeConfig: loupeConfig,
+                        viewportSize: viewportSize
+                    )
+
+                    HoldLoupeView(
+                        croppedImage: hoveredCropCGImage,
+                        title: "Hold #\(activeHold.holdID)",
+                        subtitle: "(\(Int(activeHold.xCm)), \(Int(activeHold.yCm))) cm",
+                        config: loupeConfig
+                    )
+                    .position(loupePosition)
+                    .transition(.scale(scale: 0.85).combined(with: .opacity))
+                    .allowsHitTesting(false)
                 }
             }
+            .frame(width: viewportSize.width, height: viewportSize.height)
+            .clipped()
             .contentShape(Rectangle())
-            .simultaneousGesture(
+            .contextMenu {
+                if isEditingHolds, canEditWallLayout, let hold = hoveredHold {
+                    Button("Delete Hold #\(hold.holdID)", role: .destructive) {
+                        delete(hold: hold)
+                    }
+                }
+            }
+            .gesture(
                 SpatialTapGesture()
                     .onEnded { value in
-                        handleCanvasTap(at: value.location, size: geometry.size)
+                        handleCanvasTap(at: value.location, zoomTransform: zoomTransform)
                     }
+            )
+            .simultaneousGesture(
+                DragGesture(minimumDistance: 4)
+                    .onChanged { value in
+                        handleDragChanged(
+                            value: value,
+                            zoomTransform: zoomTransform,
+                            fittedSize: fittedSize,
+                            viewportSize: viewportSize
+                        )
+                    }
+                    .onEnded { value in
+                        handleDragEnded(value: value, zoomTransform: zoomTransform)
+                    }
+            )
+            .simultaneousGesture(
+                MagnificationGesture()
+                    .onChanged { value in
+                        let targetScale = min(5.0, max(1.0, baseZoomScale * value))
+                        zoomScale = targetScale
+                        if zoomScale <= 1.0 {
+                            panOffset = .zero
+                        } else {
+                            panOffset = WallZoomTransform.clampedOffset(
+                                panOffset,
+                                fittedSize: fittedSize,
+                                viewportSize: viewportSize,
+                                scale: zoomScale
+                            )
+                        }
+                    }
+                    .onEnded { _ in
+                        baseZoomScale = zoomScale
+                    }
+            )
+            .onContinuousHover(coordinateSpace: .local) { phase in
+                switch phase {
+                case let .active(viewportPoint):
+                    handleMouseHover(at: viewportPoint, zoomTransform: zoomTransform)
+                case .ended:
+                    handleMouseExited()
+                }
+            }
+            #if os(macOS)
+            .background(
+                ScrollWheelZoomModifier { delta, mouseLocation in
+                    if let result = WallZoomTransform.focalZoom(
+                        delta: delta,
+                        mouseLocation: mouseLocation,
+                        currentScale: zoomScale,
+                        currentOffset: panOffset,
+                        fittedSize: fittedSize,
+                        viewportSize: viewportSize
+                    ) {
+                        zoomScale = result.newScale
+                        baseZoomScale = result.newScale
+                        panOffset = result.newOffset
+                    }
+                }
+            )
+            #endif
+        }
+    }
+
+    // MARK: - Drag & Tap Handlers
+
+    private func handleDragChanged(
+        value: DragGesture.Value,
+        zoomTransform: WallZoomTransform,
+        fittedSize: CGSize,
+        viewportSize: CGSize
+    ) {
+        currentMouseLocation = value.location
+
+        // Check if starting a drag on a hold (or continuing dragging one)
+        if draggedHold == nil && dragStartOffset == nil {
+            if isEditingHolds && canEditWallLayout,
+               let match = zoomTransform.closestHold(near: value.startLocation, in: holds, maxScreenDistance: 24.0) {
+                draggedHold = match.hold
+            } else if zoomScale > 1.0 {
+                dragStartOffset = panOffset
+            }
+        }
+
+        if let hold = draggedHold {
+            // Dragging hold in physical world coordinates (cm)
+            let world = zoomTransform.viewportToWorldCm(value.location)
+            hold.xCm = max(0, min(WallSpec.widthCm, world.xCm))
+            hold.yCm = max(0, min(WallSpec.totalHeightCm, world.yCm))
+            hold.plane = hold.yCm <= WallSpec.kickboardHeightCm ? .kickboard : .main
+            updateCrop(for: hold)
+            inlineStatusMessage = "Moving hold #\(hold.holdID) to (\(Int(hold.xCm)), \(Int(hold.yCm))) cm"
+        } else if let start = dragStartOffset {
+            // Panning canvas
+            let candidate = CGSize(
+                width: start.width + value.translation.width,
+                height: start.height + value.translation.height
+            )
+            panOffset = WallZoomTransform.clampedOffset(
+                candidate,
+                fittedSize: fittedSize,
+                viewportSize: viewportSize,
+                scale: zoomScale
             )
         }
     }
+
+    private func handleDragEnded(
+        value: DragGesture.Value,
+        zoomTransform: WallZoomTransform
+    ) {
+        if let hold = draggedHold {
+            let world = zoomTransform.viewportToWorldCm(value.location)
+            let finalX = max(0, min(WallSpec.widthCm, world.xCm))
+            let finalY = max(0, min(WallSpec.totalHeightCm, world.yCm))
+            persistMove(holdID: hold.holdID, xCm: finalX, yCm: finalY)
+            inlineStatusMessage = "Moved hold #\(hold.holdID) to (\(Int(finalX)), \(Int(finalY))) cm"
+            draggedHold = nil
+        }
+        dragStartOffset = nil
+    }
+
+    private func handleCanvasTap(at location: CGPoint, zoomTransform: WallZoomTransform) {
+        guard canEditWallLayout else {
+            appModel.globalMessage = "Wall layout can be edited only by admin (\(Self.adminEmail)). Current user: \(effectiveUserEmail ?? "unknown")."
+            inlineStatusMessage = "Only admin can edit wall layout. Signed in as: \(effectiveUserEmail ?? "unknown")"
+            return
+        }
+
+        guard isEditingHolds else {
+            // In locked mode, tapping a hold selects it and opens high-res loupe
+            if let match = zoomTransform.closestHold(near: location, in: holds, maxScreenDistance: 24.0) {
+                hoveredHold = match.hold
+                updateCrop(for: match.hold)
+                inlineStatusMessage = "Hold #\(match.hold.holdID) at (\(Int(match.hold.xCm)), \(Int(match.hold.yCm))) cm (\(match.hold.plane.rawValue.capitalized))"
+            }
+            return
+        }
+
+        // In edit mode: if tapped directly on an existing hold, select it
+        if let match = zoomTransform.closestHold(near: location, in: holds, maxScreenDistance: 20.0) {
+            hoveredHold = match.hold
+            updateCrop(for: match.hold)
+            inlineStatusMessage = "Selected hold #\(match.hold.holdID) at (\(Int(match.hold.xCm)), \(Int(match.hold.yCm))) cm. Drag to move, right-click to delete."
+            return
+        }
+
+        // Otherwise: add new hold at exact world coordinates
+        let world = zoomTransform.viewportToWorldCm(location)
+        addHold(xCm: world.xCm, yCm: world.yCm)
+    }
+
+    private func handleMouseHover(
+        at viewportPoint: CGPoint,
+        zoomTransform: WallZoomTransform
+    ) {
+        currentMouseLocation = viewportPoint
+
+        guard draggedHold == nil else { return }
+
+        guard loupeConfig.isEnabled else {
+            if hoveredHold != nil {
+                hoveredHold = nil
+                hoveredCropCGImage = nil
+            }
+            return
+        }
+
+        let hitRadius: CGFloat = 28.0
+        if let match = zoomTransform.closestHold(near: viewportPoint, in: holds, maxScreenDistance: hitRadius) {
+            let hold = match.hold
+            if hoveredHold?.holdID != hold.holdID {
+                withAnimation(.easeOut(duration: 0.12)) {
+                    hoveredHold = hold
+                }
+                updateCrop(for: hold)
+            }
+        } else {
+            if hoveredHold != nil {
+                withAnimation(.easeOut(duration: 0.12)) {
+                    hoveredHold = nil
+                    hoveredCropCGImage = nil
+                }
+            }
+        }
+    }
+
+    private func handleMouseExited() {
+        currentMouseLocation = nil
+        if draggedHold == nil {
+            withAnimation(.easeOut(duration: 0.12)) {
+                hoveredHold = nil
+                hoveredCropCGImage = nil
+            }
+        }
+    }
+
+    // MARK: - Photo Loading & Backward Transform Cropping
+
+    private var activeCalibrationPoints: [CalibrationPoint] {
+        calibrations.first?.points ?? CalibrationPointTemplates.all
+    }
+
+    private func loadOriginalPhoto() {
+        let photoPath = calibrations.first?.photoPath ?? WallCalibration.defaultPhotoPath
+        Task.detached {
+            let image = await OriginalPhotoLoader.shared.loadPhoto(from: photoPath)
+            await MainActor.run {
+                self.originalPhotoCGImage = image
+                if let active = self.draggedHold ?? self.hoveredHold {
+                    self.updateCrop(for: active)
+                }
+            }
+        }
+    }
+
+    private func updateCrop(for hold: Hold) {
+        guard let originalImage = originalPhotoCGImage else { return }
+        hoveredCropCGImage = HoldBackwardTransformService.cropLocation(
+            from: originalImage,
+            xCm: hold.xCm,
+            yCm: hold.yCm,
+            plane: hold.plane,
+            calibrationPoints: activeCalibrationPoints,
+            cropSpan: loupeConfig.cropPixelSpan
+        )
+    }
+
+    // MARK: - Controls Toolbar
 
     private var controls: some View {
         VStack(spacing: 8) {
@@ -103,6 +400,9 @@ struct HoldEditorView: View {
                     if canEditWallLayout {
                         isEditingHolds.toggle()
                         inlineStatusMessage = nil
+                        if !isEditingHolds {
+                            draggedHold = nil
+                        }
                     } else {
                         appModel.globalMessage = "Wall layout can be edited only by admin."
                         inlineStatusMessage = "Only admin can edit wall layout. Signed in as: \(effectiveUserEmail ?? "unknown")"
@@ -110,129 +410,61 @@ struct HoldEditorView: View {
                 }
                 .buttonStyle(.borderedProminent)
 
-                Button("Delete all and reset counter", role: .destructive) {
-                    if canEditWallLayout {
-                        showDeleteAllConfirmation = true
-                    } else {
-                        appModel.globalMessage = "Wall layout can be edited only by admin."
-                        inlineStatusMessage = "Only admin can edit wall layout. Signed in as: \(effectiveUserEmail ?? "unknown")"
+                if isEditingHolds {
+                    Button("Delete all and reset counter", role: .destructive) {
+                        if canEditWallLayout {
+                            showDeleteAllConfirmation = true
+                        } else {
+                            appModel.globalMessage = "Wall layout can be edited only by admin."
+                            inlineStatusMessage = "Only admin can edit wall layout. Signed in as: \(effectiveUserEmail ?? "unknown")"
+                        }
                     }
+                    .buttonStyle(.bordered)
+                    .disabled(holds.isEmpty)
                 }
-                .buttonStyle(.bordered)
-                .disabled(holds.isEmpty)
 
                 Spacer()
+
+                WallZoomControlsView(
+                    zoomScale: $zoomScale,
+                    panOffset: $panOffset,
+                    baseZoomScale: $baseZoomScale,
+                    loupeConfig: $loupeConfig
+                )
             }
 
-            Text("Positioning mode: only hold ID and coordinates are edited here.")
-                .font(.footnote)
-                .foregroundStyle(.secondary)
-                .frame(maxWidth: .infinity, alignment: .leading)
-
             Text(isEditingHolds
-                 ? "Edit mode: tap wall to add, drag to move, right-click to delete."
-                 : "Locked mode: wall is read-only. Press Edit to modify hold positions.")
+                 ? "Edit mode: tap wall to add hold, drag to reposition (loupe shows exact bolt position), right-click to delete."
+                 : "Locked mode: wall is read-only. Hover over holds to view high-resolution loupe preview. Press Edit to modify.")
                 .font(.footnote)
                 .foregroundStyle(.secondary)
                 .frame(maxWidth: .infinity, alignment: .leading)
 
             if !canEditWallLayout {
-                Text("Wall layout is shared across all users. Only admin can edit it.")
-                    .font(.footnote)
-                    .foregroundStyle(.secondary)
-                    .frame(maxWidth: .infinity, alignment: .leading)
-
-                Text("Current user: \(appModel.currentUser?.email ?? "not logged in")")
+                Text("Wall layout is shared across all users. Only admin can edit it. Current user: \(appModel.currentUser?.email ?? "not logged in")")
                     .font(.footnote)
                     .foregroundStyle(.secondary)
                     .frame(maxWidth: .infinity, alignment: .leading)
             }
-
-            if let inlineStatusMessage, !inlineStatusMessage.isEmpty {
-                Text(inlineStatusMessage)
-                    .font(.footnote)
-                    .foregroundStyle(.red)
-                    .frame(maxWidth: .infinity, alignment: .leading)
-            }
         }
     }
 
-    private func wallBackground(size: CGSize) -> some View {
-        let kickboardHeight = size.height * (WallSpec.kickboardHeightCm / WallSpec.totalHeightCm)
-        let mainWallHeight = max(0, size.height - kickboardHeight)
-        let mainWallImageURL = existingURL(for: { try WallProjectPaths.defaultMainWallRectifiedURL() })
-        let kickboardImageURL = existingURL(for: { try WallProjectPaths.defaultKickboardRectifiedURL() })
+    // MARK: - Data Management
 
-        return ZStack(alignment: .bottom) {
-            VStack(spacing: 0) {
-                wallSectionBackground(
-                    imageURL: mainWallImageURL,
-                    fallbackColor: Color.gray.opacity(0.2)
-                )
-                .frame(height: mainWallHeight)
-
-                wallSectionBackground(
-                    imageURL: kickboardImageURL,
-                    fallbackColor: Color.brown.opacity(0.22)
-                )
-                .frame(height: kickboardHeight)
-            }
-            .frame(maxWidth: .infinity, maxHeight: .infinity)
-
-            Rectangle()
-                .fill(Color.black.opacity(0.35))
-                .frame(height: 1)
-                .offset(y: -kickboardHeight)
-        }
-        .clipShape(RoundedRectangle(cornerRadius: 10))
-    }
-
-    @ViewBuilder
-    private func wallSectionBackground(imageURL: URL?, fallbackColor: Color) -> some View {
-        if let imageURL {
-            AsyncImage(url: imageURL) { phase in
-                switch phase {
-                case let .success(image):
-                    image
-                        .resizable()
-                        .scaledToFit()
-                        .frame(maxWidth: .infinity, maxHeight: .infinity)
-                        .background(fallbackColor)
-                default:
-                    Rectangle().fill(fallbackColor)
-                }
-            }
-        } else {
-            Rectangle().fill(fallbackColor)
-        }
-    }
-
-    private func existingURL(for resolver: () throws -> URL) -> URL? {
-        guard let resolved = try? resolver(),
-              FileManager.default.fileExists(atPath: resolved.path) else {
-            return nil
-        }
-        return resolved
-    }
-
-    private func addHold(at location: CGPoint, size: CGSize) {
-        guard canEditWallLayout else {
-            appModel.globalMessage = "Wall layout can be edited only by admin."
-            inlineStatusMessage = "Only admin can edit wall layout. Signed in as: \(effectiveUserEmail ?? "unknown")"
-            return
-        }
+    private func addHold(xCm: Double, yCm: Double) {
+        guard canEditWallLayout else { return }
 
         let writeContext = ModelContext(modelContext.container)
         let existing = (try? writeContext.fetch(FetchDescriptor<Hold>(sortBy: [SortDescriptor(\.holdID)]))) ?? []
         let holdID = (existing.map(\.holdID).max() ?? 0) + 1
-        let xCm = max(0, min(WallSpec.widthCm, (location.x / size.width) * WallSpec.widthCm))
-        let yCm = max(0, min(WallSpec.totalHeightCm, (1 - (location.y / size.height)) * WallSpec.totalHeightCm))
-        let plane: HoldPlane = yCm <= WallSpec.kickboardHeightCm ? .kickboard : .main
+        let clampedX = max(0, min(WallSpec.widthCm, xCm))
+        let clampedY = max(0, min(WallSpec.totalHeightCm, yCm))
+        let plane: HoldPlane = clampedY <= WallSpec.kickboardHeightCm ? .kickboard : .main
 
         let hold = Hold(
             holdID: holdID,
-            xCm: xCm,
-            yCm: yCm,
+            xCm: clampedX,
+            yCm: clampedY,
             plane: plane,
             role: .hand
         )
@@ -242,23 +474,16 @@ struct HoldEditorView: View {
             let insertedPresent = isHoldPersisted(holdID: holdID)
 
             if insertedPresent {
-                inlineStatusMessage = "Added hold #\(holdID) at (\(Int(xCm)), \(Int(yCm))) cm. Total holds: \(afterCount)."
+                inlineStatusMessage = "Added hold #\(holdID) at (\(Int(clampedX)), \(Int(clampedY))) cm. Total holds: \(afterCount)."
+                if let newHold = holds.first(where: { $0.holdID == holdID }) {
+                    hoveredHold = newHold
+                    updateCrop(for: newHold)
+                }
             } else {
                 inlineStatusMessage = "Insert attempted for hold #\(holdID), but DB verification failed."
                 appModel.globalMessage = "Insert verification failed."
             }
         }
-    }
-
-    private func move(hold: Hold, to location: CGPoint, size: CGSize) {
-        guard canEditWallLayout else {
-            return
-        }
-
-        hold.xCm = max(0, min(WallSpec.widthCm, (location.x / size.width) * WallSpec.widthCm))
-        hold.yCm = max(0, min(WallSpec.totalHeightCm, (1 - (location.y / size.height)) * WallSpec.totalHeightCm))
-        hold.plane = hold.yCm <= WallSpec.kickboardHeightCm ? .kickboard : .main
-        inlineStatusMessage = nil
     }
 
     private func persistMove(holdID: Int, xCm: Double, yCm: Double) {
@@ -304,7 +529,11 @@ struct HoldEditorView: View {
 
         if persist(context: writeContext) {
             _ = fetchHoldsAndReturnCount()
-            inlineStatusMessage = "Hold deleted. Total holds: \(holds.count)."
+            if hoveredHold?.holdID == hold.holdID {
+                hoveredHold = nil
+                hoveredCropCGImage = nil
+            }
+            inlineStatusMessage = "Hold #\(id) deleted. Total holds: \(holds.count)."
         }
     }
 
@@ -328,6 +557,9 @@ struct HoldEditorView: View {
             try writeContext.save()
 
             _ = fetchHoldsAndReturnCount()
+            hoveredHold = nil
+            draggedHold = nil
+            hoveredCropCGImage = nil
             inlineStatusMessage = "All holds deleted. Hold counter reset to 1."
             appModel.globalMessage = "All holds deleted. Hold counter reset to 1."
         } catch {
@@ -382,30 +614,6 @@ struct HoldEditorView: View {
         }
     }
 
-    private func position(for hold: Hold, size: CGSize) -> CGPoint {
-        let x = (hold.xCm / WallSpec.widthCm) * size.width
-        let y = (1 - (hold.yCm / WallSpec.totalHeightCm)) * size.height
-        return CGPoint(x: x, y: y)
-    }
-
-    private func handleCanvasTap(at location: CGPoint, size: CGSize) {
-        inlineStatusMessage = "Wall click detected at (\(Int(location.x)), \(Int(location.y))) px."
-
-        guard canEditWallLayout else {
-            appModel.globalMessage = "Wall layout can be edited only by admin (\(Self.adminEmail)). Current user: \(effectiveUserEmail ?? "unknown")."
-            inlineStatusMessage = "Only admin can edit wall layout. Signed in as: \(effectiveUserEmail ?? "unknown")"
-            return
-        }
-
-        guard isEditingHolds else {
-            appModel.globalMessage = "Holds are locked. Press Edit to add or move holds."
-            inlineStatusMessage = "Holds are locked. Press Edit first."
-            return
-        }
-
-        addHold(at: location, size: size)
-    }
-
     private var canEditWallLayout: Bool {
         appModel.isAdmin
     }
@@ -430,26 +638,34 @@ struct HoldEditorView: View {
     }
 }
 
+// MARK: - Hold Position Visual Marker Dot
+
 private struct HoldPositionDotView: View {
     let holdID: Int
+    var xCm: Double = 0
+    var yCm: Double = 0
+    var isHovered: Bool = false
+    var isEditing: Bool = false
 
     var body: some View {
         ZStack(alignment: .top) {
             Circle()
-                .fill(Color.purple.opacity(0.22))
-                .frame(width: 10, height: 10)
+                .fill(isHovered ? Color.cyan.opacity(0.35) : Color.purple.opacity(0.25))
+                .frame(width: isHovered ? 16 : 10, height: isHovered ? 16 : 10)
                 .overlay {
-                    Circle().stroke(Color.purple, lineWidth: 1)
+                    Circle().stroke(isHovered ? Color.cyan : Color.purple, lineWidth: isHovered ? 2 : 1)
                 }
+                .shadow(color: isHovered ? Color.cyan.opacity(0.8) : .clear, radius: 4)
+                .animation(.spring(response: 0.25, dampingFraction: 0.7), value: isHovered)
 
             Text("\(holdID)")
-                .font(.caption2.monospacedDigit())
+                .font(.caption2.monospacedDigit().weight(isHovered ? .bold : .regular))
                 .padding(.horizontal, 3)
                 .padding(.vertical, 1)
-                .background(Color.black.opacity(0.65))
+                .background(Color.black.opacity(isHovered ? 0.9 : 0.65))
                 .foregroundStyle(.white)
                 .clipShape(RoundedRectangle(cornerRadius: 3))
-                .offset(y: -12)
+                .offset(y: isHovered ? -16 : -12)
         }
     }
 }

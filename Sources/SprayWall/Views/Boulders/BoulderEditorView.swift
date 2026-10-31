@@ -219,7 +219,7 @@ struct BoulderEditorView: View {
 
                 // Wall Canvas rendered with zoom scale and pan shift
                 ZStack {
-                    wallBackground(size: fittedSize)
+                    WallBackgroundView(size: fittedSize)
 
                     // Visual hold markers rendered on the canvas
                     ForEach(holdsForWallPreview) { hold in
@@ -330,7 +330,6 @@ struct BoulderEditorView: View {
                     }
             )
             .onContinuousHover(coordinateSpace: .local) { phase in
-                guard canEditDraft else { return }
                 switch phase {
                 case let .active(viewportPoint):
                     handleMouseHover(at: viewportPoint, zoomTransform: zoomTransform)
@@ -356,14 +355,7 @@ struct BoulderEditorView: View {
     // MARK: - Geometry & Zoom Math
 
     private func computeFittedSize(in viewport: CGSize) -> CGSize {
-        let wallAspect: CGFloat = WallSpec.widthCm / WallSpec.totalHeightCm
-        if (viewport.width / max(1, viewport.height)) > wallAspect {
-            let fitHeight = max(10, viewport.height)
-            return CGSize(width: fitHeight * wallAspect, height: fitHeight)
-        } else {
-            let fitWidth = max(10, viewport.width)
-            return CGSize(width: fitWidth, height: fitWidth / wallAspect)
-        }
+        WallZoomTransform.computeFittedSize(in: viewport)
     }
 
     private func handleScrollZoom(
@@ -372,38 +364,18 @@ struct BoulderEditorView: View {
         fittedSize: CGSize,
         viewportSize: CGSize
     ) {
-        let minScale: CGFloat = 1.0
-        let maxScale: CGFloat = 5.0
-
-        let previousScale = zoomScale
-        let newScale = min(maxScale, max(minScale, zoomScale + (delta * zoomScale)))
-        guard abs(newScale - previousScale) > 0.001 else { return }
-
-        if newScale <= 1.0 {
-            withAnimation(.easeOut(duration: 0.15)) {
-                zoomScale = 1.0
-                baseZoomScale = 1.0
-                panOffset = .zero
-            }
-            return
-        }
-
-        // Focal zoom towards mouse position
-        let mouseFromCenterX = mouseLocation.x - (viewportSize.width / 2)
-        let mouseFromCenterY = mouseLocation.y - (viewportSize.height / 2)
-
-        let scaleRatio = newScale / previousScale
-        let targetX = mouseFromCenterX - ((mouseFromCenterX - panOffset.width) * scaleRatio)
-        let targetY = mouseFromCenterY - ((mouseFromCenterY - panOffset.height) * scaleRatio)
-
-        zoomScale = newScale
-        baseZoomScale = newScale
-        panOffset = clampedOffset(
-            CGSize(width: targetX, height: targetY),
+        if let result = WallZoomTransform.focalZoom(
+            delta: delta,
+            mouseLocation: mouseLocation,
+            currentScale: zoomScale,
+            currentOffset: panOffset,
             fittedSize: fittedSize,
-            viewportSize: viewportSize,
-            scale: newScale
-        )
+            viewportSize: viewportSize
+        ) {
+            zoomScale = result.newScale
+            baseZoomScale = result.newScale
+            panOffset = result.newOffset
+        }
     }
 
     private func clampedOffset(
@@ -412,27 +384,7 @@ struct BoulderEditorView: View {
         viewportSize: CGSize,
         scale: CGFloat
     ) -> CGSize {
-        let scaledWidth = fittedSize.width * scale
-        let scaledHeight = fittedSize.height * scale
-
-        let maxPanX = max(0, (scaledWidth - viewportSize.width) / 2)
-        let clampedX = min(maxPanX, max(-maxPanX, candidate.width))
-
-        let maxPanY = max(0, (scaledHeight - viewportSize.height) / 2)
-        let clampedY = min(maxPanY, max(-maxPanY, candidate.height))
-
-        return CGSize(width: clampedX, height: clampedY)
-    }
-
-    private func stepZoom(by delta: CGFloat) {
-        let newScale = min(5.0, max(1.0, zoomScale + delta))
-        withAnimation(.easeOut(duration: 0.15)) {
-            zoomScale = newScale
-            baseZoomScale = newScale
-            if newScale <= 1.0 {
-                panOffset = .zero
-            }
-        }
+        WallZoomTransform.clampedOffset(candidate, fittedSize: fittedSize, viewportSize: viewportSize, scale: scale)
     }
 
     // MARK: - Loupe Positioning Math & Configuration
@@ -442,6 +394,14 @@ struct BoulderEditorView: View {
         zoomTransform: WallZoomTransform
     ) {
         currentMouseLocation = viewportPoint
+
+        guard loupeConfig.isEnabled else {
+            if hoveredHold != nil {
+                hoveredHold = nil
+                hoveredCropCGImage = nil
+            }
+            return
+        }
 
         let hitRadius: CGFloat = 28.0
         if let match = zoomTransform.closestHold(near: viewportPoint, in: holdsForWallPreview, maxScreenDistance: hitRadius) {
@@ -482,137 +442,22 @@ struct BoulderEditorView: View {
         } else {
             anchorPoint = zoomTransform.worldCmToViewport(xCm: fallbackHold.xCm, yCm: fallbackHold.yCm)
         }
-
-        let loupeW = loupeConfig.size.width
-        let loupeH = loupeConfig.size.height + (loupeConfig.showBadge ? 28 : 0)
-
-        let halfW = loupeW / 2
-        let halfH = loupeH / 2
-
-        var candidateX = anchorPoint.x + loupeConfig.offsetFromMarker.width
-        var candidateY = anchorPoint.y + loupeConfig.offsetFromMarker.height
-
-        // If too close to top edge, flip below anchor
-        if candidateY - halfH < 12 {
-            candidateY = anchorPoint.y + abs(loupeConfig.offsetFromMarker.height)
-        }
-
-        // Clamp inside viewport bounds
-        let minX = halfW + 12
-        let maxX = max(minX, viewportSize.width - halfW - 12)
-        candidateX = min(maxX, max(minX, candidateX))
-
-        let minY = halfH + 12
-        let maxY = max(minY, viewportSize.height - halfH - 12)
-        candidateY = min(maxY, max(minY, candidateY))
-
-        return CGPoint(x: candidateX, y: candidateY)
-    }
-
-    private var loupeMenu: some View {
-        Menu {
-            Section("Loupe Shape") {
-                Button {
-                    withAnimation(.spring(response: 0.3)) {
-                        loupeConfig.shape = .circle
-                    }
-                } label: {
-                    Label("Circle", systemImage: loupeConfig.shape == .circle ? "checkmark.circle.fill" : "circle")
-                }
-
-                Button {
-                    withAnimation(.spring(response: 0.3)) {
-                        loupeConfig.shape = .roundedRectangle
-                    }
-                } label: {
-                    Label("Rounded Card", systemImage: loupeConfig.shape == .roundedRectangle ? "checkmark.circle.fill" : "app")
-                }
-            }
-
-            Section("Loupe Size") {
-                Button("Compact (150 pt)") {
-                    withAnimation(.spring(response: 0.3)) {
-                        loupeConfig.size = CGSize(width: 150, height: 150)
-                        loupeConfig.cropPixelSpan = 300
-                    }
-                }
-
-                Button("Standard (190 pt)") {
-                    withAnimation(.spring(response: 0.3)) {
-                        loupeConfig.size = CGSize(width: 190, height: 190)
-                        loupeConfig.cropPixelSpan = 380
-                    }
-                }
-
-                Button("Large (240 pt)") {
-                    withAnimation(.spring(response: 0.3)) {
-                        loupeConfig.size = CGSize(width: 240, height: 240)
-                        loupeConfig.cropPixelSpan = 480
-                    }
-                }
-            }
-
-            Section("Details") {
-                Toggle("Center Reticle", isOn: $loupeConfig.showCrosshair)
-                Toggle("Hold Badge", isOn: $loupeConfig.showBadge)
-            }
-        } label: {
-            Image(systemName: loupeConfig.shape == .circle ? "viewfinder.circle" : "viewfinder.rectangular")
-                .font(.caption)
-        }
-        .buttonStyle(.plain)
-        .help("Hold Loupe Settings (Shape & Size)")
+        return WallZoomTransform.computeLoupePosition(
+            anchorPoint: anchorPoint,
+            loupeConfig: loupeConfig,
+            viewportSize: viewportSize
+        )
     }
 
     // MARK: - Zoom Controls View
 
     private var zoomControls: some View {
-        HStack(spacing: 6) {
-            Button {
-                stepZoom(by: -0.2)
-            } label: {
-                Image(systemName: "minus.magnifyingglass")
-            }
-            .buttonStyle(.plain)
-            .disabled(zoomScale <= 1.01)
-            .help("Zoom out (Ctrl + scroll down)")
-
-            Text("\(Int((zoomScale * 100).rounded()))%")
-                .font(.caption.monospacedDigit().weight(.medium))
-                .frame(minWidth: 38)
-
-            Button {
-                stepZoom(by: 0.2)
-            } label: {
-                Image(systemName: "plus.magnifyingglass")
-            }
-            .buttonStyle(.plain)
-            .disabled(zoomScale >= 4.99)
-            .help("Zoom in (Ctrl + scroll up)")
-
-            if zoomScale > 1.01 || panOffset != .zero {
-                Button("Reset") {
-                    withAnimation(.easeOut(duration: 0.2)) {
-                        zoomScale = 1.0
-                        baseZoomScale = 1.0
-                        panOffset = .zero
-                    }
-                }
-                .font(.caption2)
-                .buttonStyle(.bordered)
-                .controlSize(.small)
-                .help("Reset zoom to fit window")
-            }
-
-            Divider()
-                .frame(height: 14)
-
-            loupeMenu
-        }
-        .padding(.horizontal, 8)
-        .padding(.vertical, 4)
-        .background(Color.secondary.opacity(0.12))
-        .clipShape(Capsule())
+        WallZoomControlsView(
+            zoomScale: $zoomScale,
+            panOffset: $panOffset,
+            baseZoomScale: $baseZoomScale,
+            loupeConfig: $loupeConfig
+        )
     }
 
     // MARK: - Draft Inspector View
@@ -771,16 +616,7 @@ struct BoulderEditorView: View {
     private func loadOriginalPhoto() {
         let photoPath = calibrations.first?.photoPath ?? WallCalibration.defaultPhotoPath
         Task.detached {
-            guard let url = try? WallProjectPaths.resolvePhotoURL(from: photoPath) else {
-                return
-            }
-            guard let source = CGImageSourceCreateWithURL(url as CFURL, nil) else {
-                return
-            }
-            let options: [CFString: Any] = [kCGImageSourceShouldCache: true]
-            guard let image = CGImageSourceCreateImageAtIndex(source, 0, options as CFDictionary) else {
-                return
-            }
+            let image = await OriginalPhotoLoader.shared.loadPhoto(from: photoPath)
             await MainActor.run {
                 self.originalPhotoCGImage = image
                 if let currentHold = self.hoveredHold {
@@ -948,64 +784,6 @@ struct BoulderEditorView: View {
         }
     }
 
-    private func wallBackground(size: CGSize) -> some View {
-        let kickboardHeight = size.height * (WallSpec.kickboardHeightCm / WallSpec.totalHeightCm)
-        let mainWallHeight = max(0, size.height - kickboardHeight)
-        let mainWallImageURL = existingURL(for: { try WallProjectPaths.defaultMainWallRectifiedURL() })
-        let kickboardImageURL = existingURL(for: { try WallProjectPaths.defaultKickboardRectifiedURL() })
-
-        return ZStack(alignment: .bottom) {
-            VStack(spacing: 0) {
-                wallSectionBackground(
-                    imageURL: mainWallImageURL,
-                    fallbackColor: Color.gray.opacity(0.2)
-                )
-                .frame(height: mainWallHeight)
-
-                wallSectionBackground(
-                    imageURL: kickboardImageURL,
-                    fallbackColor: Color.brown.opacity(0.22)
-                )
-                .frame(height: kickboardHeight)
-            }
-            .frame(maxWidth: .infinity, maxHeight: .infinity)
-
-            Rectangle()
-                .fill(Color.black.opacity(0.35))
-                .frame(height: 1)
-                .offset(y: -kickboardHeight)
-        }
-        .clipShape(RoundedRectangle(cornerRadius: 10))
-    }
-
-    @ViewBuilder
-    private func wallSectionBackground(imageURL: URL?, fallbackColor: Color) -> some View {
-        if let imageURL {
-            AsyncImage(url: imageURL) { phase in
-                switch phase {
-                case let .success(image):
-                    image
-                        .resizable()
-                        .scaledToFit()
-                        .frame(maxWidth: .infinity, maxHeight: .infinity)
-                        .background(fallbackColor)
-                default:
-                    Rectangle().fill(fallbackColor)
-                }
-            }
-        } else {
-            Rectangle().fill(fallbackColor)
-        }
-    }
-
-    private func existingURL(for resolver: () throws -> URL) -> URL? {
-        guard let resolved = try? resolver(),
-              FileManager.default.fileExists(atPath: resolved.path) else {
-            return nil
-        }
-        return resolved
-    }
-
     private func position(for hold: Hold, size: CGSize) -> CGPoint {
         let x = (hold.xCm / WallSpec.widthCm) * size.width
         let y = (1 - (hold.yCm / WallSpec.totalHeightCm)) * size.height
@@ -1024,74 +802,6 @@ struct BoulderEditorView: View {
         return holds.filter { boulder.contains($0.holdID) }
     }
 }
-
-// MARK: - AppKit Scroll Wheel Zoom Handler for macOS
-
-#if os(macOS)
-private struct ScrollWheelZoomModifier: NSViewRepresentable {
-    var onZoom: (CGFloat, CGPoint) -> Void
-
-    func makeNSView(context: Context) -> ZoomWheelNSView {
-        let view = ZoomWheelNSView()
-        view.onZoom = onZoom
-        return view
-    }
-
-    func updateNSView(_ nsView: ZoomWheelNSView, context: Context) {
-        nsView.onZoom = onZoom
-    }
-}
-
-private final class ZoomWheelNSView: NSView {
-    var onZoom: ((CGFloat, CGPoint) -> Void)?
-    private nonisolated(unsafe) var monitor: Any?
-
-    override func viewDidMoveToWindow() {
-        super.viewDidMoveToWindow()
-        if window != nil && monitor == nil {
-            monitor = NSEvent.addLocalMonitorForEvents(matching: .scrollWheel) { [weak self] event in
-                guard let self = self, let win = self.window, event.window == win else {
-                    return event
-                }
-
-                if event.modifierFlags.contains(.control) {
-                    let pointInWindow = event.locationInWindow
-                    let pointInView = self.convert(pointInWindow, from: nil)
-
-                    if self.bounds.contains(pointInView) {
-                        let swiftUIPoint = CGPoint(x: pointInView.x, y: self.bounds.height - pointInView.y)
-                        let delta: CGFloat
-                        if event.hasPreciseScrollingDeltas {
-                            delta = event.scrollingDeltaY * 0.005
-                        } else {
-                            let step: CGFloat = 0.12
-                            if event.scrollingDeltaY != 0 {
-                                delta = event.scrollingDeltaY > 0 ? step : -step
-                            } else if event.deltaY != 0 {
-                                delta = event.deltaY > 0 ? step : -step
-                            } else {
-                                delta = 0
-                            }
-                        }
-                        self.onZoom?(delta, swiftUIPoint)
-                        return nil
-                    }
-                }
-                return event
-            }
-        } else if window == nil, let m = monitor {
-            NSEvent.removeMonitor(m)
-            monitor = nil
-        }
-    }
-
-    deinit {
-        if let m = monitor {
-            NSEvent.removeMonitor(m)
-        }
-    }
-}
-#endif
 
 private struct BoulderWallHoldMarker: View {
     let holdID: Int

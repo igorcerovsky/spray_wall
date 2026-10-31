@@ -120,4 +120,105 @@ struct WallZoomTransform: Sendable, Equatable {
         }
         return nil
     }
+
+    // MARK: - Reusable Zoom Geometry & Clamping Math
+
+    /// Computes fitted wall dimensions preserving aspect ratio inside a given viewport.
+    static func computeFittedSize(in viewport: CGSize) -> CGSize {
+        let wallAspect: CGFloat = WallSpec.widthCm / WallSpec.totalHeightCm
+        if (viewport.width / max(1, viewport.height)) > wallAspect {
+            let fitHeight = max(10, viewport.height)
+            return CGSize(width: fitHeight * wallAspect, height: fitHeight)
+        } else {
+            let fitWidth = max(10, viewport.width)
+            return CGSize(width: fitWidth, height: fitWidth / wallAspect)
+        }
+    }
+
+    /// Clamps pan translation offset so the wall canvas never pans completely off-screen.
+    static func clampedOffset(
+        _ candidate: CGSize,
+        fittedSize: CGSize,
+        viewportSize: CGSize,
+        scale: CGFloat
+    ) -> CGSize {
+        let scaledWidth = fittedSize.width * scale
+        let scaledHeight = fittedSize.height * scale
+
+        let maxPanX = max(0, (scaledWidth - viewportSize.width) / 2)
+        let clampedX = min(maxPanX, max(-maxPanX, candidate.width))
+
+        let maxPanY = max(0, (scaledHeight - viewportSize.height) / 2)
+        let clampedY = min(maxPanY, max(-maxPanY, candidate.height))
+
+        return CGSize(width: clampedX, height: clampedY)
+    }
+
+    /// Calculates new scale and pan offset for focal zooming towards a given mouse location.
+    static func focalZoom(
+        delta: CGFloat,
+        mouseLocation: CGPoint,
+        currentScale: CGFloat,
+        currentOffset: CGSize,
+        fittedSize: CGSize,
+        viewportSize: CGSize,
+        minScale: CGFloat = 1.0,
+        maxScale: CGFloat = 5.0
+    ) -> (newScale: CGFloat, newOffset: CGSize)? {
+        let previousScale = currentScale
+        let newScale = min(maxScale, max(minScale, currentScale + (delta * currentScale)))
+        guard abs(newScale - previousScale) > 0.001 else { return nil }
+
+        if newScale <= 1.0 {
+            return (newScale: 1.0, newOffset: .zero)
+        }
+
+        let mouseFromCenterX = mouseLocation.x - (viewportSize.width / 2)
+        let mouseFromCenterY = mouseLocation.y - (viewportSize.height / 2)
+
+        let scaleRatio = newScale / previousScale
+        let targetX = mouseFromCenterX - ((mouseFromCenterX - currentOffset.width) * scaleRatio)
+        let targetY = mouseFromCenterY - ((mouseFromCenterY - currentOffset.height) * scaleRatio)
+
+        let clamped = clampedOffset(
+            CGSize(width: targetX, height: targetY),
+            fittedSize: fittedSize,
+            viewportSize: viewportSize,
+            scale: newScale
+        )
+        return (newScale: newScale, newOffset: clamped)
+    }
+
+    /// Computes screen position for the floating magnifying loupe clamped safely within viewport boundaries.
+    static func computeLoupePosition(
+        anchorPoint: CGPoint,
+        loupeConfig: HoldLoupeConfig,
+        viewportSize: CGSize
+    ) -> CGPoint {
+        let loupeW = loupeConfig.size.width
+        let loupeH = loupeConfig.size.height + (loupeConfig.showBadge ? 28 : 0)
+
+        let halfW = loupeW / 2
+        let halfH = loupeH / 2
+
+        var candidateX = anchorPoint.x + loupeConfig.offsetFromMarker.width
+        var candidateY = anchorPoint.y + loupeConfig.offsetFromMarker.height
+
+        // If too close to top edge, flip below anchor
+        if candidateY - halfH < 12 {
+            candidateY = anchorPoint.y + abs(loupeConfig.offsetFromMarker.height)
+        }
+
+        // Clamp inside viewport bounds
+        let minX = halfW + 12
+        let maxX = max(minX, viewportSize.width - halfW - 12)
+        candidateX = min(maxX, max(minX, candidateX))
+
+        let minY = halfH + 12
+        let maxY = max(minY, viewportSize.height - halfH - 12)
+        candidateY = min(maxY, max(minY, candidateY))
+
+        return CGPoint(x: candidateX, y: candidateY)
+    }
 }
+

@@ -109,4 +109,68 @@ struct WallZoomTransformTests {
         let noMatch = transform.closestHold(near: farClick, in: holds, maxScreenDistance: 24.0)
         #expect(noMatch == nil)
     }
+
+    @Test("computeFittedSize preserves wall aspect ratio")
+    func computeFittedSizeAspectRatio() {
+        let wideViewport = CGSize(width: 1200, height: 600)
+        let wideFitted = WallZoomTransform.computeFittedSize(in: wideViewport)
+        let expectedAspect = WallSpec.widthCm / WallSpec.totalHeightCm
+        #expect(abs((wideFitted.width / wideFitted.height) - expectedAspect) < 0.001)
+        #expect(wideFitted.height == 600)
+
+        let tallViewport = CGSize(width: 400, height: 1000)
+        let tallFitted = WallZoomTransform.computeFittedSize(in: tallViewport)
+        #expect(abs((tallFitted.width / tallFitted.height) - expectedAspect) < 0.001)
+        #expect(tallFitted.width == 400)
+    }
+
+    @Test("clampedOffset prevents canvas from disappearing offscreen")
+    func clampedOffsetLimits() {
+        let fitted = CGSize(width: 800, height: 800)
+        let viewport = CGSize(width: 800, height: 800)
+
+        // At zoom scale 1.0, maxPan is 0
+        let clampedAt1 = WallZoomTransform.clampedOffset(CGSize(width: 200, height: -200), fittedSize: fitted, viewportSize: viewport, scale: 1.0)
+        #expect(clampedAt1.width == 0)
+        #expect(clampedAt1.height == 0)
+
+        // At zoom scale 2.0, scaled size is 1600x1600, maxPan is 400
+        let clampedAt2 = WallZoomTransform.clampedOffset(CGSize(width: 900, height: -900), fittedSize: fitted, viewportSize: viewport, scale: 2.0)
+        #expect(clampedAt2.width == 400)
+        #expect(clampedAt2.height == -400)
+    }
+
+    @Test("focalZoom calculates focal point shift and scale")
+    func focalZoomCalculation() {
+        let fitted = CGSize(width: 800, height: 800)
+        let viewport = CGSize(width: 800, height: 800)
+
+        let result = WallZoomTransform.focalZoom(
+            delta: 0.2,
+            mouseLocation: CGPoint(x: 500, y: 300),
+            currentScale: 1.0,
+            currentOffset: .zero,
+            fittedSize: fitted,
+            viewportSize: viewport
+        )
+
+        #expect(result != nil)
+        #expect((result?.newScale ?? 0) > 1.0)
+    }
+
+    @Test("computeLoupePosition clamps inside viewport and flips at top edge")
+    func computeLoupePositionBounds() {
+        let viewport = CGSize(width: 800, height: 600)
+        let config = HoldLoupeConfig.defaultCircle
+
+        // Anchor near top edge should flip downward
+        let topAnchor = CGPoint(x: 400, y: 20)
+        let topPos = WallZoomTransform.computeLoupePosition(anchorPoint: topAnchor, loupeConfig: config, viewportSize: viewport)
+        #expect(topPos.y > topAnchor.y)
+
+        // Anchor near right edge clamps inside
+        let rightAnchor = CGPoint(x: 790, y: 300)
+        let rightPos = WallZoomTransform.computeLoupePosition(anchorPoint: rightAnchor, loupeConfig: config, viewportSize: viewport)
+        #expect(rightPos.x + (config.size.width / 2.0) <= viewport.width)
+    }
 }
