@@ -255,3 +255,4 @@ struct HoldLoupeMenu: View {
         .help("Hold Loupe Settings (Shape & Size)")
     }
 }
+

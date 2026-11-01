@@ -63,3 +63,4 @@ struct WallBackgroundView: View {
         return resolved
     }
 }
+

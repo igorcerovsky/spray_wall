@@ -41,3 +41,4 @@ actor OriginalPhotoLoader {
         return image
     }
 }
+
