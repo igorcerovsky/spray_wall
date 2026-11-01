@@ -84,14 +84,29 @@ struct BoulderEditorView: View {
     private var draftLayout: some View {
         GeometryReader { windowGeo in
             if windowGeo.size.width < 680 {
-                VStack(spacing: 8) {
-                    HStack {
-                        roleButtons
-                        Spacer()
-                        zoomControls
+                VStack(spacing: 6) {
+                    if windowGeo.size.width < 460 {
+                        VStack(spacing: 6) {
+                            HStack {
+                                roleButtons
+                                Spacer()
+                            }
+                            HStack {
+                                Spacer()
+                                zoomControls
+                            }
+                        }
+                        .padding(.horizontal, 10)
+                        .padding(.top, 4)
+                    } else {
+                        HStack {
+                            roleButtons
+                            Spacer()
+                            zoomControls
+                        }
+                        .padding(.horizontal)
+                        .padding(.top, 4)
                     }
-                    .padding(.horizontal)
-                    .padding(.top, 4)
 
                     fittedZoomableWallView
                         .frame(maxWidth: .infinity, maxHeight: .infinity)
@@ -137,28 +152,26 @@ struct BoulderEditorView: View {
     // MARK: - Established Mode Layout
 
     private var establishedLayout: some View {
-        VStack(spacing: 10) {
-            HStack(spacing: 8) {
-                Text(displayName)
-                    .font(.headline.weight(.semibold))
-                    .lineLimit(1)
-                    .truncationMode(.tail)
-                Text(displayGrade)
-                    .font(.subheadline.weight(.semibold))
-                    .foregroundStyle(.secondary)
-                Text(displaySetter)
-                    .font(.subheadline)
-                    .foregroundStyle(.secondary)
-                    .lineLimit(1)
-                    .truncationMode(.tail)
-                Text(starsText(for: boulder.rating))
-                    .font(.subheadline)
-                    .foregroundStyle(.yellow)
-                Spacer(minLength: 0)
-                zoomControls
+        VStack(spacing: 8) {
+            ViewThatFits(in: .horizontal) {
+                HStack(spacing: 8) {
+                    establishedHeaderInfo
+                    Spacer(minLength: 0)
+                    zoomControls
+                }
+                VStack(alignment: .leading, spacing: 6) {
+                    HStack {
+                        establishedHeaderInfo
+                        Spacer()
+                    }
+                    HStack {
+                        Spacer()
+                        zoomControls
+                    }
+                }
             }
             .padding(.horizontal)
-            .padding(.top, 6)
+            .padding(.top, 4)
 
             fittedZoomableWallView
                 .frame(maxWidth: .infinity, maxHeight: .infinity)
@@ -198,6 +211,27 @@ struct BoulderEditorView: View {
             }
             .padding(.horizontal)
             .padding(.bottom, 8)
+        }
+    }
+
+    @ViewBuilder
+    private var establishedHeaderInfo: some View {
+        HStack(spacing: 8) {
+            Text(displayName)
+                .font(.headline.weight(.semibold))
+                .lineLimit(1)
+                .truncationMode(.tail)
+            Text(displayGrade)
+                .font(.subheadline.weight(.semibold))
+                .foregroundStyle(.secondary)
+            Text(displaySetter)
+                .font(.subheadline)
+                .foregroundStyle(.secondary)
+                .lineLimit(1)
+                .truncationMode(.tail)
+            Text(starsText(for: boulder.rating))
+                .font(.subheadline)
+                .foregroundStyle(.yellow)
         }
     }
 
@@ -273,14 +307,50 @@ struct BoulderEditorView: View {
                         guard canEditDraft else { return }
                         if let match = zoomTransform.closestHold(near: value.location, in: holdsForWallPreview, maxScreenDistance: 24.0) {
                             removeFromDraftIfAllowed(holdID: match.hold.holdID)
+                            if hoveredHold?.holdID == match.hold.holdID {
+                                hoveredHold = nil
+                                hoveredCropCGImage = nil
+                            }
                         }
                     }
                     .exclusively(
                         before: SpatialTapGesture(count: 1)
                             .onEnded { value in
-                                guard canEditDraft else { return }
-                                if let match = zoomTransform.closestHold(near: value.location, in: holdsForWallPreview, maxScreenDistance: 24.0) {
-                                    handleRoleFirstTap(on: match.hold)
+                                if canEditDraft {
+                                    if let match = zoomTransform.closestHold(near: value.location, in: holdsForWallPreview, maxScreenDistance: 26.0) {
+                                        handleRoleFirstTap(on: match.hold)
+                                        withAnimation(.easeOut(duration: 0.15)) {
+                                            hoveredHold = match.hold
+                                            currentMouseLocation = value.location
+                                        }
+                                        updateCrop(for: match.hold)
+                                    } else {
+                                        withAnimation(.easeOut(duration: 0.15)) {
+                                            hoveredHold = nil
+                                            hoveredCropCGImage = nil
+                                        }
+                                    }
+                                } else {
+                                    // Established mode: tap a hold to view loupe on iPhone / touch screen
+                                    if let match = zoomTransform.closestHold(near: value.location, in: holdsForWallPreview, maxScreenDistance: 28.0) {
+                                        if hoveredHold?.holdID == match.hold.holdID {
+                                            withAnimation(.easeOut(duration: 0.15)) {
+                                                hoveredHold = nil
+                                                hoveredCropCGImage = nil
+                                            }
+                                        } else {
+                                            withAnimation(.easeOut(duration: 0.15)) {
+                                                hoveredHold = match.hold
+                                                currentMouseLocation = value.location
+                                            }
+                                            updateCrop(for: match.hold)
+                                        }
+                                    } else {
+                                        withAnimation(.easeOut(duration: 0.15)) {
+                                            hoveredHold = nil
+                                            hoveredCropCGImage = nil
+                                        }
+                                    }
                                 }
                             }
                     )

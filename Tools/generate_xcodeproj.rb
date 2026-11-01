@@ -112,8 +112,17 @@ end
 
 resources_root = File.join(ROOT, 'Resources')
 if Dir.exist?(resources_root)
+  assets_path = File.join(resources_root, 'Assets.xcassets')
+  if Dir.exist?(assets_path)
+    rel = assets_path.sub("#{ROOT}/", '')
+    ref = main_group.files.find { |item| item.path == rel } || main_group.new_file(rel)
+    ios_app_target.add_resources([ref])
+    mac_app_target.add_resources([ref])
+  end
+
   Dir.glob(File.join(resources_root, '**/*')).sort.each do |path|
     next if File.directory?(path)
+    next if path.include?('Assets.xcassets')
 
     rel = path.sub("#{ROOT}/", '')
     ref = main_group.files.find { |item| item.path == rel } || main_group.new_file(rel)

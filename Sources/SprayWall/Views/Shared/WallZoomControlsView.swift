@@ -51,10 +51,26 @@ struct WallZoomControlsView: View {
                 .frame(height: 14)
 
             // Checkbox to enable or disable the magnifying loupe
+            #if os(macOS)
             Toggle("Use Loupe", isOn: $loupeConfig.isEnabled)
                 .toggleStyle(.checkbox)
                 .font(.caption)
                 .help("Toggle high-resolution hold magnifying loupe")
+            #else
+            Button {
+                loupeConfig.isEnabled.toggle()
+            } label: {
+                HStack(spacing: 4) {
+                    Image(systemName: loupeConfig.isEnabled ? "checkmark.square.fill" : "square")
+                        .font(.caption)
+                        .foregroundStyle(loupeConfig.isEnabled ? Color.accentColor : Color.secondary)
+                    Text("Loupe")
+                        .font(.caption)
+                        .foregroundStyle(.primary)
+                }
+            }
+            .buttonStyle(.plain)
+            #endif
 
             HoldLoupeMenu(config: $loupeConfig)
         }

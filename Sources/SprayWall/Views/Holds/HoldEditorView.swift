@@ -287,26 +287,63 @@ struct HoldEditorView: View {
 
     private func handleCanvasTap(at location: CGPoint, zoomTransform: WallZoomTransform) {
         guard canEditWallLayout else {
-            appModel.globalMessage = "Wall layout can be edited only by admin (\(Self.adminEmail)). Current user: \(effectiveUserEmail ?? "unknown")."
-            inlineStatusMessage = "Only admin can edit wall layout. Signed in as: \(effectiveUserEmail ?? "unknown")"
+            // Read-only user: tapping a hold shows or hides the loupe on iPhone / touch screen
+            if let match = zoomTransform.closestHold(near: location, in: holds, maxScreenDistance: 28.0) {
+                if hoveredHold?.holdID == match.hold.holdID {
+                    withAnimation(.easeOut(duration: 0.15)) {
+                        hoveredHold = nil
+                        hoveredCropCGImage = nil
+                    }
+                } else {
+                    withAnimation(.easeOut(duration: 0.15)) {
+                        hoveredHold = match.hold
+                        currentMouseLocation = location
+                    }
+                    updateCrop(for: match.hold)
+                    inlineStatusMessage = "Hold #\(match.hold.holdID) at (\(Int(match.hold.xCm)), \(Int(match.hold.yCm))) cm (\(match.hold.plane.rawValue.capitalized))"
+                }
+            } else {
+                withAnimation(.easeOut(duration: 0.15)) {
+                    hoveredHold = nil
+                    hoveredCropCGImage = nil
+                }
+            }
             return
         }
 
         guard isEditingHolds else {
             // In locked mode, tapping a hold selects it and opens high-res loupe
-            if let match = zoomTransform.closestHold(near: location, in: holds, maxScreenDistance: 24.0) {
-                hoveredHold = match.hold
-                updateCrop(for: match.hold)
-                inlineStatusMessage = "Hold #\(match.hold.holdID) at (\(Int(match.hold.xCm)), \(Int(match.hold.yCm))) cm (\(match.hold.plane.rawValue.capitalized))"
+            if let match = zoomTransform.closestHold(near: location, in: holds, maxScreenDistance: 28.0) {
+                if hoveredHold?.holdID == match.hold.holdID {
+                    withAnimation(.easeOut(duration: 0.15)) {
+                        hoveredHold = nil
+                        hoveredCropCGImage = nil
+                    }
+                } else {
+                    withAnimation(.easeOut(duration: 0.15)) {
+                        hoveredHold = match.hold
+                        currentMouseLocation = location
+                    }
+                    updateCrop(for: match.hold)
+                    inlineStatusMessage = "Hold #\(match.hold.holdID) at (\(Int(match.hold.xCm)), \(Int(match.hold.yCm))) cm (\(match.hold.plane.rawValue.capitalized))"
+                }
+            } else {
+                withAnimation(.easeOut(duration: 0.15)) {
+                    hoveredHold = nil
+                    hoveredCropCGImage = nil
+                }
             }
             return
         }
 
         // In edit mode: if tapped directly on an existing hold, select it
-        if let match = zoomTransform.closestHold(near: location, in: holds, maxScreenDistance: 20.0) {
-            hoveredHold = match.hold
+        if let match = zoomTransform.closestHold(near: location, in: holds, maxScreenDistance: 24.0) {
+            withAnimation(.easeOut(duration: 0.15)) {
+                hoveredHold = match.hold
+                currentMouseLocation = location
+            }
             updateCrop(for: match.hold)
-            inlineStatusMessage = "Selected hold #\(match.hold.holdID) at (\(Int(match.hold.xCm)), \(Int(match.hold.yCm))) cm. Drag to move, right-click to delete."
+            inlineStatusMessage = "Selected hold #\(match.hold.holdID) at (\(Int(match.hold.xCm)), \(Int(match.hold.yCm))) cm. Drag to move, or tap Delete."
             return
         }
 
@@ -395,47 +432,61 @@ struct HoldEditorView: View {
 
     private var controls: some View {
         VStack(spacing: 8) {
-            HStack(spacing: 12) {
-                Button(isEditingHolds ? "Done" : "Edit") {
-                    if canEditWallLayout {
-                        isEditingHolds.toggle()
-                        inlineStatusMessage = nil
-                        if !isEditingHolds {
-                            draggedHold = nil
+            ViewThatFits(in: .horizontal) {
+                HStack(spacing: 12) {
+                    editButton
+                    if isEditingHolds {
+                        deleteAllButton
+                    }
+                    Spacer()
+                    WallZoomControlsView(
+                        zoomScale: $zoomScale,
+                        panOffset: $panOffset,
+                        baseZoomScale: $baseZoomScale,
+                        loupeConfig: $loupeConfig
+                    )
+                }
+
+                VStack(spacing: 6) {
+                    HStack {
+                        editButton
+                        Spacer()
+                        WallZoomControlsView(
+                            zoomScale: $zoomScale,
+                            panOffset: $panOffset,
+                            baseZoomScale: $baseZoomScale,
+                            loupeConfig: $loupeConfig
+                        )
+                    }
+                    if isEditingHolds {
+                        HStack {
+                            deleteAllButton
+                            Spacer()
                         }
-                    } else {
-                        appModel.globalMessage = "Wall layout can be edited only by admin."
-                        inlineStatusMessage = "Only admin can edit wall layout. Signed in as: \(effectiveUserEmail ?? "unknown")"
                     }
                 }
-                .buttonStyle(.borderedProminent)
+            }
 
-                if isEditingHolds {
-                    Button("Delete all and reset counter", role: .destructive) {
-                        if canEditWallLayout {
-                            showDeleteAllConfirmation = true
-                        } else {
-                            appModel.globalMessage = "Wall layout can be edited only by admin."
-                            inlineStatusMessage = "Only admin can edit wall layout. Signed in as: \(effectiveUserEmail ?? "unknown")"
-                        }
+            if isEditingHolds, let selected = hoveredHold {
+                HStack(spacing: 8) {
+                    Text("Selected: Hold #\(selected.holdID) (\(Int(selected.xCm)), \(Int(selected.yCm)) cm)")
+                        .font(.caption)
+                        .foregroundStyle(.secondary)
+                    Spacer()
+                    Button(role: .destructive) {
+                        delete(hold: selected)
+                    } label: {
+                        Label("Delete #\(selected.holdID)", systemImage: "trash")
+                            .font(.caption2)
                     }
                     .buttonStyle(.bordered)
-                    .disabled(holds.isEmpty)
+                    .tint(.red)
                 }
-
-                Spacer()
-
-                WallZoomControlsView(
-                    zoomScale: $zoomScale,
-                    panOffset: $panOffset,
-                    baseZoomScale: $baseZoomScale,
-                    loupeConfig: $loupeConfig
-                )
             }
 
             Text(isEditingHolds
-                 ? "Edit mode: tap wall to add hold, drag to reposition (loupe shows exact bolt position), right-click to delete."
-                 : "Locked mode: wall is read-only. Hover over holds to view high-resolution loupe preview. Press Edit to modify.")
+                 ? "Edit mode: tap wall to add hold, drag to reposition (loupe shows exact bolt position), right-click or tap Delete to remove."
+                 : "Locked mode: wall is read-only. Tap or hover over holds to view high-resolution loupe preview. Press Edit to modify.")
                 .font(.footnote)
                 .foregroundStyle(.secondary)
                 .frame(maxWidth: .infinity, alignment: .leading)
@@ -447,6 +498,35 @@ struct HoldEditorView: View {
                     .frame(maxWidth: .infinity, alignment: .leading)
             }
         }
+    }
+
+    private var editButton: some View {
+        Button(isEditingHolds ? "Done" : "Edit") {
+            if canEditWallLayout {
+                isEditingHolds.toggle()
+                inlineStatusMessage = nil
+                if !isEditingHolds {
+                    draggedHold = nil
+                }
+            } else {
+                appModel.globalMessage = "Wall layout can be edited only by admin."
+                inlineStatusMessage = "Only admin can edit wall layout. Signed in as: \(effectiveUserEmail ?? "unknown")"
+            }
+        }
+        .buttonStyle(.borderedProminent)
+    }
+
+    private var deleteAllButton: some View {
+        Button("Delete all and reset counter", role: .destructive) {
+            if canEditWallLayout {
+                showDeleteAllConfirmation = true
+            } else {
+                appModel.globalMessage = "Wall layout can be edited only by admin."
+                inlineStatusMessage = "Only admin can edit wall layout. Signed in as: \(effectiveUserEmail ?? "unknown")"
+            }
+        }
+        .buttonStyle(.bordered)
+        .disabled(holds.isEmpty)
     }
 
     // MARK: - Data Management
