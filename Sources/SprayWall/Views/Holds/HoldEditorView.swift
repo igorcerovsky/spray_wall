@@ -21,13 +21,51 @@ struct HoldEditorView: View {
     @State private var panOffset: CGSize = .zero
     @State private var dragStartOffset: CGSize? = nil
 
-    // Loupe preview state
+    // Loupe preview & selection state
     @State private var loupeConfig = HoldLoupeConfig.defaultCircle
     @State private var hoveredHold: Hold?
-    @State private var draggedHold: Hold?
-    @State private var hoveredCropCGImage: CGImage?
+    @State private var selectedHoldID: Int?
+    @State private var activeDragAction: HoldDragAction?
+    @State private var activeCropCGImage: CGImage?
+    @State private var croppedHoldID: Int? = nil
+    @State private var croppedHoldCoord: CGPoint? = nil
     @State private var originalPhotoCGImage: CGImage?
     @State private var currentMouseLocation: CGPoint? = nil
+    @State private var isShiftPressed: Bool = false
+
+    private var isShiftActive: Bool {
+        #if os(macOS)
+        return isShiftPressed || NSEvent.modifierFlags.contains(.shift)
+        #else
+        return isShiftPressed
+        #endif
+    }
+
+    private var activeDragHoldID: Int? {
+        guard let action = activeDragAction else { return nil }
+        switch action {
+        case let .move(id), let .resizeMajor(id), let .resizeMinor(id), let .rotate(id):
+            return id
+        case .pan:
+            return nil
+        }
+    }
+
+    private var activeHoldForLoupe: Hold? {
+        if let dragID = activeDragHoldID, let hold = holds.first(where: { $0.holdID == dragID }) {
+            return hold
+        }
+        if isEditingHolds, let selID = selectedHoldID, let hold = holds.first(where: { $0.holdID == selID }) {
+            return hold
+        }
+        if let hovered = hoveredHold {
+            return hovered
+        }
+        if let selID = selectedHoldID, let hold = holds.first(where: { $0.holdID == selID }) {
+            return hold
+        }
+        return nil
+    }
 
     var body: some View {
         NavigationStack {
@@ -72,6 +110,17 @@ struct HoldEditorView: View {
                 fetchHolds()
                 loadOriginalPhoto()
             }
+            .onChange(of: calibrations) { _, _ in
+                loadOriginalPhoto()
+            }
+            #if os(macOS)
+            .onAppear {
+                NSEvent.addLocalMonitorForEvents(matching: .flagsChanged) { event in
+                    isShiftPressed = event.modifierFlags.contains(.shift)
+                    return event
+                }
+            }
+            #endif
             .confirmationDialog(
                 "Delete All Holds?",
                 isPresented: $showDeleteAllConfirmation,
@@ -109,15 +158,22 @@ struct HoldEditorView: View {
 
                     // Visual hold markers rendered on the canvas
                     ForEach(holds) { hold in
-                        let isHovered = (hoveredHold?.holdID == hold.holdID) || (draggedHold?.holdID == hold.holdID)
+                        let isHovered = (hoveredHold?.holdID == hold.holdID) || (activeDragHoldID == hold.holdID)
+                        let isSelected = selectedHoldID == hold.holdID
                         let markerPos = zoomTransform.worldCmToWall(xCm: hold.xCm, yCm: hold.yCm)
+                        let holdWidthWall = max(6.0, CGFloat(hold.majorCm) * (fittedSize.width / CGFloat(WallSpec.widthCm)))
+                        let holdHeightWall = max(6.0, CGFloat(hold.minorCm) * (fittedSize.height / CGFloat(WallSpec.totalHeightCm)))
 
                         HoldPositionDotView(
                             holdID: hold.holdID,
-                            xCm: hold.xCm,
-                            yCm: hold.yCm,
+                            widthPt: holdWidthWall,
+                            heightPt: holdHeightWall,
+                            rotationDeg: hold.rotationDeg,
+                            zoomScale: zoomScale,
                             isHovered: isHovered,
-                            isEditing: isEditingHolds
+                            isSelected: isSelected,
+                            isEditing: isEditingHolds,
+                            isShiftPressed: isShiftActive
                         )
                         .position(markerPos)
                         .allowsHitTesting(false)
@@ -129,21 +185,36 @@ struct HoldEditorView: View {
                 .allowsHitTesting(false) // Let the outer viewport handle all mouse interaction using the transformation matrix
 
                 // Floating Loupe Preview
-                if loupeConfig.isEnabled, let activeHold = draggedHold ?? hoveredHold {
+                if loupeConfig.isEnabled, let activeHold = activeHoldForLoupe {
                     let anchorScreenPt = zoomTransform.worldCmToViewport(xCm: activeHold.xCm, yCm: activeHold.yCm)
-                    let loupePosition = WallZoomTransform.computeLoupePosition(
-                        anchorPoint: currentMouseLocation ?? anchorScreenPt,
-                        loupeConfig: loupeConfig,
-                        viewportSize: viewportSize
-                    )
+                    let loupePosition: CGPoint = {
+                        if isEditingHolds && (selectedHoldID != nil || activeDragAction != nil) {
+                            return WallZoomTransform.computeEditingLoupePosition(
+                                holdScreenPoint: anchorScreenPt,
+                                loupeConfig: loupeConfig,
+                                viewportSize: viewportSize,
+                                fittedSize: fittedSize,
+                                zoomScale: zoomScale,
+                                panOffset: panOffset
+                            )
+                        } else {
+                            return WallZoomTransform.computeLoupePosition(
+                                anchorPoint: currentMouseLocation ?? anchorScreenPt,
+                                loupeConfig: loupeConfig,
+                                viewportSize: viewportSize
+                            )
+                        }
+                    }()
 
                     HoldLoupeView(
-                        croppedImage: hoveredCropCGImage,
-                        title: "Hold #\(activeHold.holdID)",
-                        subtitle: "(\(Int(activeHold.xCm)), \(Int(activeHold.yCm))) cm",
-                        config: loupeConfig
+                        croppedImage: activeCropCGImage,
+                        hold: activeHold,
+                        calibrationPoints: activeCalibrationPoints,
+                        config: loupeConfig,
+                        showCoordinates: true
                     )
                     .position(loupePosition)
+                    .animation(.spring(response: 0.25, dampingFraction: 0.85), value: loupePosition)
                     .transition(.scale(scale: 0.85).combined(with: .opacity))
                     .allowsHitTesting(false)
                 }
@@ -152,7 +223,8 @@ struct HoldEditorView: View {
             .clipped()
             .contentShape(Rectangle())
             .contextMenu {
-                if isEditingHolds, canEditWallLayout, let hold = hoveredHold {
+                let contextHold = hoveredHold ?? (selectedHoldID != nil ? holds.first(where: { $0.holdID == selectedHoldID }) : nil)
+                if isEditingHolds, canEditWallLayout, let hold = contextHold {
                     Button("Delete Hold #\(hold.holdID)", role: .destructive) {
                         delete(hold: hold)
                     }
@@ -237,26 +309,102 @@ struct HoldEditorView: View {
     ) {
         currentMouseLocation = value.location
 
-        // Check if starting a drag on a hold (or continuing dragging one)
-        if draggedHold == nil && dragStartOffset == nil {
-            if isEditingHolds && canEditWallLayout,
-               let match = zoomTransform.closestHold(near: value.startLocation, in: holds, maxScreenDistance: 24.0) {
-                draggedHold = match.hold
+        // Check if starting a drag
+        if activeDragAction == nil {
+            if isEditingHolds && canEditWallLayout {
+                if isShiftActive,
+                   let selID = selectedHoldID,
+                   let selectedHold = holds.first(where: { $0.holdID == selID }),
+                   let handle = hitTestHandle(near: value.startLocation, hold: selectedHold, zoomTransform: zoomTransform, fittedSize: fittedSize) {
+                    // Shift is pressed: edit the ellipse!
+                    switch handle {
+                    case .rotate:
+                        activeDragAction = .rotate(selID)
+                    case .resizeMajor:
+                        activeDragAction = .resizeMajor(selID)
+                    case .resizeMinor:
+                        activeDragAction = .resizeMinor(selID)
+                    case .move:
+                        activeDragAction = .move(selID)
+                    }
+                } else if let match = zoomTransform.closestHold(near: value.startLocation, in: holds, maxScreenDistance: 24.0) {
+                    // Shift not pressed (or tapped inside hold): drag the hold as before!
+                    selectedHoldID = match.hold.holdID
+                    activeDragAction = .move(match.hold.holdID)
+                    updateCrop(for: match.hold)
+                } else if zoomScale > 1.0 {
+                    activeDragAction = .pan(panOffset)
+                }
             } else if zoomScale > 1.0 {
-                dragStartOffset = panOffset
+                activeDragAction = .pan(panOffset)
             }
         }
 
-        if let hold = draggedHold {
-            // Dragging hold in physical world coordinates (cm)
-            let world = zoomTransform.viewportToWorldCm(value.location)
-            hold.xCm = max(0, min(WallSpec.widthCm, world.xCm))
-            hold.yCm = max(0, min(WallSpec.totalHeightCm, world.yCm))
-            hold.plane = hold.yCm <= WallSpec.kickboardHeightCm ? .kickboard : .main
-            updateCrop(for: hold)
-            inlineStatusMessage = "Moving hold #\(hold.holdID) to (\(Int(hold.xCm)), \(Int(hold.yCm))) cm"
-        } else if let start = dragStartOffset {
-            // Panning canvas
+        guard let action = activeDragAction else { return }
+
+        switch action {
+        case let .move(holdID):
+            if let hold = holds.first(where: { $0.holdID == holdID }) {
+                let world = zoomTransform.viewportToWorldCm(value.location)
+                hold.xCm = max(0, min(WallSpec.widthCm, world.xCm))
+                hold.yCm = max(0, min(WallSpec.totalHeightCm, world.yCm))
+                hold.plane = hold.yCm <= WallSpec.kickboardHeightCm ? .kickboard : .main
+                updateCrop(for: hold)
+                inlineStatusMessage = "Moving hold #\(hold.holdID) to (\(Int(hold.xCm)), \(Int(hold.yCm))) cm"
+            }
+
+        case let .resizeMajor(holdID):
+            if let hold = holds.first(where: { $0.holdID == holdID }) {
+                let mouseWall = zoomTransform.viewportToWall(value.location)
+                let holdWall = zoomTransform.worldCmToWall(xCm: hold.xCm, yCm: hold.yCm)
+                let dx = mouseWall.x - holdWall.x
+                let dy = mouseWall.y - holdWall.y
+                let rad = CGFloat(hold.rotationDeg * .pi / 180.0)
+                let localX = dx * cos(rad) - dy * sin(rad)
+                let newA = max(2.0, abs(localX))
+                let scaleCmToWall = fittedSize.width / CGFloat(WallSpec.widthCm)
+                let newMajorCm = max(2.0, min(80.0, (2.0 * newA) / scaleCmToWall))
+                hold.majorCm = (newMajorCm * 10).rounded() / 10
+                if activeCropCGImage == nil || croppedHoldID != hold.holdID {
+                    updateCrop(for: hold)
+                }
+                inlineStatusMessage = "Hold #\(hold.holdID) major axis: \(String(format: "%.1f", hold.majorCm)) cm"
+            }
+
+        case let .resizeMinor(holdID):
+            if let hold = holds.first(where: { $0.holdID == holdID }) {
+                let mouseWall = zoomTransform.viewportToWall(value.location)
+                let holdWall = zoomTransform.worldCmToWall(xCm: hold.xCm, yCm: hold.yCm)
+                let dx = mouseWall.x - holdWall.x
+                let dy = mouseWall.y - holdWall.y
+                let rad = CGFloat(hold.rotationDeg * .pi / 180.0)
+                let localY = dx * sin(rad) + dy * cos(rad)
+                let newB = max(2.0, abs(localY))
+                let scaleCmToWall = fittedSize.height / CGFloat(WallSpec.totalHeightCm)
+                let newMinorCm = max(2.0, min(80.0, (2.0 * newB) / scaleCmToWall))
+                hold.minorCm = (newMinorCm * 10).rounded() / 10
+                if activeCropCGImage == nil || croppedHoldID != hold.holdID {
+                    updateCrop(for: hold)
+                }
+                inlineStatusMessage = "Hold #\(hold.holdID) minor axis: \(String(format: "%.1f", hold.minorCm)) cm"
+            }
+
+        case let .rotate(holdID):
+            if let hold = holds.first(where: { $0.holdID == holdID }) {
+                let mouseWall = zoomTransform.viewportToWall(value.location)
+                let holdWall = zoomTransform.worldCmToWall(xCm: hold.xCm, yCm: hold.yCm)
+                let dx = mouseWall.x - holdWall.x
+                let dy = -(mouseWall.y - holdWall.y)
+                var deg = atan2(dy, dx) * 180.0 / .pi
+                if deg < 0 { deg += 360 }
+                hold.rotationDeg = deg.rounded()
+                if activeCropCGImage == nil || croppedHoldID != hold.holdID {
+                    updateCrop(for: hold)
+                }
+                inlineStatusMessage = "Hold #\(hold.holdID) rotation: \(Int(hold.rotationDeg))°"
+            }
+
+        case let .pan(start):
             let candidate = CGSize(
                 width: start.width + value.translation.width,
                 height: start.height + value.translation.height
@@ -274,15 +422,73 @@ struct HoldEditorView: View {
         value: DragGesture.Value,
         zoomTransform: WallZoomTransform
     ) {
-        if let hold = draggedHold {
-            let world = zoomTransform.viewportToWorldCm(value.location)
-            let finalX = max(0, min(WallSpec.widthCm, world.xCm))
-            let finalY = max(0, min(WallSpec.totalHeightCm, world.yCm))
-            persistMove(holdID: hold.holdID, xCm: finalX, yCm: finalY)
-            inlineStatusMessage = "Moved hold #\(hold.holdID) to (\(Int(finalX)), \(Int(finalY))) cm"
-            draggedHold = nil
+        if let action = activeDragAction {
+            switch action {
+            case let .move(holdID), let .resizeMajor(holdID), let .resizeMinor(holdID), let .rotate(holdID):
+                if let hold = holds.first(where: { $0.holdID == holdID }) {
+                    persistHoldGeometry(
+                        holdID: hold.holdID,
+                        xCm: hold.xCm,
+                        yCm: hold.yCm,
+                        majorCm: hold.majorCm,
+                        minorCm: hold.minorCm,
+                        rotationDeg: hold.rotationDeg
+                    )
+                    inlineStatusMessage = "Hold #\(hold.holdID): (\(String(format: "%.1f", hold.majorCm)), \(String(format: "%.1f", hold.minorCm))) cm, \(Int(hold.rotationDeg))°"
+                }
+            case .pan:
+                break
+            }
         }
-        dragStartOffset = nil
+        activeDragAction = nil
+    }
+
+    private func hitTestHandle(
+        near location: CGPoint,
+        hold: Hold,
+        zoomTransform: WallZoomTransform,
+        fittedSize: CGSize
+    ) -> HoldHandleType? {
+        let mouseWall = zoomTransform.viewportToWall(location)
+        let holdWall = zoomTransform.worldCmToWall(xCm: hold.xCm, yCm: hold.yCm)
+
+        let dx = mouseWall.x - holdWall.x
+        let dy = mouseWall.y - holdWall.y
+
+        let rad = CGFloat(hold.rotationDeg * .pi / 180.0)
+        let localX = dx * cos(rad) - dy * sin(rad)
+        let localY = dx * sin(rad) + dy * cos(rad)
+
+        let holdWidthWall = max(6.0, CGFloat(hold.majorCm) * (fittedSize.width / CGFloat(WallSpec.widthCm)))
+        let holdHeightWall = max(6.0, CGFloat(hold.minorCm) * (fittedSize.height / CGFloat(WallSpec.totalHeightCm)))
+
+        let a = holdWidthWall / 2.0
+        let b = holdHeightWall / 2.0
+        let stemLen = 22.0 / zoomTransform.zoomScale
+
+        let distRot = hypot(localX - (a + stemLen), localY) * zoomTransform.zoomScale
+        let distMaj1 = hypot(localX - a, localY) * zoomTransform.zoomScale
+        let distMaj2 = hypot(localX + a, localY) * zoomTransform.zoomScale
+        let distMin1 = hypot(localX, localY - b) * zoomTransform.zoomScale
+        let distMin2 = hypot(localX, localY + b) * zoomTransform.zoomScale
+
+        if distRot <= 18 {
+            return .rotate
+        }
+        if min(distMaj1, distMaj2) <= 16 {
+            return .resizeMajor
+        }
+        if min(distMin1, distMin2) <= 16 {
+            return .resizeMinor
+        }
+
+        let norm = (localX * localX) / max(1.0, a * a) + (localY * localY) / max(1.0, b * b)
+        let centerDistScreen = hypot(dx, dy) * zoomTransform.zoomScale
+        if norm <= 1.25 || centerDistScreen <= 24 {
+            return .move
+        }
+
+        return nil
     }
 
     private func handleCanvasTap(at location: CGPoint, zoomTransform: WallZoomTransform) {
@@ -292,7 +498,9 @@ struct HoldEditorView: View {
                 if hoveredHold?.holdID == match.hold.holdID {
                     withAnimation(.easeOut(duration: 0.15)) {
                         hoveredHold = nil
-                        hoveredCropCGImage = nil
+                        activeCropCGImage = nil
+                        croppedHoldID = nil
+                        croppedHoldCoord = nil
                     }
                 } else {
                     withAnimation(.easeOut(duration: 0.15)) {
@@ -305,7 +513,9 @@ struct HoldEditorView: View {
             } else {
                 withAnimation(.easeOut(duration: 0.15)) {
                     hoveredHold = nil
-                    hoveredCropCGImage = nil
+                    activeCropCGImage = nil
+                    croppedHoldID = nil
+                    croppedHoldCoord = nil
                 }
             }
             return
@@ -317,7 +527,9 @@ struct HoldEditorView: View {
                 if hoveredHold?.holdID == match.hold.holdID {
                     withAnimation(.easeOut(duration: 0.15)) {
                         hoveredHold = nil
-                        hoveredCropCGImage = nil
+                        activeCropCGImage = nil
+                        croppedHoldID = nil
+                        croppedHoldCoord = nil
                     }
                 } else {
                     withAnimation(.easeOut(duration: 0.15)) {
@@ -330,7 +542,9 @@ struct HoldEditorView: View {
             } else {
                 withAnimation(.easeOut(duration: 0.15)) {
                     hoveredHold = nil
-                    hoveredCropCGImage = nil
+                    activeCropCGImage = nil
+                    croppedHoldID = nil
+                    croppedHoldCoord = nil
                 }
             }
             return
@@ -339,11 +553,25 @@ struct HoldEditorView: View {
         // In edit mode: if tapped directly on an existing hold, select it
         if let match = zoomTransform.closestHold(near: location, in: holds, maxScreenDistance: 24.0) {
             withAnimation(.easeOut(duration: 0.15)) {
+                selectedHoldID = match.hold.holdID
                 hoveredHold = match.hold
                 currentMouseLocation = location
             }
             updateCrop(for: match.hold)
-            inlineStatusMessage = "Selected hold #\(match.hold.holdID) at (\(Int(match.hold.xCm)), \(Int(match.hold.yCm))) cm. Drag to move, or right-click / context-menu to delete."
+            inlineStatusMessage = "Hold #\(match.hold.holdID): (\(String(format: "%.1f", match.hold.majorCm)), \(String(format: "%.1f", match.hold.minorCm))) cm, \(Int(match.hold.rotationDeg))°. Drag to move, or hold Shift to edit ellipse."
+            return
+        }
+
+        // If a hold was selected and user tapped empty wall, deselect it
+        if selectedHoldID != nil {
+            withAnimation(.easeOut(duration: 0.15)) {
+                selectedHoldID = nil
+                hoveredHold = nil
+                activeCropCGImage = nil
+                croppedHoldID = nil
+                croppedHoldCoord = nil
+            }
+            inlineStatusMessage = nil
             return
         }
 
@@ -358,12 +586,22 @@ struct HoldEditorView: View {
     ) {
         currentMouseLocation = viewportPoint
 
-        guard draggedHold == nil else { return }
+        guard activeDragAction == nil else { return }
+
+        // When a hold is selected in edit mode, editing that hold has priority!
+        if isEditingHolds, let selID = selectedHoldID, let selHold = holds.first(where: { $0.holdID == selID }) {
+            if activeCropCGImage == nil || croppedHoldID != selHold.holdID {
+                updateCrop(for: selHold)
+            }
+            return
+        }
 
         guard loupeConfig.isEnabled else {
-            if hoveredHold != nil {
+            if hoveredHold != nil || activeCropCGImage != nil {
                 hoveredHold = nil
-                hoveredCropCGImage = nil
+                activeCropCGImage = nil
+                croppedHoldID = nil
+                croppedHoldCoord = nil
             }
             return
         }
@@ -381,7 +619,11 @@ struct HoldEditorView: View {
             if hoveredHold != nil {
                 withAnimation(.easeOut(duration: 0.12)) {
                     hoveredHold = nil
-                    hoveredCropCGImage = nil
+                    if selectedHoldID == nil {
+                        activeCropCGImage = nil
+                        croppedHoldID = nil
+                        croppedHoldCoord = nil
+                    }
                 }
             }
         }
@@ -389,10 +631,14 @@ struct HoldEditorView: View {
 
     private func handleMouseExited() {
         currentMouseLocation = nil
-        if draggedHold == nil {
+        if activeDragAction == nil {
             withAnimation(.easeOut(duration: 0.12)) {
                 hoveredHold = nil
-                hoveredCropCGImage = nil
+                if !isEditingHolds || selectedHoldID == nil {
+                    activeCropCGImage = nil
+                    croppedHoldID = nil
+                    croppedHoldCoord = nil
+                }
             }
         }
     }
@@ -400,7 +646,10 @@ struct HoldEditorView: View {
     // MARK: - Photo Loading & Backward Transform Cropping
 
     private var activeCalibrationPoints: [CalibrationPoint] {
-        calibrations.first?.points ?? CalibrationPointTemplates.all
+        if let points = calibrations.first?.points, !points.isEmpty {
+            return points
+        }
+        return CalibrationPointTemplates.all
     }
 
     private func loadOriginalPhoto() {
@@ -409,7 +658,7 @@ struct HoldEditorView: View {
             let image = await OriginalPhotoLoader.shared.loadPhoto(from: photoPath)
             await MainActor.run {
                 self.originalPhotoCGImage = image
-                if let active = self.draggedHold ?? self.hoveredHold {
+                if let active = self.activeHoldForLoupe {
                     self.updateCrop(for: active)
                 }
             }
@@ -417,15 +666,29 @@ struct HoldEditorView: View {
     }
 
     private func updateCrop(for hold: Hold) {
-        guard let originalImage = originalPhotoCGImage else { return }
-        hoveredCropCGImage = HoldBackwardTransformService.cropLocation(
+        guard let originalImage = originalPhotoCGImage else {
+            loadOriginalPhoto()
+            return
+        }
+        if croppedHoldID == hold.holdID,
+           let lastCoord = croppedHoldCoord,
+           abs(lastCoord.x - CGFloat(hold.xCm)) < 0.1,
+           abs(lastCoord.y - CGFloat(hold.yCm)) < 0.1,
+           activeCropCGImage != nil {
+            return
+        }
+        if let crop = HoldBackwardTransformService.cropLocation(
             from: originalImage,
             xCm: hold.xCm,
             yCm: hold.yCm,
             plane: hold.plane,
             calibrationPoints: activeCalibrationPoints,
             cropSpan: loupeConfig.cropPixelSpan
-        )
+        ) {
+            activeCropCGImage = crop
+            croppedHoldID = hold.holdID
+            croppedHoldCoord = CGPoint(x: hold.xCm, y: hold.yCm)
+        }
     }
 
     // MARK: - Controls Toolbar
@@ -468,7 +731,9 @@ struct HoldEditorView: View {
             }
 
             Text(isEditingHolds
-                 ? "Edit mode: tap wall to add hold, drag to reposition (loupe shows exact bolt position), right-click or long-press to remove."
+                 ? (isShiftActive
+                    ? "Shift held: drag cyan circle to rotate, white handles to resize ellipse."
+                    : "Edit mode: drag holds to reposition them. Hold Shift to edit ellipse size and rotation.")
                  : "Locked mode: wall is read-only. Tap or hover over holds to view high-resolution loupe preview. Press Edit to modify.")
                 .font(.footnote)
                 .foregroundStyle(.secondary)
@@ -489,7 +754,8 @@ struct HoldEditorView: View {
                 isEditingHolds.toggle()
                 inlineStatusMessage = nil
                 if !isEditingHolds {
-                    draggedHold = nil
+                    activeDragAction = nil
+                    selectedHoldID = nil
                 }
             } else {
                 appModel.globalMessage = "Wall layout can be edited only by admin."
@@ -529,7 +795,10 @@ struct HoldEditorView: View {
             xCm: clampedX,
             yCm: clampedY,
             plane: plane,
-            role: .hand
+            role: .hand,
+            majorCm: Hold.defaultMajorCm,
+            minorCm: Hold.defaultMinorCm,
+            rotationDeg: Hold.defaultRotationDeg
         )
         writeContext.insert(hold)
         if persist(context: writeContext) {
@@ -537,7 +806,8 @@ struct HoldEditorView: View {
             let insertedPresent = isHoldPersisted(holdID: holdID)
 
             if insertedPresent {
-                inlineStatusMessage = "Added hold #\(holdID) at (\(Int(clampedX)), \(Int(clampedY))) cm. Total holds: \(afterCount)."
+                selectedHoldID = holdID
+                inlineStatusMessage = "Added hold #\(holdID): (\(Int(clampedX)), \(Int(clampedY))) cm. Total holds: \(afterCount)."
                 if let newHold = holds.first(where: { $0.holdID == holdID }) {
                     hoveredHold = newHold
                     updateCrop(for: newHold)
@@ -549,7 +819,14 @@ struct HoldEditorView: View {
         }
     }
 
-    private func persistMove(holdID: Int, xCm: Double, yCm: Double) {
+    private func persistHoldGeometry(
+        holdID: Int,
+        xCm: Double,
+        yCm: Double,
+        majorCm: Double,
+        minorCm: Double,
+        rotationDeg: Double
+    ) {
         let writeContext = ModelContext(modelContext.container)
         let id = holdID
         let descriptor = FetchDescriptor<Hold>(
@@ -559,13 +836,16 @@ struct HoldEditorView: View {
         )
 
         guard let target = try? writeContext.fetch(descriptor).first else {
-            inlineStatusMessage = "Move failed: hold #\(holdID) not found in DB."
+            inlineStatusMessage = "Save failed: hold #\(holdID) not found in DB."
             return
         }
 
         target.xCm = max(0, min(WallSpec.widthCm, xCm))
         target.yCm = max(0, min(WallSpec.totalHeightCm, yCm))
         target.plane = target.yCm <= WallSpec.kickboardHeightCm ? .kickboard : .main
+        target.majorCm = max(1.0, majorCm)
+        target.minorCm = max(1.0, minorCm)
+        target.rotationDeg = rotationDeg
 
         if persist(context: writeContext) {
             _ = fetchHoldsAndReturnCount()
@@ -592,9 +872,14 @@ struct HoldEditorView: View {
 
         if persist(context: writeContext) {
             _ = fetchHoldsAndReturnCount()
+            if selectedHoldID == hold.holdID {
+                selectedHoldID = nil
+            }
             if hoveredHold?.holdID == hold.holdID {
                 hoveredHold = nil
-                hoveredCropCGImage = nil
+                activeCropCGImage = nil
+                croppedHoldID = nil
+                croppedHoldCoord = nil
             }
             inlineStatusMessage = "Hold #\(id) deleted. Total holds: \(holds.count)."
         }
@@ -621,8 +906,11 @@ struct HoldEditorView: View {
 
             _ = fetchHoldsAndReturnCount()
             hoveredHold = nil
-            draggedHold = nil
-            hoveredCropCGImage = nil
+            selectedHoldID = nil
+            activeDragAction = nil
+            activeCropCGImage = nil
+            croppedHoldID = nil
+            croppedHoldCoord = nil
             inlineStatusMessage = "All holds deleted. Hold counter reset to 1."
             appModel.globalMessage = "All holds deleted. Hold counter reset to 1."
         } catch {
@@ -701,34 +989,138 @@ struct HoldEditorView: View {
     }
 }
 
-// MARK: - Hold Position Visual Marker Dot
+// MARK: - Drag Actions & Handle Types
+
+private enum HoldDragAction {
+    case move(Int)
+    case resizeMajor(Int)
+    case resizeMinor(Int)
+    case rotate(Int)
+    case pan(CGSize)
+}
+
+private enum HoldHandleType {
+    case rotate
+    case resizeMajor
+    case resizeMinor
+    case move
+}
+
+// MARK: - Hold Position Visual Ellipse Dot
 
 private struct HoldPositionDotView: View {
     let holdID: Int
-    var xCm: Double = 0
-    var yCm: Double = 0
+    var widthPt: CGFloat = 16
+    var heightPt: CGFloat = 16
+    var rotationDeg: Double = 0
+    var zoomScale: CGFloat = 1.0
     var isHovered: Bool = false
+    var isSelected: Bool = false
     var isEditing: Bool = false
+    var isShiftPressed: Bool = false
 
     var body: some View {
-        ZStack(alignment: .top) {
-            Circle()
-                .fill(isHovered ? Color.cyan.opacity(0.35) : Color.purple.opacity(0.25))
-                .frame(width: isHovered ? 16 : 10, height: isHovered ? 16 : 10)
-                .overlay {
-                    Circle().stroke(isHovered ? Color.cyan : Color.purple, lineWidth: isHovered ? 2 : 1)
-                }
-                .shadow(color: isHovered ? Color.cyan.opacity(0.8) : .clear, radius: 4)
-                .animation(.spring(response: 0.25, dampingFraction: 0.7), value: isHovered)
+        let displayWidth = isHovered || isSelected ? max(widthPt * 1.05, widthPt + 2) : widthPt
+        let displayHeight = isHovered || isSelected ? max(heightPt * 1.05, heightPt + 2) : heightPt
+        let a = displayWidth / 2.0
+        let b = displayHeight / 2.0
+        let handleSize = max(7.0, 10.0 / zoomScale)
+        let rotHandleSize = max(9.0, 13.0 / zoomScale)
+        let stemLen = 22.0 / zoomScale
 
+        ZStack(alignment: .center) {
+            // Rotated hold ellipse, bounding box, and interactive visual handles
+            ZStack {
+                if isSelected && isEditing && isShiftPressed {
+                    // 1. Rotated bounding box outline
+                    Rectangle()
+                        .stroke(Color.cyan.opacity(0.85), style: StrokeStyle(lineWidth: max(1.0, 1.4 / zoomScale), dash: [4 / zoomScale, 4 / zoomScale]))
+                        .frame(width: displayWidth, height: displayHeight)
+
+                    // 2. Rotation stem line extending from major axis (+X end)
+                    Rectangle()
+                        .fill(Color.cyan)
+                        .frame(width: stemLen, height: max(1.0, 1.6 / zoomScale))
+                        .offset(x: a + stemLen / 2.0)
+
+                    // 3. Rotation handle (cyan circle with white stroke)
+                    Circle()
+                        .fill(Color.cyan)
+                        .frame(width: rotHandleSize, height: rotHandleSize)
+                        .overlay {
+                            Circle().stroke(Color.white, lineWidth: max(1.0, 1.8 / zoomScale))
+                        }
+                        .shadow(color: Color.black.opacity(0.4), radius: 2)
+                        .offset(x: a + stemLen)
+
+                    // 4. Major axis handles (two white squares on left and right)
+                    RoundedRectangle(cornerRadius: max(1.0, 2.0 / zoomScale))
+                        .fill(Color.white)
+                        .frame(width: handleSize, height: handleSize)
+                        .overlay {
+                            RoundedRectangle(cornerRadius: max(1.0, 2.0 / zoomScale)).stroke(Color.cyan, lineWidth: max(1.0, 1.6 / zoomScale))
+                        }
+                        .shadow(color: Color.black.opacity(0.3), radius: 1.5)
+                        .offset(x: a)
+
+                    RoundedRectangle(cornerRadius: max(1.0, 2.0 / zoomScale))
+                        .fill(Color.white)
+                        .frame(width: handleSize, height: handleSize)
+                        .overlay {
+                            RoundedRectangle(cornerRadius: max(1.0, 2.0 / zoomScale)).stroke(Color.cyan, lineWidth: max(1.0, 1.6 / zoomScale))
+                        }
+                        .shadow(color: Color.black.opacity(0.3), radius: 1.5)
+                        .offset(x: -a)
+
+                    // 5. Minor axis handles (two white squares on top and bottom)
+                    RoundedRectangle(cornerRadius: max(1.0, 2.0 / zoomScale))
+                        .fill(Color.white)
+                        .frame(width: handleSize, height: handleSize)
+                        .overlay {
+                            RoundedRectangle(cornerRadius: max(1.0, 2.0 / zoomScale)).stroke(Color.blue, lineWidth: max(1.0, 1.6 / zoomScale))
+                        }
+                        .shadow(color: Color.black.opacity(0.3), radius: 1.5)
+                        .offset(y: -b)
+
+                    RoundedRectangle(cornerRadius: max(1.0, 2.0 / zoomScale))
+                        .fill(Color.white)
+                        .frame(width: handleSize, height: handleSize)
+                        .overlay {
+                            RoundedRectangle(cornerRadius: max(1.0, 2.0 / zoomScale)).stroke(Color.blue, lineWidth: max(1.0, 1.6 / zoomScale))
+                        }
+                        .shadow(color: Color.black.opacity(0.3), radius: 1.5)
+                        .offset(y: b)
+                }
+
+                // Hold ellipse shape
+                Ellipse()
+                    .fill(isSelected ? Color.cyan.opacity(0.38) : (isHovered ? Color.cyan.opacity(0.28) : Color.purple.opacity(0.22)))
+                    .overlay {
+                        Ellipse().stroke(
+                            isSelected ? Color.cyan : (isHovered ? Color.cyan : Color.purple),
+                            lineWidth: isSelected ? max(1.5, 2.4 / zoomScale) : (isHovered ? max(1.2, 2.0 / zoomScale) : max(0.8, 1.2 / zoomScale))
+                        )
+                    }
+                    .frame(width: displayWidth, height: displayHeight)
+            }
+            .rotationEffect(.degrees(-rotationDeg))
+            .animation(.spring(response: 0.25, dampingFraction: 0.7), value: isHovered || isSelected)
+
+            // Bolt center point marker (always shows exact bolt hole)
+            Circle()
+                .fill(isSelected ? Color.yellow : (isHovered ? Color.white : Color.white.opacity(0.85)))
+                .frame(width: max(3.0, 4.0 / zoomScale), height: max(3.0, 4.0 / zoomScale))
+
+            // Hold number badge
             Text("\(holdID)")
-                .font(.caption2.monospacedDigit().weight(isHovered ? .bold : .regular))
+                .font(.caption2.monospacedDigit().weight(isHovered || isSelected ? .bold : .regular))
                 .padding(.horizontal, 3)
                 .padding(.vertical, 1)
-                .background(Color.black.opacity(isHovered ? 0.9 : 0.65))
+                .background(Color.black.opacity(isHovered || isSelected ? 0.9 : 0.65))
                 .foregroundStyle(.white)
                 .clipShape(RoundedRectangle(cornerRadius: 3))
-                .offset(y: isHovered ? -16 : -12)
+                .offset(y: -(max(heightPt, widthPt) / 2 + 12 / zoomScale))
         }
+        .shadow(color: isSelected ? Color.cyan.opacity(0.9) : (isHovered ? Color.cyan.opacity(0.6) : .clear), radius: 4)
     }
 }

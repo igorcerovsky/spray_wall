@@ -16,6 +16,9 @@ struct HoldDetailView: View {
 
                     TextField("X (cm)", value: xBinding, format: .number)
                     TextField("Y (cm)", value: yBinding, format: .number)
+                    TextField("Major axis (cm)", value: majorBinding, format: .number)
+                    TextField("Minor axis (cm)", value: minorBinding, format: .number)
+                    TextField("Rotation (°)", value: rotationBinding, format: .number)
 
                     Picker("Plane", selection: planeBinding) {
                         ForEach(HoldPlane.allCases) { plane in
@@ -73,6 +76,27 @@ struct HoldDetailView: View {
         Binding(
             get: { hold.yCm },
             set: { hold.yCm = clamp($0, range: 0...WallSpec.totalHeightCm) }
+        )
+    }
+
+    private var majorBinding: Binding<Double> {
+        Binding(
+            get: { hold.majorCm },
+            set: { hold.majorCm = clamp($0, range: 1...100) }
+        )
+    }
+
+    private var minorBinding: Binding<Double> {
+        Binding(
+            get: { hold.minorCm },
+            set: { hold.minorCm = clamp($0, range: 1...100) }
+        )
+    }
+
+    private var rotationBinding: Binding<Double> {
+        Binding(
+            get: { hold.rotationDeg },
+            set: { hold.rotationDeg = $0 }
         )
     }
 

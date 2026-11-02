@@ -260,10 +260,15 @@ struct BoulderEditorView: View {
                         let role = boulder.role(for: hold.holdID)
                         let isHovered = hoveredHold?.holdID == hold.holdID
                         let markerPos = zoomTransform.worldCmToWall(xCm: hold.xCm, yCm: hold.yCm)
+                        let holdWidthWall = max(6.0, CGFloat(hold.majorCm) * (fittedSize.width / CGFloat(WallSpec.widthCm)))
+                        let holdHeightWall = max(6.0, CGFloat(hold.minorCm) * (fittedSize.height / CGFloat(WallSpec.totalHeightCm)))
 
                         BoulderWallHoldMarker(
                             holdID: hold.holdID,
                             role: role,
+                            widthPt: holdWidthWall,
+                            heightPt: holdHeightWall,
+                            rotationDeg: hold.rotationDeg,
                             isDimmed: role == nil,
                             showHoldID: canEditDraft,
                             isHovered: isHovered
@@ -291,6 +296,7 @@ struct BoulderEditorView: View {
                         croppedImage: hoveredCropCGImage,
                         hold: hoveredHold,
                         role: role,
+                        calibrationPoints: activeCalibrationPoints,
                         config: loupeConfig
                     )
                     .position(loupePosition)
@@ -876,14 +882,21 @@ struct BoulderEditorView: View {
 private struct BoulderWallHoldMarker: View {
     let holdID: Int
     let role: BoulderHoldGroup?
+    var widthPt: CGFloat = 16
+    var heightPt: CGFloat = 16
+    var rotationDeg: Double = 0
     let isDimmed: Bool
     let showHoldID: Bool
     var isHovered: Bool = false
 
     var body: some View {
+        let displayWidth = isHovered ? max(widthPt * 1.12, widthPt + 3) : widthPt
+        let displayHeight = isHovered ? max(heightPt * 1.12, heightPt + 3) : heightPt
+
         ZStack(alignment: .top) {
-            markerView
-                .frame(width: isHovered ? 20 : 16, height: isHovered ? 20 : 16)
+            markerView(width: displayWidth, height: displayHeight)
+                .frame(width: displayWidth, height: displayHeight)
+                .rotationEffect(.degrees(-rotationDeg))
                 .animation(.spring(response: 0.25, dampingFraction: 0.7), value: isHovered)
 
             if showHoldID {
@@ -894,45 +907,46 @@ private struct BoulderWallHoldMarker: View {
                     .background(Color.black.opacity(isHovered ? 0.9 : 0.65))
                     .foregroundStyle(.white)
                     .clipShape(RoundedRectangle(cornerRadius: 3))
-                    .offset(y: isHovered ? -16 : -14)
+                    .offset(y: -(max(heightPt, widthPt) / 2 + 12))
             }
         }
-        .opacity(isDimmed && !isHovered ? 0.45 : 1.0)
+        .opacity(isDimmed && !isHovered ? 0.40 : 1.0)
         .shadow(color: isHovered ? markerColor.opacity(0.85) : .clear, radius: 4)
     }
 
     @ViewBuilder
-    private var markerView: some View {
+    private func markerView(width: CGFloat, height: CGFloat) -> some View {
+        let cornerRadius = max(3.0, min(width, height) * 0.15)
         switch role {
         case .start:
-            RoundedRectangle(cornerRadius: 2)
+            RoundedRectangle(cornerRadius: cornerRadius)
                 .fill(markerColor.opacity(0.22))
                 .overlay {
-                    RoundedRectangle(cornerRadius: 2).stroke(markerColor, lineWidth: 2)
+                    RoundedRectangle(cornerRadius: cornerRadius).stroke(markerColor, lineWidth: isHovered ? 2.5 : 2)
                 }
         case .hold:
-            Circle()
+            Ellipse()
                 .fill(markerColor.opacity(0.22))
                 .overlay {
-                    Circle().stroke(markerColor, lineWidth: 2)
+                    Ellipse().stroke(markerColor, lineWidth: isHovered ? 2.5 : 2)
                 }
         case .foothold:
             Diamond()
                 .fill(markerColor.opacity(0.22))
                 .overlay {
-                    Diamond().stroke(markerColor, lineWidth: 2)
+                    Diamond().stroke(markerColor, lineWidth: isHovered ? 2.5 : 2)
                 }
         case .top:
-            RoundedRectangle(cornerRadius: 2)
+            RoundedRectangle(cornerRadius: cornerRadius)
                 .fill(markerColor.opacity(0.22))
                 .overlay {
-                    RoundedRectangle(cornerRadius: 2).stroke(markerColor, lineWidth: 2)
+                    RoundedRectangle(cornerRadius: cornerRadius).stroke(markerColor, lineWidth: isHovered ? 2.5 : 2)
                 }
         case .none:
-            Circle()
-                .fill(markerColor.opacity(0.22))
+            Ellipse()
+                .fill(markerColor.opacity(0.12))
                 .overlay {
-                    Circle().stroke(markerColor, lineWidth: 2)
+                    Ellipse().stroke(markerColor.opacity(0.4), lineWidth: 1)
                 }
         }
     }
@@ -953,23 +967,4 @@ private struct BoulderWallHoldMarker: View {
     }
 }
 
-private struct Diamond: InsettableShape {
-    var insetAmount: CGFloat = 0
 
-    func path(in rect: CGRect) -> Path {
-        let insetRect = rect.insetBy(dx: insetAmount, dy: insetAmount)
-        var path = Path()
-        path.move(to: CGPoint(x: insetRect.midX, y: insetRect.minY))
-        path.addLine(to: CGPoint(x: insetRect.maxX, y: insetRect.midY))
-        path.addLine(to: CGPoint(x: insetRect.midX, y: insetRect.maxY))
-        path.addLine(to: CGPoint(x: insetRect.minX, y: insetRect.midY))
-        path.closeSubpath()
-        return path
-    }
-
-    func inset(by amount: CGFloat) -> some InsettableShape {
-        var copy = self
-        copy.insetAmount += amount
-        return copy
-    }
-}

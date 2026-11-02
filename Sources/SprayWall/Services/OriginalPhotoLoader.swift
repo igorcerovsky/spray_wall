@@ -19,7 +19,17 @@ actor OriginalPhotoLoader {
             return cachedImage
         }
 
-        guard let url = try? WallProjectPaths.resolvePhotoURL(from: path) else {
+        let resolvedURL: URL? = {
+            if let url = try? WallProjectPaths.resolvePhotoURL(from: path) {
+                return url
+            }
+            if path != WallCalibration.defaultPhotoPath {
+                return try? WallProjectPaths.resolvePhotoURL(from: WallCalibration.defaultPhotoPath)
+            }
+            return nil
+        }()
+
+        guard let url = resolvedURL else {
             return nil
         }
 

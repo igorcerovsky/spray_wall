@@ -15,6 +15,15 @@ final class Hold {
 
     var createdAt: Date
 
+    // Ellipse geometry: backing values for lightweight store migration
+    var majorCmValue: Double?
+    var minorCmValue: Double?
+    var rotationDegValue: Double?
+
+    static let defaultMajorCm: Double = 8.0
+    static let defaultMinorCm: Double = 8.0
+    static let defaultRotationDeg: Double = 0.0
+
     @Relationship(deleteRule: .cascade, inverse: \Grip.hold)
     var grips: [Grip]
 
@@ -27,6 +36,9 @@ final class Hold {
         isStart: Bool = false,
         isTop: Bool = false,
         isStartFoot: Bool = false,
+        majorCm: Double = Hold.defaultMajorCm,
+        minorCm: Double = Hold.defaultMinorCm,
+        rotationDeg: Double = Hold.defaultRotationDeg,
         createdAt: Date = .now,
         grips: [Grip] = []
     ) {
@@ -38,8 +50,30 @@ final class Hold {
         self.isStart = isStart
         self.isTop = isTop
         self.isStartFoot = isStartFoot
+        self.majorCmValue = majorCm
+        self.minorCmValue = minorCm
+        self.rotationDegValue = rotationDeg
         self.createdAt = createdAt
         self.grips = grips
+    }
+
+    var majorCm: Double {
+        get { majorCmValue ?? Self.defaultMajorCm }
+        set { majorCmValue = max(1.0, newValue) }
+    }
+
+    var minorCm: Double {
+        get { minorCmValue ?? Self.defaultMinorCm }
+        set { minorCmValue = max(1.0, newValue) }
+    }
+
+    var rotationDeg: Double {
+        get { rotationDegValue ?? Self.defaultRotationDeg }
+        set {
+            var deg = newValue.truncatingRemainder(dividingBy: 360)
+            if deg < 0 { deg += 360 }
+            rotationDegValue = deg
+        }
     }
 
     var plane: HoldPlane {

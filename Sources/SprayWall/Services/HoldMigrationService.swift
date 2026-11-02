@@ -3,7 +3,7 @@ import SwiftData
 
 enum HoldMigrationService {
     private static let migrationVersionKey = "spraywall.hold_migration_version"
-    private static let currentMigrationVersion = 1
+    private static let currentMigrationVersion = 2
 
     static func migrateToCurrentVersion(context: ModelContext) throws {
         let defaults = UserDefaults.standard
@@ -50,6 +50,21 @@ enum HoldMigrationService {
 
             if HoldRole(rawValue: hold.roleRaw) == nil {
                 hold.role = .hand
+                changed = true
+            }
+
+            if hold.majorCmValue == nil {
+                hold.majorCm = Hold.defaultMajorCm
+                changed = true
+            }
+
+            if hold.minorCmValue == nil {
+                hold.minorCm = Hold.defaultMinorCm
+                changed = true
+            }
+
+            if hold.rotationDegValue == nil {
+                hold.rotationDeg = Hold.defaultRotationDeg
                 changed = true
             }
 

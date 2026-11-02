@@ -46,6 +46,9 @@ struct HoldDTO: Codable {
     var isStart: Bool
     var isTop: Bool
     var isStartFoot: Bool
+    var majorCm: Double?
+    var minorCm: Double?
+    var rotationDeg: Double?
     var createdAt: Date
     var grips: [GripDTO]
 }
@@ -162,6 +165,9 @@ enum ProjectArchiveService {
                     isStart: $0.isStart,
                     isTop: $0.isTop,
                     isStartFoot: $0.isStartFoot,
+                    majorCm: $0.majorCm,
+                    minorCm: $0.minorCm,
+                    rotationDeg: $0.rotationDeg,
                     createdAt: $0.createdAt,
                     grips: $0.grips.map {
                         GripDTO(
@@ -270,6 +276,9 @@ enum ProjectArchiveService {
             hold.isStart = dto.isStart
             hold.isTop = dto.isTop
             hold.isStartFoot = dto.isStartFoot
+            hold.majorCm = dto.majorCm ?? Hold.defaultMajorCm
+            hold.minorCm = dto.minorCm ?? Hold.defaultMinorCm
+            hold.rotationDeg = dto.rotationDeg ?? Hold.defaultRotationDeg
 
             let incomingGripIDs = Set(dto.grips.map(\.id))
             for grip in hold.grips where !incomingGripIDs.contains(grip.id) {

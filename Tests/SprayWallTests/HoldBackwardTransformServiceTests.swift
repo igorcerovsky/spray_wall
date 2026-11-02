@@ -236,5 +236,53 @@ struct HoldBackwardTransformServiceTests {
         #expect(topCornerCrop?.width == 320)
         #expect(topCornerCrop?.height == 320)
     }
+
+    @Test("projectedEllipseGeometry accounts for perspective orientation and scaling in loupe")
+    func projectedEllipseGeometryTests() {
+        let hold = Hold(
+            holdID: 15,
+            xCm: 180,
+            yCm: 200,
+            plane: .main,
+            role: .hand,
+            majorCm: 16.0,
+            minorCm: 8.0,
+            rotationDeg: 0.0
+        )
+
+        let proj0 = HoldBackwardTransformService.projectedEllipseGeometry(
+            for: hold,
+            calibrationPoints: sampleCalibrationPoints,
+            cropSpan: 380,
+            loupeSize: CGSize(width: 190, height: 190)
+        )
+
+        // With rotation 0, horizontal wall line in photo is near horizontal
+        #expect(abs(proj0.rotationDeg) < 15.0)
+        // Major axis (16cm) should be roughly twice minor axis (8cm)
+        #expect(proj0.widthPt > proj0.heightPt * 1.5)
+
+        // Rotate by 90 degrees (pointing up on wall)
+        hold.rotationDeg = 90.0
+        let proj90 = HoldBackwardTransformService.projectedEllipseGeometry(
+            for: hold,
+            calibrationPoints: sampleCalibrationPoints,
+            cropSpan: 380,
+            loupeSize: CGSize(width: 190, height: 190)
+        )
+        // Pointing up in screen coordinates is roughly -90 degrees
+        #expect(abs(proj90.rotationDeg - (-90.0)) < 15.0)
+
+        // Empty calibration fallback
+        let fallbackProj = HoldBackwardTransformService.projectedEllipseGeometry(
+            for: hold,
+            calibrationPoints: [],
+            cropSpan: 380,
+            loupeSize: CGSize(width: 190, height: 190)
+        )
+        #expect(fallbackProj.rotationDeg == -90.0)
+        #expect(fallbackProj.widthPt > 0)
+        #expect(fallbackProj.heightPt > 0)
+    }
 }
 

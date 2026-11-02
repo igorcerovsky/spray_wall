@@ -104,12 +104,15 @@ struct WallZoomTransform: Sendable, Equatable {
         maxScreenDistance: CGFloat = 24.0
     ) -> (hold: Hold, distance: CGFloat)? {
         var closest: Hold? = nil
-        var minDistance = maxScreenDistance
+        var minDistance = CGFloat.greatestFiniteMagnitude
 
         for hold in holds {
             let screenPt = worldCmToViewport(xCm: hold.xCm, yCm: hold.yCm)
             let dist = hypot(viewportPoint.x - screenPt.x, viewportPoint.y - screenPt.y)
-            if dist <= minDistance {
+            let holdRadius = CGFloat(max(hold.majorCm, hold.minorCm)) * 0.5 * (fittedSize.width / CGFloat(WallSpec.widthCm)) * zoomScale
+            let threshold = max(maxScreenDistance, holdRadius + 4.0)
+
+            if dist <= threshold && dist < minDistance {
                 minDistance = dist
                 closest = hold
             }
@@ -219,6 +222,82 @@ struct WallZoomTransform: Sendable, Equatable {
         candidateY = min(maxY, max(minY, candidateY))
 
         return CGPoint(x: candidateX, y: candidateY)
+    }
+
+    /// Computes screen position for the floating magnifying loupe during hold/ellipse editing,
+    /// positioning the loupe to the left or right of the wall image so it never obscures the hold or its editing handles.
+    ///
+    /// - Parameters:
+    ///   - holdScreenPoint: Position of the hold on screen in viewport coordinates.
+    ///   - loupeConfig: Configuration of the loupe (size, badge, etc.).
+    ///   - viewportSize: Dimensions of the outer viewport.
+    ///   - fittedSize: Fitted dimensions of the wall canvas before zoom.
+    ///   - zoomScale: Current zoom scale.
+    ///   - panOffset: Current pan offset.
+    /// - Returns: Viewport position (x, y) where the loupe should be placed.
+    static func computeEditingLoupePosition(
+        holdScreenPoint: CGPoint,
+        loupeConfig: HoldLoupeConfig,
+        viewportSize: CGSize,
+        fittedSize: CGSize,
+        zoomScale: CGFloat,
+        panOffset: CGSize
+    ) -> CGPoint {
+        let loupeW = loupeConfig.size.width
+        let loupeH = loupeConfig.size.height + (loupeConfig.showBadge ? 28.0 : 0.0)
+
+        let halfW = loupeW / 2.0
+        let halfH = loupeH / 2.0
+
+        // Determine horizontal edges of the wall image on screen
+        let wallCenterX = (viewportSize.width / 2.0) + panOffset.width
+        let scaledWallWidth = fittedSize.width * zoomScale
+        let wallLeft = wallCenterX - (scaledWallWidth / 2.0)
+        let wallRight = wallCenterX + (scaledWallWidth / 2.0)
+
+        // Decide whether to place on the left or right of the image/screen.
+        // If the hold is on the right half, place on the left.
+        // If the hold is on the left half, place on the right.
+        let placeOnLeft = holdScreenPoint.x >= (viewportSize.width / 2.0)
+
+        var targetX: CGFloat
+        if placeOnLeft {
+            // Loupe goes to the left of the hold.
+            // Check if there is an empty gutter to the left of the wall image.
+            let leftGutter = wallLeft
+            if leftGutter >= loupeW + 24.0 {
+                let gutterCenter = leftGutter / 2.0
+                targetX = max(halfW + 16.0, min(leftGutter - halfW - 12.0, gutterCenter))
+            } else {
+                // Wall fills the left side or zoomed in: anchor to left edge of viewport
+                targetX = halfW + 20.0
+                if holdScreenPoint.x - halfW - 30.0 > halfW + 12.0 {
+                    targetX = min(targetX, holdScreenPoint.x - halfW - 30.0)
+                }
+            }
+        } else {
+            // Loupe goes to the right of the hold.
+            // Check if there is an empty gutter to the right of the wall image.
+            let rightGutter = viewportSize.width - wallRight
+            if rightGutter >= loupeW + 24.0 {
+                let gutterCenter = wallRight + (rightGutter / 2.0)
+                targetX = min(viewportSize.width - halfW - 16.0, max(wallRight + halfW + 12.0, gutterCenter))
+            } else {
+                // Wall fills the right side or zoomed in: anchor to right edge of viewport
+                targetX = viewportSize.width - halfW - 20.0
+                if holdScreenPoint.x + halfW + 30.0 < viewportSize.width - halfW - 12.0 {
+                    targetX = max(targetX, holdScreenPoint.x + halfW + 30.0)
+                }
+            }
+        }
+
+        // Vertically align with the hold so the user can look across horizontally,
+        // clamped safely within the viewport bounds.
+        let minY = halfH + 16.0
+        let maxY = max(minY, viewportSize.height - halfH - 16.0)
+        let targetY = min(maxY, max(minY, holdScreenPoint.y))
+
+        return CGPoint(x: targetX, y: targetY)
     }
 }
 

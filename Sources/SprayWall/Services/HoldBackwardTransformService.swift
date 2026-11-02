@@ -291,4 +291,140 @@ enum HoldBackwardTransformService {
             cropSpan: cropSpan
         )
     }
+
+    /// Estimates the local resolution in original photo pixels per physical centimeter
+    /// at the given physical position on the wall.
+    static func photoPixelsPerCm(
+        xCm: Double,
+        yCm: Double,
+        plane: HoldPlane,
+        calibrationPoints: [CalibrationPoint]
+    ) -> Double {
+        guard let p0 = photoPixelLocation(xCm: xCm, yCm: yCm, plane: plane, calibrationPoints: calibrationPoints) else {
+            return 10.0
+        }
+
+        let deltaCm = 2.0
+        let pX = photoPixelLocation(
+            xCm: xCm + deltaCm <= WallSpec.widthCm ? xCm + deltaCm : xCm - deltaCm,
+            yCm: yCm,
+            plane: plane,
+            calibrationPoints: calibrationPoints
+        )
+        let pY = photoPixelLocation(
+            xCm: xCm,
+            yCm: yCm + deltaCm <= WallSpec.totalHeightCm ? yCm + deltaCm : yCm - deltaCm,
+            plane: plane,
+            calibrationPoints: calibrationPoints
+        )
+
+        var count = 0
+        var totalDist = 0.0
+        if let pX {
+            totalDist += hypot(Double(pX.x - p0.x), Double(pX.y - p0.y)) / deltaCm
+            count += 1
+        }
+        if let pY {
+            totalDist += hypot(Double(pY.x - p0.x), Double(pY.y - p0.y)) / deltaCm
+            count += 1
+        }
+
+        return count > 0 ? (totalDist / Double(count)) : 10.0
+    }
+
+    /// Geometric parameters of a hold's ellipse projected into the loupe view coordinates,
+    /// fully accounting for perspective homography, camera tilt, and anisotropic scaling.
+    struct ProjectedEllipseGeometry: Equatable, Sendable {
+        /// Width of the major axis in loupe view points.
+        var widthPt: CGFloat
+        /// Height of the minor axis in loupe view points.
+        var heightPt: CGFloat
+        /// Exact rotation angle in degrees for `.rotationEffect(.degrees(rotationDeg))` in SwiftUI.
+        var rotationDeg: Double
+    }
+
+    /// Computes the exact projected geometry (width, height, rotation angle) of a hold's ellipse
+    /// when displayed over the cropped original photo inside the loupe.
+    static func projectedEllipseGeometry(
+        for hold: Hold,
+        calibrationPoints: [CalibrationPoint],
+        cropSpan: CGFloat,
+        loupeSize: CGSize
+    ) -> ProjectedEllipseGeometry {
+        let loupeScale = loupeSize.width / max(1.0, cropSpan)
+        let rad = hold.rotationDeg * .pi / 180.0
+        let ux = cos(rad)
+        let uy = sin(rad)
+        let vx = -sin(rad)
+        let vy = cos(rad)
+
+        let stepCm = 1.0
+
+        let xA = min(WallSpec.widthCm, max(0.0, hold.xCm + stepCm * ux))
+        let xB = min(WallSpec.widthCm, max(0.0, hold.xCm - stepCm * ux))
+        let yA = min(WallSpec.totalHeightCm, max(0.0, hold.yCm + stepCm * uy))
+        let yB = min(WallSpec.totalHeightCm, max(0.0, hold.yCm - stepCm * uy))
+
+        let pA = photoPixelLocation(xCm: xA, yCm: yA, plane: hold.plane, calibrationPoints: calibrationPoints)
+        let pB = photoPixelLocation(xCm: xB, yCm: yB, plane: hold.plane, calibrationPoints: calibrationPoints)
+
+        let xMinA = min(WallSpec.widthCm, max(0.0, hold.xCm + stepCm * vx))
+        let xMinB = min(WallSpec.widthCm, max(0.0, hold.xCm - stepCm * vx))
+        let yMinA = min(WallSpec.totalHeightCm, max(0.0, hold.yCm + stepCm * vy))
+        let yMinB = min(WallSpec.totalHeightCm, max(0.0, hold.yCm - stepCm * vy))
+
+        let pMinA = photoPixelLocation(xCm: xMinA, yCm: yMinA, plane: hold.plane, calibrationPoints: calibrationPoints)
+        let pMinB = photoPixelLocation(xCm: xMinB, yCm: yMinB, plane: hold.plane, calibrationPoints: calibrationPoints)
+
+        guard let pA, let pB, let pMinA, let pMinB else {
+            let pxPerCm = photoPixelsPerCm(for: hold, calibrationPoints: calibrationPoints)
+            let ptsPerCm = max(1.0, pxPerCm * loupeScale)
+            return ProjectedEllipseGeometry(
+                widthPt: max(6.0, CGFloat(hold.majorCm) * ptsPerCm),
+                heightPt: max(6.0, CGFloat(hold.minorCm) * ptsPerCm),
+                rotationDeg: -hold.rotationDeg
+            )
+        }
+
+        let distMajCm = hypot(xA - xB, yA - yB)
+        let distMinCm = hypot(xMinA - xMinB, yMinA - yMinB)
+
+        let dxCI = pA.x - pB.x
+        let dyCI = pA.y - pB.y
+
+        let dxMinCI = pMinA.x - pMinB.x
+        let dyMinCI = pMinA.y - pMinB.y
+
+        let majorPxPerCm = max(1.0, hypot(dxCI, dyCI) / max(0.01, distMajCm))
+        let minorPxPerCm = max(1.0, hypot(dxMinCI, dyMinCI) / max(0.01, distMinCm))
+
+        // In SwiftUI on screen: +x is right, +y is down.
+        // In CoreImage: +x is right, +y is up.
+        // Therefore, dyScreen = -dyCI.
+        let dxScreen = dxCI
+        let dyScreen = -dyCI
+        let angleDeg = atan2(dyScreen, dxScreen) * 180.0 / .pi
+
+        let widthPt = max(6.0, CGFloat(hold.majorCm) * CGFloat(majorPxPerCm) * loupeScale)
+        let heightPt = max(6.0, CGFloat(hold.minorCm) * CGFloat(minorPxPerCm) * loupeScale)
+
+        return ProjectedEllipseGeometry(
+            widthPt: widthPt,
+            heightPt: heightPt,
+            rotationDeg: angleDeg
+        )
+    }
+
+    /// Estimates the local resolution in original photo pixels per physical centimeter for a hold.
+    static func photoPixelsPerCm(
+        for hold: Hold,
+        calibrationPoints: [CalibrationPoint]
+    ) -> Double {
+        photoPixelsPerCm(
+            xCm: hold.xCm,
+            yCm: hold.yCm,
+            plane: hold.plane,
+            calibrationPoints: calibrationPoints
+        )
+    }
 }

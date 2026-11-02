@@ -173,4 +173,49 @@ struct WallZoomTransformTests {
         let rightPos = WallZoomTransform.computeLoupePosition(anchorPoint: rightAnchor, loupeConfig: config, viewportSize: viewport)
         #expect(rightPos.x + (config.size.width / 2.0) <= viewport.width)
     }
+
+    @Test("computeEditingLoupePosition places loupe on opposite side of hold")
+    func computeEditingLoupePositionOppositeSides() {
+        let viewport = CGSize(width: 1200, height: 800)
+        let fitted = CGSize(width: 600, height: 800)
+        let config = HoldLoupeConfig.defaultCircle
+
+        // Hold on right side of screen (e.g. x = 800) -> Loupe must be on the left
+        let rightHold = CGPoint(x: 800, y: 400)
+        let leftLoupe = WallZoomTransform.computeEditingLoupePosition(
+            holdScreenPoint: rightHold,
+            loupeConfig: config,
+            viewportSize: viewport,
+            fittedSize: fitted,
+            zoomScale: 1.0,
+            panOffset: .zero
+        )
+        #expect(leftLoupe.x < 300) // Loupe sits in the left gutter (< 300)
+        #expect(abs(leftLoupe.y - 400) < 0.1) // Vertically aligned with hold
+
+        // Hold on left side of screen (e.g. x = 400) -> Loupe must be on the right
+        let leftHold = CGPoint(x: 400, y: 300)
+        let rightLoupe = WallZoomTransform.computeEditingLoupePosition(
+            holdScreenPoint: leftHold,
+            loupeConfig: config,
+            viewportSize: viewport,
+            fittedSize: fitted,
+            zoomScale: 1.0,
+            panOffset: .zero
+        )
+        #expect(rightLoupe.x > 900) // Loupe sits in the right gutter (> 900)
+        #expect(abs(rightLoupe.y - 300) < 0.1) // Vertically aligned with hold
+
+        // Zoomed in 2x: image fills screen (no gutters), loupe docks safely at edges
+        let zoomedLoupe = WallZoomTransform.computeEditingLoupePosition(
+            holdScreenPoint: CGPoint(x: 1000, y: 200),
+            loupeConfig: config,
+            viewportSize: viewport,
+            fittedSize: fitted,
+            zoomScale: 2.0,
+            panOffset: .zero
+        )
+        #expect(zoomedLoupe.x < 200) // Positioned safely at the far left edge of viewport
+        #expect(abs(zoomedLoupe.y - 200) < 0.1)
+    }
 }

@@ -63,6 +63,9 @@ enum LegacyStoreMigrationService {
                 isStart: legacyHold.isStart,
                 isTop: legacyHold.isTop,
                 isStartFoot: legacyHold.isStartFoot,
+                majorCm: legacyHold.majorCm,
+                minorCm: legacyHold.minorCm,
+                rotationDeg: legacyHold.rotationDeg,
                 createdAt: legacyHold.createdAt
             )
             context.insert(newHold)

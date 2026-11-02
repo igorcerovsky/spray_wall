@@ -8,6 +8,8 @@ struct HoldLoupeView: View {
     let title: String
     let subtitle: String?
     let role: BoulderHoldGroup?
+    let hold: Hold?
+    let calibrationPoints: [CalibrationPoint]
     let config: HoldLoupeConfig
 
     init(
@@ -15,12 +17,16 @@ struct HoldLoupeView: View {
         title: String,
         subtitle: String? = nil,
         role: BoulderHoldGroup? = nil,
+        hold: Hold? = nil,
+        calibrationPoints: [CalibrationPoint] = [],
         config: HoldLoupeConfig = .defaultCircle
     ) {
         self.croppedImage = croppedImage
         self.title = title
         self.subtitle = subtitle
         self.role = role
+        self.hold = hold
+        self.calibrationPoints = calibrationPoints
         self.config = config
     }
 
@@ -28,6 +34,7 @@ struct HoldLoupeView: View {
         croppedImage: CGImage?,
         hold: Hold,
         role: BoulderHoldGroup? = nil,
+        calibrationPoints: [CalibrationPoint] = [],
         config: HoldLoupeConfig = .defaultCircle,
         showCoordinates: Bool = false
     ) {
@@ -35,6 +42,8 @@ struct HoldLoupeView: View {
         self.title = "Hold #\(hold.holdID)"
         self.subtitle = showCoordinates ? "\(Int(hold.xCm)), \(Int(hold.yCm)) cm" : nil
         self.role = role
+        self.hold = hold
+        self.calibrationPoints = calibrationPoints
         self.config = config
     }
 
@@ -70,6 +79,11 @@ struct HoldLoupeView: View {
                 ProgressView()
                     .progressViewStyle(.circular)
                     .tint(.white)
+            }
+
+            // Overlay rotated ellipse / bounding box and symbol
+            if let hold {
+                loupeHoldOverlay(hold: hold)
             }
 
             // Center targeting reticle / crosshair
@@ -176,6 +190,72 @@ struct HoldLoupeView: View {
             Capsule().stroke(Color.white.opacity(0.25), lineWidth: 0.5)
         )
         .shadow(color: Color.black.opacity(0.25), radius: 4, x: 0, y: 2)
+    }
+
+    @ViewBuilder
+    private func loupeHoldOverlay(hold: Hold) -> some View {
+        let proj = HoldBackwardTransformService.projectedEllipseGeometry(
+            for: hold,
+            calibrationPoints: calibrationPoints,
+            cropSpan: config.cropPixelSpan,
+            loupeSize: config.size
+        )
+
+        ZStack {
+            if let role {
+                boulderMarker(role: role, widthPt: proj.widthPt, heightPt: proj.heightPt)
+            } else {
+                ZStack {
+                    // Dashed rotated bounding box
+                    Rectangle()
+                        .stroke(Color.white.opacity(0.4), style: StrokeStyle(lineWidth: 1.2, dash: [4, 4]))
+
+                    // Hold ellipse
+                    Ellipse()
+                        .fill(Color.cyan.opacity(0.18))
+                        .overlay {
+                            Ellipse().stroke(Color.cyan, lineWidth: 2)
+                        }
+                }
+                .frame(width: proj.widthPt, height: proj.heightPt)
+            }
+        }
+        .rotationEffect(.degrees(proj.rotationDeg))
+        .allowsHitTesting(false)
+    }
+
+    @ViewBuilder
+    private func boulderMarker(role: BoulderHoldGroup, widthPt: CGFloat, heightPt: CGFloat) -> some View {
+        let color = roleColor(for: role)
+        let cornerRadius = max(3.0, min(widthPt, heightPt) * 0.15)
+
+        ZStack {
+            // Subtle bounding box
+            Rectangle()
+                .stroke(color.opacity(0.35), style: StrokeStyle(lineWidth: 1, dash: [3, 3]))
+
+            switch role {
+            case .start, .top:
+                RoundedRectangle(cornerRadius: cornerRadius)
+                    .fill(color.opacity(0.22))
+                    .overlay {
+                        RoundedRectangle(cornerRadius: cornerRadius).stroke(color, lineWidth: 2.2)
+                    }
+            case .hold:
+                Ellipse()
+                    .fill(color.opacity(0.22))
+                    .overlay {
+                        Ellipse().stroke(color, lineWidth: 2.2)
+                    }
+            case .foothold:
+                Diamond()
+                    .fill(color.opacity(0.22))
+                    .overlay {
+                        Diamond().stroke(color, lineWidth: 2.2)
+                    }
+            }
+        }
+        .frame(width: widthPt, height: heightPt)
     }
 
     private func roleColor(for role: BoulderHoldGroup) -> Color {
