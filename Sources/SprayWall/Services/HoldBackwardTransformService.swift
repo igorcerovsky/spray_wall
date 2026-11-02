@@ -188,31 +188,55 @@ enum HoldBackwardTransformService {
         let bitmapCenterX = CGFloat(xPx)
         let bitmapCenterY = imageHeight - CGFloat(yPx)
 
-        let targetSpan = cropSpan.rounded()
-        let halfSpan = (targetSpan / 2.0).rounded()
-        var originX = (bitmapCenterX - halfSpan).rounded()
-        var originY = (bitmapCenterY - halfSpan).rounded()
+        let targetSpan = Int(cropSpan.rounded())
+        guard targetSpan > 0 else { return nil }
+        let halfSpan = targetSpan / 2
 
-        // Clamp crop rectangle within image boundaries
-        if originX < 0 {
-            originX = 0
-        } else if originX + targetSpan > imageWidth {
-            originX = max(0, imageWidth - targetSpan)
+        let srcOriginX = Int(bitmapCenterX.rounded()) - halfSpan
+        let srcOriginY = Int(bitmapCenterY.rounded()) - halfSpan
+
+        // Fast path: if the crop is completely inside image bounds, use fast zero-copy cropping
+        if srcOriginX >= 0,
+           srcOriginY >= 0,
+           srcOriginX + targetSpan <= cgImage.width,
+           srcOriginY + targetSpan <= cgImage.height {
+            let cropRect = CGRect(x: srcOriginX, y: srcOriginY, width: targetSpan, height: targetSpan)
+            return cgImage.cropping(to: cropRect)
         }
 
-        if originY < 0 {
-            originY = 0
-        } else if originY + targetSpan > imageHeight {
-            originY = max(0, imageHeight - targetSpan)
+        // Boundary path: crop extends past image boundaries (e.g. corner calibration points near photo edge).
+        // Draw into an RGBA bitmap context of exact targetSpan x targetSpan so the target pixel
+        // (bitmapCenterX, bitmapCenterY) is ALWAYS placed at the exact center (halfSpan, halfSpan) of the loupe.
+        let colorSpace = cgImage.colorSpace ?? CGColorSpaceCreateDeviceRGB()
+        let bitmapInfo = CGImageAlphaInfo.premultipliedLast.rawValue
+        guard let context = CGContext(
+            data: nil,
+            width: targetSpan,
+            height: targetSpan,
+            bitsPerComponent: 8,
+            bytesPerRow: targetSpan * 4,
+            space: colorSpace,
+            bitmapInfo: bitmapInfo
+        ) else {
+            // Clamped fallback if context creation fails
+            let clampedX = max(0, min(Int(imageWidth) - 1, srcOriginX))
+            let clampedY = max(0, min(Int(imageHeight) - 1, srcOriginY))
+            let w = max(1, min(targetSpan, Int(imageWidth) - clampedX))
+            let h = max(1, min(targetSpan, Int(imageHeight) - clampedY))
+            return cgImage.cropping(to: CGRect(x: clampedX, y: clampedY, width: w, height: h))
         }
 
-        let effectiveWidth = min(targetSpan, imageWidth - originX)
-        let effectiveHeight = min(targetSpan, imageHeight - originY)
+        // Background neutral dark tone
+        context.setFillColor(CGColor(red: 0.08, green: 0.08, blue: 0.09, alpha: 1.0))
+        context.fill(CGRect(x: 0, y: 0, width: targetSpan, height: targetSpan))
 
-        guard effectiveWidth > 0 && effectiveHeight > 0 else { return nil }
+        // In CGContext, (0,0) is bottom-left and Y increases upward.
+        // In CGImage bitmap, row 0 is top and Y increases downward.
+        let destX = CGFloat(-srcOriginX)
+        let destY = CGFloat(targetSpan + srcOriginY) - imageHeight
+        context.draw(cgImage, in: CGRect(x: destX, y: destY, width: imageWidth, height: imageHeight))
 
-        let cropRect = CGRect(x: originX, y: originY, width: effectiveWidth, height: effectiveHeight)
-        return cgImage.cropping(to: cropRect)
+        return context.makeImage()
     }
 
     /// Extracts a high-resolution sub-image centered at the physical wall coordinate (xCm, yCm).
