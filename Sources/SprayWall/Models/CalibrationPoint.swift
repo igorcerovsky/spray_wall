@@ -117,4 +117,23 @@ enum CalibrationPointTemplates {
             )
         }
     }
+
+    /// Returns the common seam partner ID for kickboard & main wall shared corners:
+    /// - `mw_bl` (Main Wall Bottom Left) ↔ `kb_tl` (Kickboard Top Left)
+    /// - `mw_br` (Main Wall Bottom Right) ↔ `kb_tr` (Kickboard Top Right)
+    static func commonPartnerID(for pointID: String) -> String? {
+        switch pointID {
+        case "mw_bl": return "kb_tl"
+        case "kb_tl": return "mw_bl"
+        case "mw_br": return "kb_tr"
+        case "kb_tr": return "mw_br"
+        default: return nil
+        }
+    }
+
+    /// Checks whether two point IDs form a shared kickboard & main wall seam pair.
+    static func isCommonSeamPair(_ idA: String, _ idB: String) -> Bool {
+        guard let partner = commonPartnerID(for: idA) else { return false }
+        return partner == idB
+    }
 }

@@ -94,4 +94,27 @@ struct CalibrationZoomTransformTests {
         let noMatch = transform.closestPoint(near: farCursor, in: testPoints, maxScreenDistance: 25.0)
         #expect(noMatch == nil)
     }
+
+    @Test("CalibrationPointTemplates identifies joint kickboard and main wall common seam partners")
+    func commonSeamPartners() {
+        // Main wall bottom left + kickboard top left
+        #expect(CalibrationPointTemplates.commonPartnerID(for: "mw_bl") == "kb_tl")
+        #expect(CalibrationPointTemplates.commonPartnerID(for: "kb_tl") == "mw_bl")
+        #expect(CalibrationPointTemplates.isCommonSeamPair("mw_bl", "kb_tl"))
+        #expect(CalibrationPointTemplates.isCommonSeamPair("kb_tl", "mw_bl"))
+
+        // Main wall bottom right + kickboard top right
+        #expect(CalibrationPointTemplates.commonPartnerID(for: "mw_br") == "kb_tr")
+        #expect(CalibrationPointTemplates.commonPartnerID(for: "kb_tr") == "mw_br")
+        #expect(CalibrationPointTemplates.isCommonSeamPair("mw_br", "kb_tr"))
+        #expect(CalibrationPointTemplates.isCommonSeamPair("kb_tr", "mw_br"))
+
+        // Non-seam points should have no partner
+        #expect(CalibrationPointTemplates.commonPartnerID(for: "mw_tl") == nil)
+        #expect(CalibrationPointTemplates.commonPartnerID(for: "mw_tr") == nil)
+        #expect(CalibrationPointTemplates.commonPartnerID(for: "kb_bl") == nil)
+        #expect(CalibrationPointTemplates.commonPartnerID(for: "kb_br") == nil)
+        #expect(!CalibrationPointTemplates.isCommonSeamPair("mw_bl", "mw_br"))
+        #expect(!CalibrationPointTemplates.isCommonSeamPair("mw_tl", "kb_tl"))
+    }
 }

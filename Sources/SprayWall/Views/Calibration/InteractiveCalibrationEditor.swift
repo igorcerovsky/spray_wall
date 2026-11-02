@@ -32,6 +32,9 @@ struct InteractiveCalibrationEditor: View {
     @State private var dragStartPointPx: CGPoint? = nil
     @State private var isNudgingActive = false
 
+    // Joint moving of kickboard and main wall common seam points (mw_bl ↔ kb_tl, mw_br ↔ kb_tr)
+    @AppStorage("interactiveCalibration_jointCommonPoints") private var jointCommonPoints: Bool = true
+
     // Zoom & Pan state
     @State private var zoomScale: CGFloat = 1.0
     @State private var baseZoomScale: CGFloat = 1.0
@@ -104,9 +107,12 @@ struct InteractiveCalibrationEditor: View {
                                         offsetY: offsetY,
                                         displayedHeight: displayedHeight
                                     ),
-                                    isSelected: selectedPointID == point.id,
-                                    isHovered: hoveredPointID == point.id,
-                                    isDragged: draggedPointID == point.id,
+                                    isSelected: isPointOrPartnerSelected(point.id),
+                                    isHovered: isPointOrPartnerHovered(point.id),
+                                    isDragged: isPointOrPartnerDragged(point.id),
+                                    isJointLinked: jointCommonPoints && CalibrationPointTemplates.commonPartnerID(for: point.id) != nil,
+                                    displayLabel: pointMarkerBadgeLabel(for: point),
+                                    hideBadge: shouldHideDuplicateBadge(for: point),
                                     zoomScale: zoomScale
                                 )
                             }
@@ -208,6 +214,15 @@ struct InteractiveCalibrationEditor: View {
 
                                         editedPoints[idx].xPx = newX
                                         editedPoints[idx].yPx = newY
+
+                                        // If joint moving of common seam points is enabled, sync partner point in real-time
+                                        if jointCommonPoints,
+                                           let partnerID = CalibrationPointTemplates.commonPartnerID(for: pointID),
+                                           let partnerIdx = editedPoints.firstIndex(where: { $0.id == partnerID }) {
+                                            editedPoints[partnerIdx].xPx = newX
+                                            editedPoints[partnerIdx].yPx = newY
+                                        }
+
                                         updateCrop(xPx: newX, yPx: newY, cgImage: cgImage)
                                     } else if let startPan = dragStartPan {
                                         let maxPanX = max(0, (displayedSize.width - geo.size.width) / 2)
@@ -223,6 +238,12 @@ struct InteractiveCalibrationEditor: View {
                                 .onEnded { _ in
                                     if let pointID = draggedPointID,
                                        let pt = editedPoints.first(where: { $0.id == pointID }) {
+                                        if jointCommonPoints,
+                                           let partnerID = CalibrationPointTemplates.commonPartnerID(for: pointID),
+                                           let partnerIdx = editedPoints.firstIndex(where: { $0.id == partnerID }) {
+                                            editedPoints[partnerIdx].xPx = pt.xPx
+                                            editedPoints[partnerIdx].yPx = pt.yPx
+                                        }
                                         updateCrop(xPx: pt.xPx, yPx: pt.yPx, cgImage: cgImage)
                                     }
                                     draggedPointID = nil
@@ -332,17 +353,54 @@ struct InteractiveCalibrationEditor: View {
 
                 ToolbarItem(placement: .principal) {
                     if ifcaseLoaded {
-                        WallZoomControlsView(
-                            zoomScale: $zoomScale,
-                            panOffset: $panOffset,
-                            baseZoomScale: $baseZoomScale,
-                            loupeConfig: $loupeConfig
-                        )
+                        HStack(spacing: 12) {
+                            WallZoomControlsView(
+                                zoomScale: $zoomScale,
+                                panOffset: $panOffset,
+                                baseZoomScale: $baseZoomScale,
+                                loupeConfig: $loupeConfig
+                            )
+
+                            #if os(macOS)
+                            HStack(spacing: 6) {
+                                Toggle(isOn: $jointCommonPoints) {
+                                    HStack(spacing: 4) {
+                                        Image(systemName: "link")
+                                            .font(.caption2)
+                                        Text("Joint Common Seam")
+                                            .font(.caption)
+                                    }
+                                }
+                                .toggleStyle(.checkbox)
+                                .help("Joint moving kickboard & main wall common points:\n• Main Wall Bottom Left + Kickboard Top Left (mw_bl ↔ kb_tl)\n• Main Wall Bottom Right + Kickboard Top Right (mw_br ↔ kb_tr)")
+                                .onChange(of: jointCommonPoints) { _, isJoint in
+                                    if isJoint {
+                                        syncCommonPointsIfNeeded()
+                                    }
+                                }
+                            }
+                            .padding(.horizontal, 8)
+                            .padding(.vertical, 4)
+                            .background(Color.secondary.opacity(0.12))
+                            .clipShape(RoundedRectangle(cornerRadius: 8))
+                            #endif
+                        }
                     }
                 }
 
                 ToolbarItem(placement: .primaryAction) {
                     Menu {
+                        Toggle(isOn: $jointCommonPoints) {
+                            Label("Joint Common Seam (mw_bl ↔ kb_tl, mw_br ↔ kb_tr)", systemImage: "link")
+                        }
+                        .onChange(of: jointCommonPoints) { _, isJoint in
+                            if isJoint {
+                                syncCommonPointsIfNeeded()
+                            }
+                        }
+
+                        Divider()
+
                         Button {
                             resetToDefaults()
                         } label: {
@@ -399,6 +457,96 @@ struct InteractiveCalibrationEditor: View {
         let anchor: CGPoint
     }
 
+    private func isPointOrPartnerSelected(_ id: String) -> Bool {
+        if selectedPointID == id { return true }
+        if jointCommonPoints, let partnerID = CalibrationPointTemplates.commonPartnerID(for: id), selectedPointID == partnerID {
+            return true
+        }
+        return false
+    }
+
+    private func isPointOrPartnerHovered(_ id: String) -> Bool {
+        if hoveredPointID == id { return true }
+        if jointCommonPoints, let partnerID = CalibrationPointTemplates.commonPartnerID(for: id), hoveredPointID == partnerID {
+            return true
+        }
+        return false
+    }
+
+    private func isPointOrPartnerDragged(_ id: String) -> Bool {
+        if draggedPointID == id { return true }
+        if jointCommonPoints, let partnerID = CalibrationPointTemplates.commonPartnerID(for: id), draggedPointID == partnerID {
+            return true
+        }
+        return false
+    }
+
+    private func pointDisplayName(for point: CalibrationPoint) -> String {
+        if jointCommonPoints {
+            if point.id == "mw_bl" || point.id == "kb_tl" {
+                return "Seam Left (MW BL + KB TL)"
+            } else if point.id == "mw_br" || point.id == "kb_tr" {
+                return "Seam Right (MW BR + KB TR)"
+            }
+        }
+        return point.label
+    }
+
+    private func pointMarkerBadgeLabel(for point: CalibrationPoint) -> String {
+        if jointCommonPoints {
+            if point.id == "mw_bl" || point.id == "kb_tl" {
+                return "Seam Left (MW BL / KB TL)"
+            } else if point.id == "mw_br" || point.id == "kb_tr" {
+                return "Seam Right (MW BR / KB TR)"
+            }
+        }
+        return point.label
+    }
+
+    private func shouldHideDuplicateBadge(for point: CalibrationPoint) -> Bool {
+        guard jointCommonPoints else { return false }
+        if point.id == "kb_tl" || point.id == "kb_tr" {
+            if let partnerID = CalibrationPointTemplates.commonPartnerID(for: point.id),
+               let partner = editedPoints.first(where: { $0.id == partnerID }),
+               partner.xPx == point.xPx && partner.yPx == point.yPx {
+                return true
+            }
+        }
+        return false
+    }
+
+    private func syncCommonPointsIfNeeded() {
+        guard jointCommonPoints else { return }
+
+        // Sync Left seam (mw_bl + kb_tl)
+        if let mwBL = editedPoints.first(where: { $0.id == "mw_bl" }),
+           let kbTLIdx = editedPoints.firstIndex(where: { $0.id == "kb_tl" }) {
+            if selectedPointID == "kb_tl" {
+                if let mwBLIdx = editedPoints.firstIndex(where: { $0.id == "mw_bl" }) {
+                    editedPoints[mwBLIdx].xPx = editedPoints[kbTLIdx].xPx
+                    editedPoints[mwBLIdx].yPx = editedPoints[kbTLIdx].yPx
+                }
+            } else {
+                editedPoints[kbTLIdx].xPx = mwBL.xPx
+                editedPoints[kbTLIdx].yPx = mwBL.yPx
+            }
+        }
+
+        // Sync Right seam (mw_br + kb_tr)
+        if let mwBR = editedPoints.first(where: { $0.id == "mw_br" }),
+           let kbTRIdx = editedPoints.firstIndex(where: { $0.id == "kb_tr" }) {
+            if selectedPointID == "kb_tr" {
+                if let mwBRIdx = editedPoints.firstIndex(where: { $0.id == "mw_br" }) {
+                    editedPoints[mwBRIdx].xPx = editedPoints[kbTRIdx].xPx
+                    editedPoints[mwBRIdx].yPx = editedPoints[kbTRIdx].yPx
+                }
+            } else {
+                editedPoints[kbTRIdx].xPx = mwBR.xPx
+                editedPoints[kbTRIdx].yPx = mwBR.yPx
+            }
+        }
+    }
+
     private func currentLoupeInfo(
         scale: CGFloat,
         offsetX: CGFloat,
@@ -409,7 +557,7 @@ struct InteractiveCalibrationEditor: View {
         if let point = editedPoints.first(where: { $0.id == draggedPointID }) {
             let pos = pointScreenPos(point: point, scale: scale, offsetX: offsetX, offsetY: offsetY, displayedHeight: displayedHeight)
             return LoupeDisplayInfo(
-                title: point.label,
+                title: pointDisplayName(for: point),
                 subtitle: "X: \(Int(round(point.xPx))), Y: \(Int(round(point.yPx))) px",
                 anchor: pos
             )
@@ -419,7 +567,7 @@ struct InteractiveCalibrationEditor: View {
         if let point = editedPoints.first(where: { $0.id == hoveredPointID }) {
             let pos = pointScreenPos(point: point, scale: scale, offsetX: offsetX, offsetY: offsetY, displayedHeight: displayedHeight)
             return LoupeDisplayInfo(
-                title: point.label,
+                title: pointDisplayName(for: point),
                 subtitle: "X: \(Int(round(point.xPx))), Y: \(Int(round(point.yPx))) px",
                 anchor: pos
             )
@@ -438,7 +586,7 @@ struct InteractiveCalibrationEditor: View {
         if isNudgingActive, let point = selectedPoint {
             let pos = pointScreenPos(point: point, scale: scale, offsetX: offsetX, offsetY: offsetY, displayedHeight: displayedHeight)
             return LoupeDisplayInfo(
-                title: point.label,
+                title: pointDisplayName(for: point),
                 subtitle: "X: \(Int(round(point.xPx))), Y: \(Int(round(point.yPx))) px",
                 anchor: pos
             )
@@ -596,6 +744,35 @@ struct InteractiveCalibrationEditor: View {
 
             Divider().frame(height: 18)
 
+            // Joint common points toggle button
+            Button {
+                jointCommonPoints.toggle()
+                if jointCommonPoints {
+                    syncCommonPointsIfNeeded()
+                    if let selected = selectedPoint {
+                        updateCrop(xPx: selected.xPx, yPx: selected.yPx, cgImage: cgImage)
+                    }
+                }
+            } label: {
+                HStack(spacing: 4) {
+                    Image(systemName: jointCommonPoints ? "checkmark.square.fill" : "square")
+                        .font(.caption)
+                        .foregroundStyle(jointCommonPoints ? Color.accentColor : Color.secondary)
+                    Image(systemName: "link")
+                        .font(.caption2)
+                    Text("Joint Seam")
+                        .font(.caption.weight(.medium))
+                }
+                .padding(.horizontal, 6)
+                .padding(.vertical, 3)
+                .background(jointCommonPoints ? Color.accentColor.opacity(0.15) : Color.secondary.opacity(0.10))
+                .clipShape(RoundedRectangle(cornerRadius: 5))
+            }
+            .buttonStyle(.plain)
+            .help("Joint moving kickboard & main wall common points (mw_bl ↔ kb_tl, mw_br ↔ kb_tr)")
+
+            Divider().frame(height: 18)
+
             // X-Axis Nudge Buttons
             HStack(spacing: 4) {
                 Text("X: \(Int(round(point.xPx)))")
@@ -716,11 +893,20 @@ struct InteractiveCalibrationEditor: View {
         hoveredCursorPx = nil
         hoveredPointID = nil
 
-        let newX = round(min(Double(imageSize.width), max(0, editedPoints[idx].xPx + dx)))
-        let newY = round(min(Double(imageSize.height), max(0, editedPoints[idx].yPx + dy)))
+        let newX = round(max(0, min(Double(imageSize.width), editedPoints[idx].xPx + dx)))
+        let newY = round(max(0, min(Double(imageSize.height), editedPoints[idx].yPx + dy)))
 
         editedPoints[idx].xPx = newX
         editedPoints[idx].yPx = newY
+
+        // If joint common points is enabled, sync partner point
+        if jointCommonPoints,
+           let partnerID = CalibrationPointTemplates.commonPartnerID(for: id),
+           let partnerIdx = editedPoints.firstIndex(where: { $0.id == partnerID }) {
+            editedPoints[partnerIdx].xPx = newX
+            editedPoints[partnerIdx].yPx = newY
+        }
+
         updateCrop(xPx: newX, yPx: newY, cgImage: cgImage)
     }
 
@@ -806,6 +992,9 @@ struct InteractiveCalibrationEditor: View {
                 editedPoints[idx].yPx = def.yPx
             }
         }
+        if jointCommonPoints {
+            syncCommonPointsIfNeeded()
+        }
         if case let .loaded(cgImage, _) = loadState,
            let selected = selectedPoint {
             updateCrop(xPx: selected.xPx, yPx: selected.yPx, cgImage: cgImage)
@@ -850,6 +1039,10 @@ struct InteractiveCalibrationEditor: View {
                     self.editedPoints[index].yPx = round(max(0, min(height, self.editedPoints[index].yPx)))
                 }
 
+                if self.jointCommonPoints {
+                    self.syncCommonPointsIfNeeded()
+                }
+
                 if let selected = self.selectedPoint {
                     self.updateCrop(xPx: selected.xPx, yPx: selected.yPx, cgImage: image)
                 }
@@ -883,27 +1076,45 @@ private struct PointMarkerVisualView: View {
     let isSelected: Bool
     let isHovered: Bool
     let isDragged: Bool
+    let isJointLinked: Bool
+    let displayLabel: String
+    let hideBadge: Bool
     let zoomScale: CGFloat
 
     var body: some View {
         let isKickboard = point.id.hasPrefix("kb")
-        let accentColor = isKickboard ? Color.orange : Color.cyan
+        let baseColor = isKickboard ? Color.orange : Color.cyan
         let isHighlighted = isSelected || isHovered || isDragged
 
         ZStack(alignment: .center) {
             // Glowing outer accent ring if selected or hovered or dragged
             if isHighlighted {
                 Circle()
-                    .stroke(isSelected ? Color.yellow : accentColor, lineWidth: 2.5)
+                    .stroke(isSelected ? Color.yellow : (isJointLinked ? Color.green : baseColor), lineWidth: 2.5)
                     .frame(width: 34, height: 34)
-                    .shadow(color: (isSelected ? Color.yellow : accentColor).opacity(0.8), radius: 4)
+                    .shadow(color: (isSelected ? Color.yellow : (isJointLinked ? Color.green : baseColor)).opacity(0.8), radius: 4)
             }
 
             // Main handle circle
-            Circle()
-                .fill(accentColor.opacity(isHighlighted ? 0.92 : 0.65))
-                .frame(width: 22, height: 22)
-                .overlay(Circle().stroke(Color.white, lineWidth: 2))
+            if isJointLinked {
+                // Dual-color gradient for linked kickboard & main wall common seam point
+                Circle()
+                    .fill(
+                        LinearGradient(
+                            colors: [Color.orange, Color.cyan],
+                            startPoint: .topLeading,
+                            endPoint: .bottomTrailing
+                        )
+                    )
+                    .opacity(isHighlighted ? 0.95 : 0.75)
+                    .frame(width: 24, height: 24)
+                    .overlay(Circle().stroke(Color.white, lineWidth: 2))
+            } else {
+                Circle()
+                    .fill(baseColor.opacity(isHighlighted ? 0.92 : 0.65))
+                    .frame(width: 22, height: 22)
+                    .overlay(Circle().stroke(Color.white, lineWidth: 2))
+            }
 
             // Center targeting red dot
             Circle()
@@ -911,15 +1122,23 @@ private struct PointMarkerVisualView: View {
                 .frame(width: 4, height: 4)
 
             // Label badge
-            Text(point.label)
-                .font(.system(size: 9, weight: .bold))
-                .fixedSize()
-                .padding(.horizontal, 4)
+            if !hideBadge {
+                HStack(spacing: 3) {
+                    if isJointLinked {
+                        Image(systemName: "link")
+                            .font(.system(size: 8, weight: .bold))
+                    }
+                    Text(displayLabel)
+                        .font(.system(size: 9, weight: .bold))
+                        .fixedSize()
+                }
+                .padding(.horizontal, 5)
                 .padding(.vertical, 2)
-                .background(Color.black.opacity(isHighlighted ? 0.88 : 0.68))
+                .background(Color.black.opacity(isHighlighted ? 0.90 : 0.70))
                 .foregroundColor(.white)
                 .clipShape(RoundedRectangle(cornerRadius: 3))
-                .offset(y: -20)
+                .offset(y: -22)
+            }
         }
         .scaleEffect(1.0 / max(1.0, sqrt(zoomScale)))
         .shadow(color: .black.opacity(0.4), radius: 3, x: 0, y: 1)
