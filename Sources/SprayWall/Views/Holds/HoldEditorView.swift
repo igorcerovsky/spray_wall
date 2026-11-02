@@ -343,7 +343,7 @@ struct HoldEditorView: View {
                 currentMouseLocation = location
             }
             updateCrop(for: match.hold)
-            inlineStatusMessage = "Selected hold #\(match.hold.holdID) at (\(Int(match.hold.xCm)), \(Int(match.hold.yCm))) cm. Drag to move, or tap Delete."
+            inlineStatusMessage = "Selected hold #\(match.hold.holdID) at (\(Int(match.hold.xCm)), \(Int(match.hold.yCm))) cm. Drag to move, or right-click / context-menu to delete."
             return
         }
 
@@ -467,25 +467,8 @@ struct HoldEditorView: View {
                 }
             }
 
-            if isEditingHolds, let selected = hoveredHold {
-                HStack(spacing: 8) {
-                    Text("Selected: Hold #\(selected.holdID) (\(Int(selected.xCm)), \(Int(selected.yCm)) cm)")
-                        .font(.caption)
-                        .foregroundStyle(.secondary)
-                    Spacer()
-                    Button(role: .destructive) {
-                        delete(hold: selected)
-                    } label: {
-                        Label("Delete #\(selected.holdID)", systemImage: "trash")
-                            .font(.caption2)
-                    }
-                    .buttonStyle(.bordered)
-                    .tint(.red)
-                }
-            }
-
             Text(isEditingHolds
-                 ? "Edit mode: tap wall to add hold, drag to reposition (loupe shows exact bolt position), right-click or tap Delete to remove."
+                 ? "Edit mode: tap wall to add hold, drag to reposition (loupe shows exact bolt position), right-click or long-press to remove."
                  : "Locked mode: wall is read-only. Tap or hover over holds to view high-resolution loupe preview. Press Edit to modify.")
                 .font(.footnote)
                 .foregroundStyle(.secondary)
