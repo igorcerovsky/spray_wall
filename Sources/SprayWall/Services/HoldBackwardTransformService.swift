@@ -166,39 +166,27 @@ enum HoldBackwardTransformService {
         )
     }
 
-    /// Extracts a high-resolution sub-image centered at the physical wall coordinate (xCm, yCm).
+    /// Extracts a high-resolution sub-image centered at the raw photo pixel coordinate (xPx, yPx).
+    /// Uses CoreImage coordinates (origin at bottom-left, y increasing upward).
     ///
     /// - Parameters:
     ///   - cgImage: The decoded high-resolution original image.
-    ///   - xCm: Horizontal coordinate in centimeters.
-    ///   - yCm: Vertical coordinate from wall bottom in centimeters.
-    ///   - plane: Kickboard or main wall plane.
-    ///   - calibrationPoints: Calibration points defining the geometric transform.
+    ///   - xPx: Horizontal pixel coordinate.
+    ///   - yPx: Vertical pixel coordinate (measured from image bottom).
     ///   - cropSpan: Side length of the square cropped area in original photo pixels.
-    /// - Returns: Cropped `CGImage` at native resolution, or nil if out of bounds or points missing.
-    static func cropLocation(
+    /// - Returns: Cropped `CGImage` at native resolution, or nil if out of bounds.
+    static func cropPhotoPixel(
         from cgImage: CGImage,
-        xCm: Double,
-        yCm: Double,
-        plane: HoldPlane,
-        calibrationPoints: [CalibrationPoint],
+        xPx: Double,
+        yPx: Double,
         cropSpan: CGFloat
     ) -> CGImage? {
-        guard let location = photoPixelLocation(
-            xCm: xCm,
-            yCm: yCm,
-            plane: plane,
-            calibrationPoints: calibrationPoints
-        ) else {
-            return nil
-        }
-
         let imageWidth = CGFloat(cgImage.width)
         let imageHeight = CGFloat(cgImage.height)
 
         // Convert CoreImage (origin bottom-left) to CGImage (row 0 at top)
-        let bitmapCenterX = location.x
-        let bitmapCenterY = imageHeight - location.y
+        let bitmapCenterX = CGFloat(xPx)
+        let bitmapCenterY = imageHeight - CGFloat(yPx)
 
         let targetSpan = cropSpan.rounded()
         let halfSpan = (targetSpan / 2.0).rounded()
@@ -225,6 +213,35 @@ enum HoldBackwardTransformService {
 
         let cropRect = CGRect(x: originX, y: originY, width: effectiveWidth, height: effectiveHeight)
         return cgImage.cropping(to: cropRect)
+    }
+
+    /// Extracts a high-resolution sub-image centered at the physical wall coordinate (xCm, yCm).
+    ///
+    /// - Parameters:
+    ///   - cgImage: The decoded high-resolution original image.
+    ///   - xCm: Horizontal coordinate in centimeters.
+    ///   - yCm: Vertical coordinate from wall bottom in centimeters.
+    ///   - plane: Kickboard or main wall plane.
+    ///   - calibrationPoints: Calibration points defining the geometric transform.
+    ///   - cropSpan: Side length of the square cropped area in original photo pixels.
+    /// - Returns: Cropped `CGImage` at native resolution, or nil if out of bounds or points missing.
+    static func cropLocation(
+        from cgImage: CGImage,
+        xCm: Double,
+        yCm: Double,
+        plane: HoldPlane,
+        calibrationPoints: [CalibrationPoint],
+        cropSpan: CGFloat
+    ) -> CGImage? {
+        guard let location = photoPixelLocation(
+            xCm: xCm,
+            yCm: yCm,
+            plane: plane,
+            calibrationPoints: calibrationPoints
+        ) else {
+            return nil
+        }
+        return cropPhotoPixel(from: cgImage, xPx: location.x, yPx: location.y, cropSpan: cropSpan)
     }
 
     /// Extracts a high-resolution sub-image centered at the hold's original photo position.

@@ -183,5 +183,58 @@ struct HoldBackwardTransformServiceTests {
         #expect(cropped?.width == 240)
         #expect(cropped?.height == 240)
     }
+
+    @Test("cropPhotoPixel crops native resolution at raw coordinates and clamps at borders")
+    func cropPhotoPixelNative() {
+        let width = 4000
+        let height = 3000
+        let colorSpace = CGColorSpaceCreateDeviceRGB()
+        let bitmapInfo = CGBitmapInfo(rawValue: CGImageAlphaInfo.premultipliedLast.rawValue)
+        guard let context = CGContext(
+            data: nil,
+            width: width,
+            height: height,
+            bitsPerComponent: 8,
+            bytesPerRow: width * 4,
+            space: colorSpace,
+            bitmapInfo: bitmapInfo.rawValue
+        ), let testImage = context.makeImage() else {
+            Issue.record("Failed to create mock test image")
+            return
+        }
+
+        // Center pixel crop
+        let centerCrop = HoldBackwardTransformService.cropPhotoPixel(
+            from: testImage,
+            xPx: 2000,
+            yPx: 1500,
+            cropSpan: 320
+        )
+        #expect(centerCrop != nil)
+        #expect(centerCrop?.width == 320)
+        #expect(centerCrop?.height == 320)
+
+        // Corner boundary clamp (origin 0,0)
+        let cornerCrop = HoldBackwardTransformService.cropPhotoPixel(
+            from: testImage,
+            xPx: 0,
+            yPx: 0,
+            cropSpan: 320
+        )
+        #expect(cornerCrop != nil)
+        #expect(cornerCrop?.width == 320)
+        #expect(cornerCrop?.height == 320)
+
+        // Far corner boundary clamp (4000, 3000)
+        let topCornerCrop = HoldBackwardTransformService.cropPhotoPixel(
+            from: testImage,
+            xPx: 4000,
+            yPx: 3000,
+            cropSpan: 320
+        )
+        #expect(topCornerCrop != nil)
+        #expect(topCornerCrop?.width == 320)
+        #expect(topCornerCrop?.height == 320)
+    }
 }
 

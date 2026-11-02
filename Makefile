@@ -1,5 +1,6 @@
 PROJECT ?= SprayWall.xcodeproj
 SCHEME ?= SprayWall
+TEST_SCHEME ?= SprayWallTests
 CONFIGURATION ?= Debug
 DERIVED_DATA ?= .build/xcode-derived-data
 
@@ -41,7 +42,7 @@ ios-build: ensure-xcodeproj
 ios-test: ensure-xcodeproj
 	xcodebuild \
 		-project $(PROJECT) \
-		-scheme $(SCHEME) \
+		-scheme $(TEST_SCHEME) \
 		-configuration $(CONFIGURATION) \
 		-destination '$(IOS_TEST_DESTINATION)' \
 		-derivedDataPath $(DERIVED_DATA) \
