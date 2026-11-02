@@ -4,9 +4,12 @@ import ImageIO
 import SwiftUI
 
 /// High-precision interactive calibration and rectification editor.
-/// Allows fine-tuning the 8 corner points defining the kickboard and main wall planes
-/// on the raw unwarped photo with a real-time floating magnifying loupe, focal zoom,
-/// panning, and single-pixel nudge controls.
+/// Allows defining and fine-tuning the 8 corner points of the kickboard and main wall
+/// directly on the raw unwarped photo with a real-time magnifying loupe, direct point dragging,
+/// zoom & pan, and single-pixel nudge controls.
+///
+/// Note: There is NO rectification transformation here because this view defines the rectification.
+/// All coordinates are direct pixel coordinates (xPx, yPx) on the original camera photo.
 struct InteractiveCalibrationEditor: View {
     @Binding var points: [CalibrationPoint]
     let photoURL: URL?
@@ -24,14 +27,14 @@ struct InteractiveCalibrationEditor: View {
     @State private var selectedPointID: String? = nil
     @State private var draggedPointID: String? = nil
     @State private var hoveredPointID: String? = nil
-    @State private var dragStartPointPx: CGPoint? = nil
-    @State private var dragStartPanOffset: CGSize? = nil
-    @State private var currentScreenAnchor: CGPoint? = nil
+    @State private var hoveredCursorLocation: CGPoint? = nil
+    @State private var hoveredCursorPx: CGPoint? = nil
 
     // Zoom & Pan state
     @State private var zoomScale: CGFloat = 1.0
     @State private var baseZoomScale: CGFloat = 1.0
     @State private var panOffset: CGSize = .zero
+    @State private var dragStartPan: CGSize? = nil
 
     // Loupe state & configuration
     @State private var loupeConfig = HoldLoupeConfig.defaultCircle
@@ -62,41 +65,90 @@ struct InteractiveCalibrationEditor: View {
 
                 case let .loaded(cgImage, imageSize):
                     GeometryReader { geo in
-                        let viewportSize = geo.size
-                        let transform = CalibrationZoomTransform(
-                            imageSize: imageSize,
-                            viewportSize: viewportSize,
-                            zoomScale: zoomScale,
-                            panOffset: panOffset
-                        )
+                        let baseScale = min(geo.size.width / imageSize.width, geo.size.height / imageSize.height)
+                        let effectiveScale = baseScale * zoomScale
+                        let displayedSize = CGSize(width: imageSize.width * effectiveScale, height: imageSize.height * effectiveScale)
+                        let offsetX = (geo.size.width - displayedSize.width) / 2 + panOffset.width
+                        let offsetY = (geo.size.height - displayedSize.height) / 2 + panOffset.height
+                        let displayedHeight = displayedSize.height
 
-                        ZStack {
-                            // Layer 1: Background & Scaled Photo Canvas
+                        ZStack(alignment: .topLeading) {
+                            // Layer 1: Background & Raw Photo
                             Color.black.ignoresSafeArea()
 
-                            canvasContent(
-                                cgImage: cgImage,
-                                imageSize: imageSize,
-                                transform: transform
-                            )
-                            .frame(width: transform.fittedSize.width, height: transform.fittedSize.height)
-                            .scaleEffect(zoomScale, anchor: .center)
-                            .offset(panOffset)
-                            .allowsHitTesting(false) // Viewport gestures handle all interactions
+                            Image(decorative: cgImage, scale: 1.0)
+                                .resizable()
+                                .scaledToFit()
+                                .frame(width: displayedSize.width, height: displayedSize.height)
+                                .position(x: offsetX + displayedSize.width / 2, y: offsetY + displayedSize.height / 2)
 
-                            // Layer 2: Floating Magnifying Loupe
-                            if loupeConfig.isEnabled, let activePoint = currentActivePoint {
-                                let anchorScreenPt = transform.photoPxToViewport(xPx: activePoint.xPx, yPx: activePoint.yPx)
+                            // Layer 2: Wall plane quadrilateral outlines
+                            wallPlanePolygons(
+                                scale: effectiveScale,
+                                offsetX: offsetX,
+                                offsetY: offsetY,
+                                displayedHeight: displayedHeight
+                            )
+
+                            // Layer 3: Draggable Point Markers
+                            ForEach($editedPoints) { $point in
+                                PointMarkerDraggableView(
+                                    point: $point,
+                                    scale: effectiveScale,
+                                    offsetX: offsetX,
+                                    offsetY: offsetY,
+                                    imageSize: imageSize,
+                                    displayedHeight: displayedHeight,
+                                    isSelected: selectedPointID == point.id,
+                                    isDragged: draggedPointID == point.id,
+                                    zoomScale: zoomScale,
+                                    onSelect: {
+                                        selectPoint(id: point.id, cgImage: cgImage)
+                                    },
+                                    onDragStart: {
+                                        draggedPointID = point.id
+                                        selectedPointID = point.id
+                                        updateCrop(xPx: point.xPx, yPx: point.yPx, cgImage: cgImage)
+                                    },
+                                    onDragChanged: {
+                                        updateCrop(xPx: point.xPx, yPx: point.yPx, cgImage: cgImage)
+                                    },
+                                    onDragEnded: {
+                                        draggedPointID = nil
+                                        updateCrop(xPx: point.xPx, yPx: point.yPx, cgImage: cgImage)
+                                    },
+                                    onHover: { isHovered in
+                                        if isHovered {
+                                            hoveredPointID = point.id
+                                            updateCrop(xPx: point.xPx, yPx: point.yPx, cgImage: cgImage)
+                                        } else if hoveredPointID == point.id {
+                                            hoveredPointID = nil
+                                            if let selected = selectedPoint {
+                                                updateCrop(xPx: selected.xPx, yPx: selected.yPx, cgImage: cgImage)
+                                            }
+                                        }
+                                    }
+                                )
+                            }
+
+                            // Layer 4: Floating Magnifying Loupe
+                            if loupeConfig.isEnabled,
+                               let info = currentLoupeInfo(
+                                   scale: effectiveScale,
+                                   offsetX: offsetX,
+                                   offsetY: offsetY,
+                                   displayedHeight: displayedHeight
+                               ) {
                                 let loupePos = WallZoomTransform.computeLoupePosition(
-                                    anchorPoint: currentScreenAnchor ?? anchorScreenPt,
+                                    anchorPoint: info.anchor,
                                     loupeConfig: loupeConfig,
-                                    viewportSize: viewportSize
+                                    viewportSize: geo.size
                                 )
 
                                 HoldLoupeView(
                                     croppedImage: loupeCropCGImage,
-                                    title: activePoint.label,
-                                    subtitle: "X: \(Int(round(activePoint.xPx))), Y: \(Int(round(activePoint.yPx))) px • (\(Int(activePoint.xCm)), \(Int(activePoint.yCm))) cm",
+                                    title: info.title,
+                                    subtitle: info.subtitle,
                                     config: loupeConfig
                                 )
                                 .position(loupePos)
@@ -104,53 +156,48 @@ struct InteractiveCalibrationEditor: View {
                                 .allowsHitTesting(false)
                             }
 
-                            // Layer 3: Bottom Fine-Nudge Bar
+                            // Layer 5: Bottom Fine-Nudge Bar
                             if let selected = selectedPoint {
                                 VStack {
                                     Spacer()
                                     fineNudgeBar(
                                         point: selected,
                                         imageSize: imageSize,
-                                        cgImage: cgImage,
-                                        transform: transform
+                                        cgImage: cgImage
                                     )
                                     .padding(.bottom, 12)
+                                    .frame(maxWidth: .infinity)
                                 }
+                                .allowsHitTesting(true)
                             }
                         }
-                        .frame(width: viewportSize.width, height: viewportSize.height)
+                        .frame(width: geo.size.width, height: geo.size.height)
                         .clipped()
                         .contentShape(Rectangle())
-                        .gesture(
-                            SpatialTapGesture()
-                                .onEnded { value in
-                                    handleCanvasTap(
-                                        at: value.location,
-                                        transform: transform,
-                                        cgImage: cgImage
-                                    )
-                                }
-                        )
+                        // Background drag gesture for panning when zoomed
                         .simultaneousGesture(
-                            DragGesture(minimumDistance: 3)
+                            DragGesture(minimumDistance: 4)
                                 .onChanged { value in
-                                    handleDragChanged(
-                                        value: value,
-                                        transform: transform,
-                                        imageSize: imageSize,
-                                        cgImage: cgImage,
-                                        viewportSize: viewportSize
-                                    )
+                                    guard draggedPointID == nil, zoomScale > 1.0 else { return }
+                                    if dragStartPan == nil {
+                                        dragStartPan = panOffset
+                                    }
+                                    if let start = dragStartPan {
+                                        let maxPanX = max(0, (displayedSize.width - geo.size.width) / 2)
+                                        let maxPanY = max(0, (displayedSize.height - geo.size.height) / 2)
+                                        let candX = start.width + value.translation.width
+                                        let candY = start.height + value.translation.height
+                                        panOffset = CGSize(
+                                            width: min(maxPanX, max(-maxPanX, candX)),
+                                            height: min(maxPanY, max(-maxPanY, candY))
+                                        )
+                                    }
                                 }
-                                .onEnded { value in
-                                    handleDragEnded(
-                                        value: value,
-                                        transform: transform,
-                                        imageSize: imageSize,
-                                        cgImage: cgImage
-                                    )
+                                .onEnded { _ in
+                                    dragStartPan = nil
                                 }
                         )
+                        // Pinch to zoom gesture
                         .simultaneousGesture(
                             MagnificationGesture()
                                 .onChanged { value in
@@ -159,11 +206,11 @@ struct InteractiveCalibrationEditor: View {
                                     if zoomScale <= 1.0 {
                                         panOffset = .zero
                                     } else {
-                                        panOffset = CalibrationZoomTransform.clampedOffset(
-                                            panOffset,
-                                            fittedSize: transform.fittedSize,
-                                            viewportSize: viewportSize,
-                                            scale: zoomScale
+                                        let maxPanX = max(0, (displayedSize.width - geo.size.width) / 2)
+                                        let maxPanY = max(0, (displayedSize.height - geo.size.height) / 2)
+                                        panOffset = CGSize(
+                                            width: min(maxPanX, max(-maxPanX, panOffset.width)),
+                                            height: min(maxPanY, max(-maxPanY, panOffset.height))
                                         )
                                     }
                                 }
@@ -171,44 +218,50 @@ struct InteractiveCalibrationEditor: View {
                                     baseZoomScale = zoomScale
                                 }
                         )
+                        // Mouse hover tracking over background photo
                         .onContinuousHover(coordinateSpace: .local) { phase in
                             switch phase {
-                            case let .active(viewportPoint):
-                                handleMouseHover(
-                                    at: viewportPoint,
-                                    transform: transform,
+                            case let .active(location):
+                                handleBackgroundHover(
+                                    at: location,
+                                    scale: effectiveScale,
+                                    offsetX: offsetX,
+                                    offsetY: offsetY,
+                                    displayedHeight: displayedHeight,
+                                    imageSize: imageSize,
                                     cgImage: cgImage
                                 )
                             case .ended:
-                                handleMouseExited()
+                                hoveredCursorLocation = nil
+                                hoveredCursorPx = nil
                             }
                         }
                         #if os(macOS)
                         .background(
                             ScrollWheelZoomModifier { delta, mouseLocation in
-                                if let result = CalibrationZoomTransform.focalZoom(
-                                    delta: delta,
-                                    mouseLocation: mouseLocation,
-                                    currentScale: zoomScale,
-                                    currentOffset: panOffset,
-                                    fittedSize: transform.fittedSize,
-                                    viewportSize: viewportSize
-                                ) {
-                                    zoomScale = result.newScale
-                                    baseZoomScale = result.newScale
-                                    panOffset = result.newOffset
+                                let previousScale = zoomScale
+                                let newScale = min(5.0, max(1.0, zoomScale + (delta * zoomScale)))
+                                guard abs(newScale - previousScale) > 0.001 else { return }
+                                if newScale <= 1.0 {
+                                    zoomScale = 1.0
+                                    baseZoomScale = 1.0
+                                    panOffset = .zero
+                                } else {
+                                    zoomScale = newScale
+                                    baseZoomScale = newScale
+                                    let maxPanX = max(0, (imageSize.width * baseScale * newScale - geo.size.width) / 2)
+                                    let maxPanY = max(0, (imageSize.height * baseScale * newScale - geo.size.height) / 2)
+                                    panOffset = CGSize(
+                                        width: min(maxPanX, max(-maxPanX, panOffset.width)),
+                                        height: min(maxPanY, max(-maxPanY, panOffset.height))
+                                    )
                                 }
                             }
                         )
                         .focusable()
                         .focusEffectDisabled()
                         .onKeyPress { press in
-                            handleKeyPress(
-                                press: press,
-                                imageSize: imageSize,
-                                cgImage: cgImage,
-                                transform: transform
-                            )
+                            handleKeyPress(press: press, imageSize: imageSize, cgImage: cgImage)
                         }
                         #endif
                     }
@@ -287,70 +340,93 @@ struct InteractiveCalibrationEditor: View {
         return editedPoints.first(where: { $0.id == selectedPointID })
     }
 
-    private var currentActivePoint: CalibrationPoint? {
-        if let draggedPointID {
-            return editedPoints.first(where: { $0.id == draggedPointID })
+    // MARK: - Loupe Target Determination
+
+    private struct LoupeDisplayInfo {
+        let title: String
+        let subtitle: String
+        let anchor: CGPoint
+    }
+
+    private func currentLoupeInfo(
+        scale: CGFloat,
+        offsetX: CGFloat,
+        offsetY: CGFloat,
+        displayedHeight: CGFloat
+    ) -> LoupeDisplayInfo? {
+        // Priority 1: Point being dragged
+        if let point = editedPoints.first(where: { $0.id == draggedPointID }) {
+            let pos = pointScreenPos(point: point, scale: scale, offsetX: offsetX, offsetY: offsetY, displayedHeight: displayedHeight)
+            return LoupeDisplayInfo(
+                title: point.label,
+                subtitle: "X: \(Int(round(point.xPx))), Y: \(Int(round(point.yPx))) px",
+                anchor: pos
+            )
         }
-        if let hoveredPointID {
-            return editedPoints.first(where: { $0.id == hoveredPointID })
+
+        // Priority 2: Point being hovered
+        if let point = editedPoints.first(where: { $0.id == hoveredPointID }) {
+            let pos = pointScreenPos(point: point, scale: scale, offsetX: offsetX, offsetY: offsetY, displayedHeight: displayedHeight)
+            return LoupeDisplayInfo(
+                title: point.label,
+                subtitle: "X: \(Int(round(point.xPx))), Y: \(Int(round(point.yPx))) px",
+                anchor: pos
+            )
         }
-        if let selectedPointID {
-            return editedPoints.first(where: { $0.id == selectedPointID })
+
+        // Priority 3: Hovering cursor over photo background
+        if let cursorLoc = hoveredCursorLocation, let cursorPx = hoveredCursorPx {
+            return LoupeDisplayInfo(
+                title: "Photo",
+                subtitle: "X: \(Int(round(cursorPx.x))), Y: \(Int(round(cursorPx.y))) px",
+                anchor: cursorLoc
+            )
         }
+
+        // Priority 4: Selected point (e.g. while fine-nudging)
+        if let point = selectedPoint {
+            let pos = pointScreenPos(point: point, scale: scale, offsetX: offsetX, offsetY: offsetY, displayedHeight: displayedHeight)
+            return LoupeDisplayInfo(
+                title: point.label,
+                subtitle: "X: \(Int(round(point.xPx))), Y: \(Int(round(point.yPx))) px",
+                anchor: pos
+            )
+        }
+
         return nil
     }
 
-    // MARK: - Canvas Rendering
-
-    @ViewBuilder
-    private func canvasContent(
-        cgImage: CGImage,
-        imageSize: CGSize,
-        transform: CalibrationZoomTransform
-    ) -> some View {
-        ZStack(alignment: .topLeading) {
-            // Unwarped native photo
-            Image(decorative: cgImage, scale: 1.0)
-                .resizable()
-                .scaledToFit()
-                .frame(width: transform.fittedSize.width, height: transform.fittedSize.height)
-
-            // Wall plane quadrilateral outlines
-            wallPlanePolygons(transform: transform)
-
-            // Calibration point markers
-            ForEach(editedPoints) { point in
-                let canvasPos = transform.photoPxToCanvas(xPx: point.xPx, yPx: point.yPx)
-                let isSelected = selectedPointID == point.id
-                let isHovered = hoveredPointID == point.id
-                let isDragged = draggedPointID == point.id
-                let isKickboard = point.id.hasPrefix("kb")
-
-                CalibrationMarkerDotView(
-                    point: point,
-                    isKickboard: isKickboard,
-                    isSelected: isSelected,
-                    isHovered: isHovered,
-                    isDragged: isDragged,
-                    zoomScale: zoomScale
-                )
-                .position(canvasPos)
-            }
-        }
+    private func pointScreenPos(
+        point: CalibrationPoint,
+        scale: CGFloat,
+        offsetX: CGFloat,
+        offsetY: CGFloat,
+        displayedHeight: CGFloat
+    ) -> CGPoint {
+        let x = offsetX + (point.xPx * scale)
+        let y = offsetY + displayedHeight - (point.yPx * scale)
+        return CGPoint(x: x, y: y)
     }
 
+    // MARK: - Plane Outline Polygons
+
     @ViewBuilder
-    private func wallPlanePolygons(transform: CalibrationZoomTransform) -> some View {
+    private func wallPlanePolygons(
+        scale: CGFloat,
+        offsetX: CGFloat,
+        offsetY: CGFloat,
+        displayedHeight: CGFloat
+    ) -> some View {
         let lookup = Dictionary(uniqueKeysWithValues: editedPoints.map { ($0.id, $0) })
 
         // Kickboard quad (kb_bl -> kb_br -> kb_tr -> kb_tl)
         if let bl = lookup["kb_bl"], let br = lookup["kb_br"],
            let tr = lookup["kb_tr"], let tl = lookup["kb_tl"] {
             let quad = QuadPolygonShape(
-                p0: transform.photoPxToCanvas(xPx: bl.xPx, yPx: bl.yPx),
-                p1: transform.photoPxToCanvas(xPx: br.xPx, yPx: br.yPx),
-                p2: transform.photoPxToCanvas(xPx: tr.xPx, yPx: tr.yPx),
-                p3: transform.photoPxToCanvas(xPx: tl.xPx, yPx: tl.yPx)
+                p0: pointScreenPos(point: bl, scale: scale, offsetX: offsetX, offsetY: offsetY, displayedHeight: displayedHeight),
+                p1: pointScreenPos(point: br, scale: scale, offsetX: offsetX, offsetY: offsetY, displayedHeight: displayedHeight),
+                p2: pointScreenPos(point: tr, scale: scale, offsetX: offsetX, offsetY: offsetY, displayedHeight: displayedHeight),
+                p3: pointScreenPos(point: tl, scale: scale, offsetX: offsetX, offsetY: offsetY, displayedHeight: displayedHeight)
             )
             quad.fill(Color.orange.opacity(0.12))
             quad.stroke(Color.orange.opacity(0.85), style: StrokeStyle(lineWidth: 1.5, dash: [5, 4]))
@@ -360,10 +436,10 @@ struct InteractiveCalibrationEditor: View {
         if let bl = lookup["mw_bl"], let br = lookup["mw_br"],
            let tr = lookup["mw_tr"], let tl = lookup["mw_tl"] {
             let quad = QuadPolygonShape(
-                p0: transform.photoPxToCanvas(xPx: bl.xPx, yPx: bl.yPx),
-                p1: transform.photoPxToCanvas(xPx: br.xPx, yPx: br.yPx),
-                p2: transform.photoPxToCanvas(xPx: tr.xPx, yPx: tr.yPx),
-                p3: transform.photoPxToCanvas(xPx: tl.xPx, yPx: tl.yPx)
+                p0: pointScreenPos(point: bl, scale: scale, offsetX: offsetX, offsetY: offsetY, displayedHeight: displayedHeight),
+                p1: pointScreenPos(point: br, scale: scale, offsetX: offsetX, offsetY: offsetY, displayedHeight: displayedHeight),
+                p2: pointScreenPos(point: tr, scale: scale, offsetX: offsetX, offsetY: offsetY, displayedHeight: displayedHeight),
+                p3: pointScreenPos(point: tl, scale: scale, offsetX: offsetX, offsetY: offsetY, displayedHeight: displayedHeight)
             )
             quad.fill(Color.cyan.opacity(0.10))
             quad.stroke(Color.cyan.opacity(0.85), style: StrokeStyle(lineWidth: 1.5, dash: [5, 4]))
@@ -376,15 +452,14 @@ struct InteractiveCalibrationEditor: View {
     private func fineNudgeBar(
         point: CalibrationPoint,
         imageSize: CGSize,
-        cgImage: CGImage,
-        transform: CalibrationZoomTransform
+        cgImage: CGImage
     ) -> some View {
         HStack(spacing: 10) {
             // Point selector menu
             Menu {
                 ForEach(editedPoints) { pt in
                     Button {
-                        selectPoint(id: pt.id, transform: transform, cgImage: cgImage)
+                        selectPoint(id: pt.id, cgImage: cgImage)
                     } label: {
                         HStack {
                             Text(pt.label)
@@ -415,24 +490,24 @@ struct InteractiveCalibrationEditor: View {
             // Previous / Next point steppers
             HStack(spacing: 2) {
                 Button {
-                    cyclePoint(forward: false, transform: transform, cgImage: cgImage)
+                    cyclePoint(forward: false, cgImage: cgImage)
                 } label: {
                     Image(systemName: "chevron.left")
                         .font(.caption2.weight(.bold))
                         .frame(width: 22, height: 22)
                 }
                 .buttonStyle(.plain)
-                .help("Previous Point (Shift+Tab)")
+                .help("Previous Point")
 
                 Button {
-                    cyclePoint(forward: true, transform: transform, cgImage: cgImage)
+                    cyclePoint(forward: true, cgImage: cgImage)
                 } label: {
                     Image(systemName: "chevron.right")
                         .font(.caption2.weight(.bold))
                         .frame(width: 22, height: 22)
                 }
                 .buttonStyle(.plain)
-                .help("Next Point (Tab)")
+                .help("Next Point")
             }
 
             Divider().frame(height: 18)
@@ -443,10 +518,10 @@ struct InteractiveCalibrationEditor: View {
                     .font(.caption.monospacedDigit())
                     .frame(minWidth: 64, alignment: .leading)
 
-                nudgeButton(label: "-10", dx: -10, dy: 0, imageSize: imageSize, cgImage: cgImage, transform: transform)
-                nudgeButton(label: "-1", dx: -1, dy: 0, imageSize: imageSize, cgImage: cgImage, transform: transform)
-                nudgeButton(label: "+1", dx: 1, dy: 0, imageSize: imageSize, cgImage: cgImage, transform: transform)
-                nudgeButton(label: "+10", dx: 10, dy: 0, imageSize: imageSize, cgImage: cgImage, transform: transform)
+                nudgeButton(label: "-10", dx: -10, dy: 0, imageSize: imageSize, cgImage: cgImage)
+                nudgeButton(label: "-1", dx: -1, dy: 0, imageSize: imageSize, cgImage: cgImage)
+                nudgeButton(label: "+1", dx: 1, dy: 0, imageSize: imageSize, cgImage: cgImage)
+                nudgeButton(label: "+10", dx: 10, dy: 0, imageSize: imageSize, cgImage: cgImage)
             }
 
             Divider().frame(height: 18)
@@ -457,10 +532,10 @@ struct InteractiveCalibrationEditor: View {
                     .font(.caption.monospacedDigit())
                     .frame(minWidth: 64, alignment: .leading)
 
-                nudgeButton(label: "-10", dx: 0, dy: -10, imageSize: imageSize, cgImage: cgImage, transform: transform)
-                nudgeButton(label: "-1", dx: 0, dy: -1, imageSize: imageSize, cgImage: cgImage, transform: transform)
-                nudgeButton(label: "+1", dx: 0, dy: 1, imageSize: imageSize, cgImage: cgImage, transform: transform)
-                nudgeButton(label: "+10", dx: 0, dy: 10, imageSize: imageSize, cgImage: cgImage, transform: transform)
+                nudgeButton(label: "-10", dx: 0, dy: -10, imageSize: imageSize, cgImage: cgImage)
+                nudgeButton(label: "-1", dx: 0, dy: -1, imageSize: imageSize, cgImage: cgImage)
+                nudgeButton(label: "+1", dx: 0, dy: 1, imageSize: imageSize, cgImage: cgImage)
+                nudgeButton(label: "+10", dx: 0, dy: 10, imageSize: imageSize, cgImage: cgImage)
             }
         }
         .padding(.horizontal, 12)
@@ -479,186 +554,47 @@ struct InteractiveCalibrationEditor: View {
         dx: Double,
         dy: Double,
         imageSize: CGSize,
-        cgImage: CGImage,
-        transform: CalibrationZoomTransform
+        cgImage: CGImage
     ) -> some View {
         Button(label) {
-            nudgeSelected(
-                dx: dx,
-                dy: dy,
-                imageSize: imageSize,
-                cgImage: cgImage,
-                transform: transform
-            )
+            nudgeSelected(dx: dx, dy: dy, imageSize: imageSize, cgImage: cgImage)
         }
         .buttonStyle(.bordered)
         .controlSize(.mini)
         .font(.caption2.monospacedDigit())
     }
 
-    // MARK: - Interaction Handlers
+    // MARK: - Interaction & Crop Updates
 
-    private func handleCanvasTap(
+    private func handleBackgroundHover(
         at location: CGPoint,
-        transform: CalibrationZoomTransform,
-        cgImage: CGImage
-    ) {
-        if let match = transform.closestPoint(near: location, in: editedPoints, maxScreenDistance: 32.0) {
-            selectPoint(id: match.point.id, transform: transform, cgImage: cgImage)
-        } else {
-            // Tapping empty background deselects
-            selectedPointID = nil
-            currentScreenAnchor = nil
-            loupeCropCGImage = nil
-        }
-    }
-
-    private func handleDragChanged(
-        value: DragGesture.Value,
-        transform: CalibrationZoomTransform,
-        imageSize: CGSize,
-        cgImage: CGImage,
-        viewportSize: CGSize
-    ) {
-        // Start dragging
-        if draggedPointID == nil && dragStartPanOffset == nil {
-            if let match = transform.closestPoint(near: value.startLocation, in: editedPoints, maxScreenDistance: 30.0) {
-                draggedPointID = match.point.id
-                selectedPointID = match.point.id
-                dragStartPointPx = CGPoint(x: match.point.xPx, y: match.point.yPx)
-            } else if zoomScale > 1.0 {
-                dragStartPanOffset = panOffset
-            }
-        }
-
-        if let pointID = draggedPointID, let startPx = dragStartPointPx {
-            // Convert translation from screen viewport points to raw photo pixels
-            let pxPerViewportPt = (imageSize.width / transform.fittedSize.width) / zoomScale
-            let deltaXPx = Double(value.translation.width * pxPerViewportPt)
-            let deltaYPx = Double(-value.translation.height * pxPerViewportPt) // CoreImage Y is inverted
-
-            let newXPx = round(min(Double(imageSize.width), max(0, startPx.x + deltaXPx)))
-            let newYPx = round(min(Double(imageSize.height), max(0, startPx.y + deltaYPx)))
-
-            if let idx = editedPoints.firstIndex(where: { $0.id == pointID }) {
-                editedPoints[idx].xPx = newXPx
-                editedPoints[idx].yPx = newYPx
-
-                let pt = editedPoints[idx]
-                currentScreenAnchor = transform.photoPxToViewport(xPx: pt.xPx, yPx: pt.yPx)
-                updateCrop(for: pt, cgImage: cgImage)
-            }
-        } else if let startPan = dragStartPanOffset {
-            let candidate = CGSize(
-                width: startPan.width + value.translation.width,
-                height: startPan.height + value.translation.height
-            )
-            panOffset = CalibrationZoomTransform.clampedOffset(
-                candidate,
-                fittedSize: transform.fittedSize,
-                viewportSize: viewportSize,
-                scale: zoomScale
-            )
-        }
-    }
-
-    private func handleDragEnded(
-        value: DragGesture.Value,
-        transform: CalibrationZoomTransform,
+        scale: CGFloat,
+        offsetX: CGFloat,
+        offsetY: CGFloat,
+        displayedHeight: CGFloat,
         imageSize: CGSize,
         cgImage: CGImage
     ) {
-        if let pointID = draggedPointID,
-           let pt = editedPoints.first(where: { $0.id == pointID }) {
-            currentScreenAnchor = transform.photoPxToViewport(xPx: pt.xPx, yPx: pt.yPx)
-            updateCrop(for: pt, cgImage: cgImage)
-        }
-        draggedPointID = nil
-        dragStartPointPx = nil
-        dragStartPanOffset = nil
-    }
+        guard draggedPointID == nil, hoveredPointID == nil else { return }
 
-    private func handleMouseHover(
-        at viewportPoint: CGPoint,
-        transform: CalibrationZoomTransform,
-        cgImage: CGImage
-    ) {
-        guard draggedPointID == nil else { return }
+        let pxX = (location.x - offsetX) / scale
+        let pxY = (offsetY + displayedHeight - location.y) / scale
 
-        if let match = transform.closestPoint(near: viewportPoint, in: editedPoints, maxScreenDistance: 28.0) {
-            hoveredPointID = match.point.id
-            currentScreenAnchor = transform.photoPxToViewport(xPx: match.point.xPx, yPx: match.point.yPx)
-            updateCrop(for: match.point, cgImage: cgImage)
+        if pxX >= 0, pxX <= imageSize.width, pxY >= 0, pxY <= imageSize.height {
+            hoveredCursorLocation = location
+            hoveredCursorPx = CGPoint(x: pxX, y: pxY)
+            updateCrop(xPx: pxX, yPx: pxY, cgImage: cgImage)
         } else {
-            hoveredPointID = nil
-            if let selected = selectedPoint {
-                currentScreenAnchor = transform.photoPxToViewport(xPx: selected.xPx, yPx: selected.yPx)
-                updateCrop(for: selected, cgImage: cgImage)
-            } else {
-                currentScreenAnchor = nil
-                loupeCropCGImage = nil
-            }
+            hoveredCursorLocation = nil
+            hoveredCursorPx = nil
         }
     }
-
-    private func handleMouseExited() {
-        guard draggedPointID == nil else { return }
-        hoveredPointID = nil
-        if let selected = selectedPoint {
-            // Keep selected point cropped in loupe
-            if case let .loaded(cgImage, _) = loadState {
-                updateCrop(for: selected, cgImage: cgImage)
-            }
-        } else {
-            currentScreenAnchor = nil
-            loupeCropCGImage = nil
-        }
-    }
-
-    #if os(macOS)
-    private func handleKeyPress(
-        press: KeyPress,
-        imageSize: CGSize,
-        cgImage: CGImage,
-        transform: CalibrationZoomTransform
-    ) -> KeyPress.Result {
-        guard selectedPointID != nil else { return .ignored }
-
-        let step: Double = press.modifiers.contains(.shift) ? 10.0 : 1.0
-
-        switch press.key {
-        case .leftArrow:
-            nudgeSelected(dx: -step, dy: 0, imageSize: imageSize, cgImage: cgImage, transform: transform)
-            return .handled
-        case .rightArrow:
-            nudgeSelected(dx: step, dy: 0, imageSize: imageSize, cgImage: cgImage, transform: transform)
-            return .handled
-        case .upArrow:
-            nudgeSelected(dx: 0, dy: step, imageSize: imageSize, cgImage: cgImage, transform: transform)
-            return .handled
-        case .downArrow:
-            nudgeSelected(dx: 0, dy: -step, imageSize: imageSize, cgImage: cgImage, transform: transform)
-            return .handled
-        case .tab:
-            cyclePoint(forward: !press.modifiers.contains(.shift), transform: transform, cgImage: cgImage)
-            return .handled
-        case .escape:
-            selectedPointID = nil
-            currentScreenAnchor = nil
-            loupeCropCGImage = nil
-            return .handled
-        default:
-            return .ignored
-        }
-    }
-    #endif
 
     private func nudgeSelected(
         dx: Double,
         dy: Double,
         imageSize: CGSize,
-        cgImage: CGImage,
-        transform: CalibrationZoomTransform
+        cgImage: CGImage
     ) {
         guard let id = selectedPointID,
               let idx = editedPoints.firstIndex(where: { $0.id == id }) else { return }
@@ -668,29 +604,19 @@ struct InteractiveCalibrationEditor: View {
 
         editedPoints[idx].xPx = newX
         editedPoints[idx].yPx = newY
-
-        let pt = editedPoints[idx]
-        currentScreenAnchor = transform.photoPxToViewport(xPx: pt.xPx, yPx: pt.yPx)
-        updateCrop(for: pt, cgImage: cgImage)
+        updateCrop(xPx: newX, yPx: newY, cgImage: cgImage)
     }
 
-    private func selectPoint(
-        id: String,
-        transform: CalibrationZoomTransform,
-        cgImage: CGImage
-    ) {
+    private func selectPoint(id: String, cgImage: CGImage) {
         selectedPointID = id
+        hoveredCursorLocation = nil
+        hoveredCursorPx = nil
         if let pt = editedPoints.first(where: { $0.id == id }) {
-            currentScreenAnchor = transform.photoPxToViewport(xPx: pt.xPx, yPx: pt.yPx)
-            updateCrop(for: pt, cgImage: cgImage)
+            updateCrop(xPx: pt.xPx, yPx: pt.yPx, cgImage: cgImage)
         }
     }
 
-    private func cyclePoint(
-        forward: Bool,
-        transform: CalibrationZoomTransform,
-        cgImage: CGImage
-    ) {
+    private func cyclePoint(forward: Bool, cgImage: CGImage) {
         guard !editedPoints.isEmpty else { return }
         let currentIndex = editedPoints.firstIndex(where: { $0.id == selectedPointID }) ?? 0
         let nextIndex: Int
@@ -700,21 +626,88 @@ struct InteractiveCalibrationEditor: View {
             nextIndex = (currentIndex - 1 + editedPoints.count) % editedPoints.count
         }
         let nextPoint = editedPoints[nextIndex]
-        selectPoint(id: nextPoint.id, transform: transform, cgImage: cgImage)
+        selectPoint(id: nextPoint.id, cgImage: cgImage)
     }
 
-    private func updateCrop(for point: CalibrationPoint, cgImage: CGImage) {
+    /// Directly crops a 100% native resolution patch from the camera photo centered at (xPx, yPx).
+    /// There is NO transformation or homography applied — raw photo pixels map directly to the bitmap.
+    private func updateCrop(xPx: Double, yPx: Double, cgImage: CGImage) {
         guard loupeConfig.isEnabled else {
             loupeCropCGImage = nil
             return
         }
-        loupeCropCGImage = HoldBackwardTransformService.cropPhotoPixel(
-            from: cgImage,
-            xPx: point.xPx,
-            yPx: point.yPx,
-            cropSpan: loupeConfig.cropPixelSpan
-        )
+
+        let imageWidth = CGFloat(cgImage.width)
+        let imageHeight = CGFloat(cgImage.height)
+
+        // CoreImage / calibration standard has yPx origin at bottom.
+        // CGImage bitmap has row 0 at top.
+        let bitmapCenterX = CGFloat(xPx)
+        let bitmapCenterY = imageHeight - CGFloat(yPx)
+
+        let targetSpan = loupeConfig.cropPixelSpan.rounded()
+        let halfSpan = (targetSpan / 2.0).rounded()
+        var originX = (bitmapCenterX - halfSpan).rounded()
+        var originY = (bitmapCenterY - halfSpan).rounded()
+
+        if originX < 0 {
+            originX = 0
+        } else if originX + targetSpan > imageWidth {
+            originX = max(0, imageWidth - targetSpan)
+        }
+
+        if originY < 0 {
+            originY = 0
+        } else if originY + targetSpan > imageHeight {
+            originY = max(0, imageHeight - targetSpan)
+        }
+
+        let effectiveWidth = min(targetSpan, imageWidth - originX)
+        let effectiveHeight = min(targetSpan, imageHeight - originY)
+
+        guard effectiveWidth > 0, effectiveHeight > 0 else {
+            loupeCropCGImage = nil
+            return
+        }
+
+        let cropRect = CGRect(x: originX, y: originY, width: effectiveWidth, height: effectiveHeight)
+        loupeCropCGImage = cgImage.cropping(to: cropRect)
     }
+
+    #if os(macOS)
+    private func handleKeyPress(
+        press: KeyPress,
+        imageSize: CGSize,
+        cgImage: CGImage
+    ) -> KeyPress.Result {
+        guard selectedPointID != nil else { return .ignored }
+        let step: Double = press.modifiers.contains(.shift) ? 10.0 : 1.0
+
+        switch press.key {
+        case .leftArrow:
+            nudgeSelected(dx: -step, dy: 0, imageSize: imageSize, cgImage: cgImage)
+            return .handled
+        case .rightArrow:
+            nudgeSelected(dx: step, dy: 0, imageSize: imageSize, cgImage: cgImage)
+            return .handled
+        case .upArrow:
+            nudgeSelected(dx: 0, dy: step, imageSize: imageSize, cgImage: cgImage)
+            return .handled
+        case .downArrow:
+            nudgeSelected(dx: 0, dy: -step, imageSize: imageSize, cgImage: cgImage)
+            return .handled
+        case .tab:
+            cyclePoint(forward: !press.modifiers.contains(.shift), cgImage: cgImage)
+            return .handled
+        case .escape:
+            selectedPointID = nil
+            loupeCropCGImage = nil
+            return .handled
+        default:
+            return .ignored
+        }
+    }
+    #endif
 
     private func resetToDefaults() {
         let defaults = CalibrationPointTemplates.all
@@ -725,16 +718,9 @@ struct InteractiveCalibrationEditor: View {
                 editedPoints[idx].yPx = def.yPx
             }
         }
-        if case let .loaded(cgImage, imageSize) = loadState,
+        if case let .loaded(cgImage, _) = loadState,
            let selected = selectedPoint {
-            let transform = CalibrationZoomTransform(
-                imageSize: imageSize,
-                viewportSize: CGSize(width: 800, height: 600),
-                zoomScale: zoomScale,
-                panOffset: panOffset
-            )
-            updateCrop(for: selected, cgImage: cgImage)
-            currentScreenAnchor = transform.photoPxToViewport(xPx: selected.xPx, yPx: selected.yPx)
+            updateCrop(xPx: selected.xPx, yPx: selected.yPx, cgImage: cgImage)
         }
     }
 
@@ -743,7 +729,6 @@ struct InteractiveCalibrationEditor: View {
     private func load() {
         editedPoints = points
 
-        // Default selected point to mw_tl if available, or first point
         if selectedPointID == nil {
             selectedPointID = editedPoints.first(where: { $0.id == "mw_tl" })?.id ?? editedPoints.first?.id
         }
@@ -778,7 +763,7 @@ struct InteractiveCalibrationEditor: View {
                 }
 
                 if let selected = self.selectedPoint {
-                    self.updateCrop(for: selected, cgImage: image)
+                    self.updateCrop(xPx: selected.xPx, yPx: selected.yPx, cgImage: image)
                 }
             }
         }
@@ -804,43 +789,52 @@ private struct QuadPolygonShape: Shape {
     }
 }
 
-private struct CalibrationMarkerDotView: View {
-    let point: CalibrationPoint
-    let isKickboard: Bool
+private struct PointMarkerDraggableView: View {
+    @Binding var point: CalibrationPoint
+    let scale: CGFloat
+    let offsetX: CGFloat
+    let offsetY: CGFloat
+    let imageSize: CGSize
+    let displayedHeight: CGFloat
     let isSelected: Bool
-    let isHovered: Bool
     let isDragged: Bool
     let zoomScale: CGFloat
+    var onSelect: () -> Void
+    var onDragStart: () -> Void
+    var onDragChanged: () -> Void
+    var onDragEnded: () -> Void
+    var onHover: (Bool) -> Void
+
+    @State private var dragStartPoint: CGPoint? = nil
 
     var body: some View {
+        let viewX = offsetX + (point.xPx * scale)
+        let viewY = offsetY + displayedHeight - (point.yPx * scale)
+        let isKickboard = point.id.hasPrefix("kb")
         let accentColor = isKickboard ? Color.orange : Color.cyan
-        let isHighlighted = isSelected || isHovered || isDragged
+        let isHighlighted = isSelected || isDragged
 
         ZStack(alignment: .center) {
-            // Outer glowing accent ring if selected or dragged
-            if isSelected || isDragged {
+            // Glowing outer accent ring if selected or dragged
+            if isHighlighted {
                 Circle()
                     .stroke(Color.yellow, lineWidth: 2.5)
-                    .frame(width: 32, height: 32)
+                    .frame(width: 34, height: 34)
                     .shadow(color: Color.yellow.opacity(0.8), radius: 4)
-            } else if isHovered {
-                Circle()
-                    .stroke(accentColor, lineWidth: 2)
-                    .frame(width: 28, height: 28)
             }
 
             // Main handle circle
             Circle()
-                .fill(accentColor.opacity(isHighlighted ? 0.85 : 0.65))
-                .frame(width: 20, height: 20)
+                .fill(accentColor.opacity(isHighlighted ? 0.90 : 0.65))
+                .frame(width: 22, height: 22)
                 .overlay(Circle().stroke(Color.white, lineWidth: 2))
 
-            // Center targeting cross-dot
+            // Center targeting red dot
             Circle()
                 .fill(Color.red)
                 .frame(width: 4, height: 4)
 
-            // Point Label Badge
+            // Label badge
             Text(point.label)
                 .font(.system(size: 9, weight: .bold))
                 .fixedSize()
@@ -849,9 +843,37 @@ private struct CalibrationMarkerDotView: View {
                 .background(Color.black.opacity(isHighlighted ? 0.88 : 0.68))
                 .foregroundColor(.white)
                 .clipShape(RoundedRectangle(cornerRadius: 3))
-                .offset(y: -18)
+                .offset(y: -20)
         }
         .scaleEffect(1.0 / max(1.0, sqrt(zoomScale)))
         .shadow(color: .black.opacity(0.4), radius: 3, x: 0, y: 1)
+        .position(x: viewX, y: viewY)
+        .onHover { hovering in
+            onHover(hovering)
+        }
+        .onTapGesture {
+            onSelect()
+        }
+        .gesture(
+            DragGesture(minimumDistance: 1)
+                .onChanged { value in
+                    if dragStartPoint == nil {
+                        dragStartPoint = CGPoint(x: point.xPx, y: point.yPx)
+                        onDragStart()
+                    }
+                    if let start = dragStartPoint {
+                        let deltaXPx = value.translation.width / scale
+                        let deltaYPx = -value.translation.height / scale
+
+                        point.xPx = round(max(0, min(imageSize.width, start.x + deltaXPx)))
+                        point.yPx = round(max(0, min(imageSize.height, start.y + deltaYPx)))
+                        onDragChanged()
+                    }
+                }
+                .onEnded { _ in
+                    dragStartPoint = nil
+                    onDragEnded()
+                }
+        )
     }
 }
