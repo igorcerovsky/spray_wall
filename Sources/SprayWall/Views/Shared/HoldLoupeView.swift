@@ -214,7 +214,7 @@ struct HoldLoupeView: View {
                     Ellipse()
                         .fill(Color.cyan.opacity(0.18))
                         .overlay {
-                            Ellipse().stroke(Color.cyan, lineWidth: 2)
+                            Ellipse().stroke(Color.cyan, lineWidth: 1.4)
                         }
                 }
                 .frame(width: proj.widthPt, height: proj.heightPt)
@@ -237,21 +237,21 @@ struct HoldLoupeView: View {
             switch role {
             case .start, .top:
                 RoundedRectangle(cornerRadius: cornerRadius)
-                    .fill(color.opacity(0.22))
+                    .fill(color.opacity(0.25))
                     .overlay {
-                        RoundedRectangle(cornerRadius: cornerRadius).stroke(color, lineWidth: 2.2)
+                        RoundedRectangle(cornerRadius: cornerRadius).stroke(color, lineWidth: 1.5)
                     }
             case .hold:
                 Ellipse()
-                    .fill(color.opacity(0.22))
+                    .fill(color.opacity(0.25))
                     .overlay {
-                        Ellipse().stroke(color, lineWidth: 2.2)
+                        Ellipse().stroke(color, lineWidth: 1.5)
                     }
             case .foothold:
                 Diamond()
-                    .fill(color.opacity(0.22))
+                    .fill(color.opacity(0.25))
                     .overlay {
-                        Diamond().stroke(color, lineWidth: 2.2)
+                        Diamond().stroke(color, lineWidth: 1.5)
                     }
             }
         }

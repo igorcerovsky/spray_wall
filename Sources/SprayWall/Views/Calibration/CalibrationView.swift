@@ -1,6 +1,7 @@
 import PhotosUI
 import SwiftData
 import SwiftUI
+import UniformTypeIdentifiers
 
 struct CalibrationView: View {
     @Environment(\.modelContext) private var modelContext
@@ -13,6 +14,7 @@ struct CalibrationView: View {
     @State private var kickboardOutputPath = ""
     @State private var isRectifying = false
     @State private var isImportingPhoto = false
+    @State private var isFileImporterPresented = false
     @State private var selectedPhotoItem: PhotosPickerItem?
     @State private var isShowingInteractiveEditor = false
     @State private var previewId = UUID()
@@ -28,16 +30,29 @@ struct CalibrationView: View {
                 }
 
                 Section("Photo") {
-                    let pickerTitle = isImportingPhoto ? "Importing Photo..." : "Pick Photo from Library"
+                    let pickerTitle = isImportingPhoto ? "Importing..." : "Pick Photo from Library"
+                    let fileTitle = isImportingPhoto ? "Importing..." : "Import Image from Computer"
 
                     TextField("resources/281026_dd.jpeg", text: $photoPath)
                         .disabled(isImportingPhoto || isRectifying)
 
-                    PhotosPicker(selection: $selectedPhotoItem, matching: .images) {
-                        Label(pickerTitle, systemImage: "photo.on.rectangle")
-                            .frame(maxWidth: .infinity, alignment: .leading)
+                    HStack(spacing: 12) {
+                        PhotosPicker(selection: $selectedPhotoItem, matching: .images) {
+                            Label(pickerTitle, systemImage: "photo.on.rectangle")
+                                .frame(maxWidth: .infinity, alignment: .center)
+                        }
+                        .buttonStyle(.bordered)
+                        .disabled(isImportingPhoto || isRectifying)
+
+                        Button {
+                            isFileImporterPresented = true
+                        } label: {
+                            Label(fileTitle, systemImage: "folder")
+                                .frame(maxWidth: .infinity, alignment: .center)
+                        }
+                        .buttonStyle(.bordered)
+                        .disabled(isImportingPhoto || isRectifying)
                     }
-                    .disabled(isImportingPhoto || isRectifying)
 
                     Text("Manual 8-point calibration is enabled for MVP.")
                         .font(.footnote)
@@ -163,6 +178,19 @@ struct CalibrationView: View {
                 guard let newItem else { return }
                 Task {
                     await importPhoto(from: newItem)
+                }
+            }
+            .fileImporter(
+                isPresented: $isFileImporterPresented,
+                allowedContentTypes: [.image]
+            ) { result in
+                switch result {
+                case .success(let url):
+                    Task {
+                        await importPhoto(fromFile: url)
+                    }
+                case .failure(let error):
+                    appModel.globalMessage = "File selection failed: \(error.localizedDescription)"
                 }
             }
         }
@@ -346,17 +374,64 @@ struct CalibrationView: View {
             }
 
             _ = try WallProjectPaths.ensureProjectDirectory()
-            let destinationURL = try WallProjectPaths.defaultPhotoOriginalURL()
+            let projectDir = try WallProjectPaths.projectDirectory()
+            let destinationURL = projectDir.appendingPathComponent("photo_original.jpg")
 
-            if FileManager.default.fileExists(atPath: destinationURL.path) {
-                try FileManager.default.removeItem(at: destinationURL)
+            for ext in ["jpg", "jpeg", "png", "heic"] {
+                let candidate = projectDir.appendingPathComponent("photo_original.\(ext)")
+                if FileManager.default.fileExists(atPath: candidate.path) {
+                    try? FileManager.default.removeItem(at: candidate)
+                }
             }
 
             try data.write(to: destinationURL, options: .atomic)
 
+            await OriginalPhotoLoader.shared.clearCache()
             photoPath = destinationURL.path
+            previewId = UUID()
             save(showMessage: false)
             appModel.globalMessage = "Photo imported to wall_project/photo_original.jpg."
+        } catch {
+            appModel.globalMessage = "Photo import failed: \(error.localizedDescription)"
+        }
+    }
+
+    @MainActor
+    private func importPhoto(fromFile url: URL) async {
+        isImportingPhoto = true
+        defer {
+            isImportingPhoto = false
+        }
+
+        let gotAccess = url.startAccessingSecurityScopedResource()
+        defer {
+            if gotAccess {
+                url.stopAccessingSecurityScopedResource()
+            }
+        }
+
+        do {
+            let data = try Data(contentsOf: url)
+
+            _ = try WallProjectPaths.ensureProjectDirectory()
+            let projectDir = try WallProjectPaths.projectDirectory()
+            let fileExtension = url.pathExtension.isEmpty ? "jpg" : url.pathExtension.lowercased()
+            let destinationURL = projectDir.appendingPathComponent("photo_original.\(fileExtension)")
+
+            for ext in ["jpg", "jpeg", "png", "heic"] {
+                let candidate = projectDir.appendingPathComponent("photo_original.\(ext)")
+                if FileManager.default.fileExists(atPath: candidate.path) {
+                    try? FileManager.default.removeItem(at: candidate)
+                }
+            }
+
+            try data.write(to: destinationURL, options: .atomic)
+
+            await OriginalPhotoLoader.shared.clearCache()
+            photoPath = destinationURL.path
+            previewId = UUID()
+            save(showMessage: false)
+            appModel.globalMessage = "Photo imported to wall_project/photo_original.\(fileExtension)."
         } catch {
             appModel.globalMessage = "Photo import failed: \(error.localizedDescription)"
         }

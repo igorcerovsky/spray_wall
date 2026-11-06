@@ -1,48 +1,182 @@
-# Spray Wall App (MVP Scaffold)
+# SprayWall
 
-This repository now contains an initial SwiftUI + SwiftData scaffold for the Spray Wall app.
+<p align="center">
+  <img src="docs/icons/constellation_realwall_natural.png" alt="SprayWall Icon" width="128" height="128">
+</p>
 
-## Scope implemented
+<p align="center">
+  <strong>High-Precision Homography Rectification, Geometric Hold Mapping & Boulder Setter for Climbing Spray Walls</strong>
+</p>
 
-- iOS-first SwiftUI app architecture (package scaffold)
-- Multi-user auth (register/login)
-- Wall calibration screen with 8 reference points
-- In-app photo picking from the device photo library (imports to `wall_project/photo_original.jpg`)
-- Real image rectification pipeline:
-  - Perspective correction for main wall and kickboard using calibration points
-  - Output files: `main_wall_rectified.png` and `kickboard_rectified.png`
-- Hold editor:
-  - Tap canvas to add hold
-  - Drag hold to move
-  - Context menu delete
-  - Hold detail + grip editing
-- Route editor:
-  - Create/edit routes
-  - Active route preview (single route at a time)
-- Attempt logger:
-  - Log success/failure against a route
-  - Attempt history
-- Settings:
-  - JSON export/import for project data
-  - Logout
-- SwiftData persistence (SQLite-backed)
-- Native Xcode project generator: `Tools/generate_xcodeproj.rb`
-- App model and architecture refactored for security (Keychain), performance (batched archive imports), and modern data typing (native `[Int]` properties instead of CSV strings).
+<p align="center">
+  <img src="https://img.shields.io/badge/Platform-macOS%2014%2B%20%7C%20iOS%2017%2B-blue?style=flat-square" alt="Platform">
+  <img src="https://img.shields.io/badge/Swift-6.0-orange?style=flat-square" alt="Swift 6.0">
+  <img src="https://img.shields.io/badge/UI-SwiftUI-purple?style=flat-square" alt="SwiftUI">
+  <img src="https://img.shields.io/badge/Storage-SwiftData-green?style=flat-square" alt="SwiftData">
+  <img src="https://img.shields.io/badge/Tests-37%20Passed-brightgreen?style=flat-square" alt="Tests">
+</p>
 
-## Notes
+---
 
-- Generate the native Xcode project with:
-  - `gem install --user-install xcodeproj` (or `bundle install`)
-  - `ruby Tools/generate_xcodeproj.rb`
-- Build/test shortcuts:
-  - `make ios-build`
-  - `make ios-test`
-  - `make ios-destinations`
-  - CLI targets disable code signing (`CODE_SIGNING_ALLOWED=NO`) for local/CI validation.
-- Open `SprayWall.xcodeproj` in Xcode and run on iOS 17+ target.
-- `swift test` passes in this repository.
+<p align="center">
+  <img src="docs/app_screenshot.png" alt="SprayWall macOS App Interface" width="880">
+</p>
 
-## Data model highlights
+---
 
-- Hold IDs, route IDs, and attempt IDs are generated with monotonic increment (`max + 1`) and never reused.
-- Kickboard is set to **90 degrees from floor** per requirement.
+## Overview
+
+**SprayWall** is a native, professional macOS and iOS application designed for home and commercial climbing spray walls. It transforms raw, perspective-distorted wall photos into geometrically calibrated, millimeter-accurate 2D climbing canvases. 
+
+Setters and climbers can accurately map physical holds as rotatable ellipses, inspect holds at high resolution using a projective magnifying loupe, define boulders with industry-standard role color-coding, track ascents, and filter problems by difficulty.
+
+---
+
+## Key Features
+
+### 📐 Geometric Wall Calibration & Image Rectification
+- **8-Point Perspective Calibration**: Maps raw photo coordinates to real-world centimeters across multi-angle wall structures (inclined main wall and 90° kickboard).
+- **Sub-Pixel Loupe Precision**: Interactive calibration editor with real-time magnifying loupe, coordinate inspection, and edge-aware cropping.
+- **Joint-Point Synchronization**: Single-toggle joint adjustment for shared seam boundary points between the kickboard and main wall.
+- **Planar Homography Pipeline**: Real-time perspective correction engine outputting high-resolution rectified PNGs (`main_wall_rectified.png` and `kickboard_rectified.png`).
+- **Flexible Photo Import**: Import high-resolution wall photos directly from the **Apple Photos Library** or browse the **Computer Filesystem** (`.jpg`, `.jpeg`, `.png`, `.heic`, `.dng`).
+
+### 🎯 Parametric Hold Modeling & Interactive Editing
+- **True Ellipse Geometry**: Holds are modeled with distinct major axis ($cm$), minor axis ($cm$), and planar rotation angle ($^\circ$).
+- **Dual-Action Direct Manipulation**:
+  - **Normal Drag**: Smoothly moves the hold's central bolt-hole position.
+  - **Shift + Drag**: Activates visual axis handles for intuitive real-time resizing and rotation.
+- **Scale-Invariant Pencil Rendering**: Marker lines and handles maintain crisp, constant on-screen stroke width ($1.2\text{ pt} / \text{zoomScale}$), avoiding visual clutter when zooming into dense hold clusters.
+- **Side-Positioned Non-Occluding Loupe**: The magnifying loupe automatically docks to the opposite screen gutter during hold editing, ensuring visual handles and holds remain fully visible.
+
+### 🔍 Projective Backward Homography Loupe
+- **Perspective-Corrected Loupe Projection**: Projects the hold's physical planar geometry through the camera homography matrix, aligning the hold ellipse and rotated bounding box with the tilted perspective photo.
+- **Multiple Loupe Geometries**: Configurable circle and rounded rectangle loupe shapes with real-time edge clamping and zoom levels.
+- **Active Hover Feedback**: Seamless hover highlighting across all holds, operating smoothly whether the loupe preview is enabled or disabled.
+
+### 🧗 Boulder Definition & Tick List
+- **Standardized Hold Roles & Color Hierarchy**:
+  | Role | Shape | Idle Outline | Hover Accent |
+  | :--- | :--- | :--- | :--- |
+  | **Start** | Rounded Rectangle | Green (`Color.green`) | Cyan Halo + Thickened Stroke |
+  | **Top** | Rounded Rectangle | Red (`Color.red`) | Cyan Halo + Thickened Stroke |
+  | **Handhold** | Ellipse | Blue (`Color.blue`) | Cyan Halo + Thickened Stroke |
+  | **Foothold** | Diamond | Yellow (`Color.yellow`) | Cyan Halo + Thickened Stroke |
+  | **Unselected** | Ellipse | White (`Color.white.opacity(0.55)`) | Vibrant Cyan (`Color.cyan`) |
+- **Rotated Bounding Box Symbols**: Holds in the boulder view are rendered with their symbols oriented inside the hold's true physical bounding box.
+- **Draft & Established Lifecycles**: Protect completed boulders from accidental edits while allowing rapid iteration in draft mode.
+- **Grade Filtering & Ascension Logging**: Dynamic grade range slider filter, 5-star quality ratings, setter attribution, and single-click ascent logging.
+
+### 🔒 Security, Reliability & Persistence
+- **SwiftData SQLite Storage**: Fully relational, atomic local database tracking holds, grips, boulders, routes, ascents, and calibrations.
+- **Keychain Security**: Secure user authentication and credentials management.
+- **Project Archives**: Full JSON export and import capabilities for backup and team synchronization.
+
+---
+
+## Architecture & Technology Stack
+
+| Component | Implementation |
+| :--- | :--- |
+| **Language** | Swift 6.0 (Strict Concurrency & Sendable compliance) |
+| **User Interface** | SwiftUI (Universal macOS & iOS responsive views) |
+| **Persistence** | SwiftData backed by SQLite (`wall_project/spraywall.sqlite`) |
+| **Computer Vision** | CoreGraphics, Accelerate $vDSP$, ImageIO perspective homography solvers |
+| **Build System** | Swift Package Manager + Ruby native Xcode project generator (`xcodeproj`) |
+
+---
+
+## Getting Started
+
+### Prerequisites
+- **macOS**: Sonoma 14.0 or newer
+- **iOS**: iOS 17.0 or newer (for mobile deployments)
+- **Xcode**: 16.0 or newer (with Swift 6 compiler toolchain)
+
+### Build & Run via Swift Package Manager
+
+```bash
+# Clone the repository
+git clone https://github.com/igorcerovsky/spray_wall.git
+cd spray_wall
+
+# Run automated test suite (37 unit tests)
+swift test
+
+# Build debug or release executable
+swift build -c release
+```
+
+### Xcode Project Generation
+
+The repository includes an automated Ruby generator that configures a native, multi-target Xcode project (`SprayWall.xcodeproj`) supporting macOS and iOS:
+
+```bash
+# Generate the Xcode project
+ruby Tools/generate_xcodeproj.rb
+
+# Build and verify with xcodebuild
+xcodebuild -project SprayWall.xcodeproj -scheme SprayWall-macOS -configuration Debug build
+```
+
+---
+
+## Default Physical Wall Specifications
+
+SprayWall is pre-configured for standard multi-pitch home and gym boards, with customizable world coordinates:
+
+| Parameter | Default Value | Notes |
+| :--- | :--- | :--- |
+| **Wall Width** | $360\text{ cm}$ | Measured horizontally across boards |
+| **Main Wall Height** | $320\text{ cm}$ | Sloped overhang section |
+| **Main Wall Angle** | $40^\circ$ | Measured from floor |
+| **Kickboard Height** | $40\text{ cm}$ | Vertical base panel |
+| **Kickboard Angle** | $90^\circ$ | Perpendicular to floor |
+| **Default Coordinate Origin** | $(0, 0)$ | Bottom-left corner of the kickboard |
+
+---
+
+## Directory Structure
+
+```text
+spray_wall/
+├── Package.swift                    # Swift Package definition (macOS & iOS targets)
+├── Sources/SprayWall/
+│   ├── App/                         # App lifecycle, navigation, environment models
+│   ├── Models/                      # SwiftData domain models (Hold, Boulder, Calibration)
+│   ├── Services/                    # Homography math, image rectification, auth, migration
+│   ├── Utilities/                   # Coordinate transformations, path resolution, codecs
+│   └── Views/
+│       ├── Calibration/             # Interactive 8-point rectification & photo import
+│       ├── Holds/                   # Hold canvas, Shift-drag ellipse geometry editor
+│       ├── Boulders/                # Boulder setter, role styling, grade filtering
+│       └── Shared/                  # Scaled background, projective loupe, zoom controls
+├── Tests/SprayWallTests/            # Comprehensive unit & regression test suites
+├── Tools/                           # Ruby Xcode project generator and maintenance scripts
+├── resources/                       # Default calibration photo and icon assets
+└── docs/                            # Documentation assets and screenshots
+```
+
+---
+
+## Testing
+
+SprayWall maintains a unit test suite covering geometric transformations, numerical precision, and persistence:
+
+```bash
+swift test
+```
+
+Test coverage includes:
+- **Square-to-Quad & Quad-to-Square Projective Mapping**
+- **Perspective Image Rectification Pipeline**
+- **Spatial Hit-Testing & Focal Zoom Inversion**
+- **Hold Ellipse Modeling & Bounding Box Rotations**
+- **Homography-Based Loupe Geometry Projection**
+- **CSV and JSON Migration Resilience**
+
+---
+
+## License
+
+This project is proprietary and developed by Igor Cerovsky. All rights reserved.

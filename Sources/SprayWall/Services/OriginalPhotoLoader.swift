@@ -50,5 +50,11 @@ actor OriginalPhotoLoader {
         self.cachedPath = path
         return image
     }
+
+    /// Clears any cached photo image to force a reload from disk.
+    func clearCache() {
+        cachedImage = nil
+        cachedPath = nil
+    }
 }
 

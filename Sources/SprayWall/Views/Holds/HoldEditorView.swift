@@ -464,7 +464,7 @@ struct HoldEditorView: View {
 
         let a = holdWidthWall / 2.0
         let b = holdHeightWall / 2.0
-        let stemLen = 22.0 / zoomTransform.zoomScale
+        let stemLen = 20.0 / zoomTransform.zoomScale
 
         let distRot = hypot(localX - (a + stemLen), localY) * zoomTransform.zoomScale
         let distMaj1 = hypot(localX - a, localY) * zoomTransform.zoomScale
@@ -590,18 +590,8 @@ struct HoldEditorView: View {
 
         // When a hold is selected in edit mode, editing that hold has priority!
         if isEditingHolds, let selID = selectedHoldID, let selHold = holds.first(where: { $0.holdID == selID }) {
-            if activeCropCGImage == nil || croppedHoldID != selHold.holdID {
+            if loupeConfig.isEnabled && (activeCropCGImage == nil || croppedHoldID != selHold.holdID) {
                 updateCrop(for: selHold)
-            }
-            return
-        }
-
-        guard loupeConfig.isEnabled else {
-            if hoveredHold != nil || activeCropCGImage != nil {
-                hoveredHold = nil
-                activeCropCGImage = nil
-                croppedHoldID = nil
-                croppedHoldCoord = nil
             }
             return
         }
@@ -613,7 +603,9 @@ struct HoldEditorView: View {
                 withAnimation(.easeOut(duration: 0.12)) {
                     hoveredHold = hold
                 }
-                updateCrop(for: hold)
+                if loupeConfig.isEnabled {
+                    updateCrop(for: hold)
+                }
             }
         } else {
             if hoveredHold != nil {
@@ -1024,9 +1016,10 @@ private struct HoldPositionDotView: View {
         let displayHeight = isHovered || isSelected ? max(heightPt * 1.05, heightPt + 2) : heightPt
         let a = displayWidth / 2.0
         let b = displayHeight / 2.0
-        let handleSize = max(7.0, 10.0 / zoomScale)
-        let rotHandleSize = max(9.0, 13.0 / zoomScale)
-        let stemLen = 22.0 / zoomScale
+        let handleSize = 8.0 / zoomScale
+        let rotHandleSize = 11.0 / zoomScale
+        let stemLen = 20.0 / zoomScale
+        let pencilLineWidth = (isSelected ? 1.4 : (isHovered ? 1.3 : 1.1)) / zoomScale
 
         ZStack(alignment: .center) {
             // Rotated hold ellipse, bounding box, and interactive visual handles
@@ -1034,13 +1027,16 @@ private struct HoldPositionDotView: View {
                 if isSelected && isEditing && isShiftPressed {
                     // 1. Rotated bounding box outline
                     Rectangle()
-                        .stroke(Color.cyan.opacity(0.85), style: StrokeStyle(lineWidth: max(1.0, 1.4 / zoomScale), dash: [4 / zoomScale, 4 / zoomScale]))
+                        .stroke(
+                            Color.cyan.opacity(0.85),
+                            style: StrokeStyle(lineWidth: 1.0 / zoomScale, dash: [3.0 / zoomScale, 3.0 / zoomScale])
+                        )
                         .frame(width: displayWidth, height: displayHeight)
 
                     // 2. Rotation stem line extending from major axis (+X end)
                     Rectangle()
                         .fill(Color.cyan)
-                        .frame(width: stemLen, height: max(1.0, 1.6 / zoomScale))
+                        .frame(width: stemLen, height: 1.2 / zoomScale)
                         .offset(x: a + stemLen / 2.0)
 
                     // 3. Rotation handle (cyan circle with white stroke)
@@ -1048,57 +1044,52 @@ private struct HoldPositionDotView: View {
                         .fill(Color.cyan)
                         .frame(width: rotHandleSize, height: rotHandleSize)
                         .overlay {
-                            Circle().stroke(Color.white, lineWidth: max(1.0, 1.8 / zoomScale))
+                            Circle().stroke(Color.white, lineWidth: 1.2 / zoomScale)
                         }
-                        .shadow(color: Color.black.opacity(0.4), radius: 2)
                         .offset(x: a + stemLen)
 
                     // 4. Major axis handles (two white squares on left and right)
-                    RoundedRectangle(cornerRadius: max(1.0, 2.0 / zoomScale))
+                    RoundedRectangle(cornerRadius: 1.5 / zoomScale)
                         .fill(Color.white)
                         .frame(width: handleSize, height: handleSize)
                         .overlay {
-                            RoundedRectangle(cornerRadius: max(1.0, 2.0 / zoomScale)).stroke(Color.cyan, lineWidth: max(1.0, 1.6 / zoomScale))
+                            RoundedRectangle(cornerRadius: 1.5 / zoomScale).stroke(Color.cyan, lineWidth: 1.2 / zoomScale)
                         }
-                        .shadow(color: Color.black.opacity(0.3), radius: 1.5)
                         .offset(x: a)
 
-                    RoundedRectangle(cornerRadius: max(1.0, 2.0 / zoomScale))
+                    RoundedRectangle(cornerRadius: 1.5 / zoomScale)
                         .fill(Color.white)
                         .frame(width: handleSize, height: handleSize)
                         .overlay {
-                            RoundedRectangle(cornerRadius: max(1.0, 2.0 / zoomScale)).stroke(Color.cyan, lineWidth: max(1.0, 1.6 / zoomScale))
+                            RoundedRectangle(cornerRadius: 1.5 / zoomScale).stroke(Color.cyan, lineWidth: 1.2 / zoomScale)
                         }
-                        .shadow(color: Color.black.opacity(0.3), radius: 1.5)
                         .offset(x: -a)
 
                     // 5. Minor axis handles (two white squares on top and bottom)
-                    RoundedRectangle(cornerRadius: max(1.0, 2.0 / zoomScale))
+                    RoundedRectangle(cornerRadius: 1.5 / zoomScale)
                         .fill(Color.white)
                         .frame(width: handleSize, height: handleSize)
                         .overlay {
-                            RoundedRectangle(cornerRadius: max(1.0, 2.0 / zoomScale)).stroke(Color.blue, lineWidth: max(1.0, 1.6 / zoomScale))
+                            RoundedRectangle(cornerRadius: 1.5 / zoomScale).stroke(Color.blue, lineWidth: 1.2 / zoomScale)
                         }
-                        .shadow(color: Color.black.opacity(0.3), radius: 1.5)
                         .offset(y: -b)
 
-                    RoundedRectangle(cornerRadius: max(1.0, 2.0 / zoomScale))
+                    RoundedRectangle(cornerRadius: 1.5 / zoomScale)
                         .fill(Color.white)
                         .frame(width: handleSize, height: handleSize)
                         .overlay {
-                            RoundedRectangle(cornerRadius: max(1.0, 2.0 / zoomScale)).stroke(Color.blue, lineWidth: max(1.0, 1.6 / zoomScale))
+                            RoundedRectangle(cornerRadius: 1.5 / zoomScale).stroke(Color.blue, lineWidth: 1.2 / zoomScale)
                         }
-                        .shadow(color: Color.black.opacity(0.3), radius: 1.5)
                         .offset(y: b)
                 }
 
-                // Hold ellipse shape
+                // Hold ellipse shape - fine pencil thickness that does not increase when zoomed
                 Ellipse()
-                    .fill(isSelected ? Color.cyan.opacity(0.38) : (isHovered ? Color.cyan.opacity(0.28) : Color.purple.opacity(0.22)))
+                    .fill(isSelected ? Color.cyan.opacity(0.35) : (isHovered ? Color.cyan.opacity(0.25) : Color.purple.opacity(0.20)))
                     .overlay {
                         Ellipse().stroke(
                             isSelected ? Color.cyan : (isHovered ? Color.cyan : Color.purple),
-                            lineWidth: isSelected ? max(1.5, 2.4 / zoomScale) : (isHovered ? max(1.2, 2.0 / zoomScale) : max(0.8, 1.2 / zoomScale))
+                            lineWidth: pencilLineWidth
                         )
                     }
                     .frame(width: displayWidth, height: displayHeight)
@@ -1106,21 +1097,11 @@ private struct HoldPositionDotView: View {
             .rotationEffect(.degrees(-rotationDeg))
             .animation(.spring(response: 0.25, dampingFraction: 0.7), value: isHovered || isSelected)
 
-            // Bolt center point marker (always shows exact bolt hole)
+            // Bolt center point marker (constant pencil-scale dot, never increases with zoom)
             Circle()
                 .fill(isSelected ? Color.yellow : (isHovered ? Color.white : Color.white.opacity(0.85)))
-                .frame(width: max(3.0, 4.0 / zoomScale), height: max(3.0, 4.0 / zoomScale))
-
-            // Hold number badge
-            Text("\(holdID)")
-                .font(.caption2.monospacedDigit().weight(isHovered || isSelected ? .bold : .regular))
-                .padding(.horizontal, 3)
-                .padding(.vertical, 1)
-                .background(Color.black.opacity(isHovered || isSelected ? 0.9 : 0.65))
-                .foregroundStyle(.white)
-                .clipShape(RoundedRectangle(cornerRadius: 3))
-                .offset(y: -(max(heightPt, widthPt) / 2 + 12 / zoomScale))
+                .frame(width: 3.0 / zoomScale, height: 3.0 / zoomScale)
         }
-        .shadow(color: isSelected ? Color.cyan.opacity(0.9) : (isHovered ? Color.cyan.opacity(0.6) : .clear), radius: 4)
+        .shadow(color: isSelected ? Color.cyan.opacity(0.5) : (isHovered ? Color.cyan.opacity(0.3) : .clear), radius: 2.0 / zoomScale)
     }
 }

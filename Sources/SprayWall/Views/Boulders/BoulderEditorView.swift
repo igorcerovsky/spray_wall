@@ -269,8 +269,8 @@ struct BoulderEditorView: View {
                             widthPt: holdWidthWall,
                             heightPt: holdHeightWall,
                             rotationDeg: hold.rotationDeg,
+                            zoomScale: zoomScale,
                             isDimmed: role == nil,
-                            showHoldID: canEditDraft,
                             isHovered: isHovered
                         )
                         .position(markerPos)
@@ -283,7 +283,7 @@ struct BoulderEditorView: View {
                 .allowsHitTesting(false) // Let the outer viewport handle all mouse interaction using the transformation matrix
 
                 // Floating Loupe Preview
-                if let hoveredHold {
+                if loupeConfig.isEnabled, let hoveredHold {
                     let loupePosition = computeLoupePosition(
                         mousePoint: currentMouseLocation,
                         fallbackHold: hoveredHold,
@@ -471,14 +471,6 @@ struct BoulderEditorView: View {
     ) {
         currentMouseLocation = viewportPoint
 
-        guard loupeConfig.isEnabled else {
-            if hoveredHold != nil {
-                hoveredHold = nil
-                hoveredCropCGImage = nil
-            }
-            return
-        }
-
         let hitRadius: CGFloat = 28.0
         if let match = zoomTransform.closestHold(near: viewportPoint, in: holdsForWallPreview, maxScreenDistance: hitRadius) {
             let hold = match.hold
@@ -486,7 +478,9 @@ struct BoulderEditorView: View {
                 withAnimation(.easeOut(duration: 0.12)) {
                     hoveredHold = hold
                 }
-                updateCrop(for: hold)
+                if loupeConfig.isEnabled {
+                    updateCrop(for: hold)
+                }
             }
         } else {
             if hoveredHold != nil {
@@ -885,73 +879,63 @@ private struct BoulderWallHoldMarker: View {
     var widthPt: CGFloat = 16
     var heightPt: CGFloat = 16
     var rotationDeg: Double = 0
+    var zoomScale: CGFloat = 1.0
     let isDimmed: Bool
-    let showHoldID: Bool
     var isHovered: Bool = false
 
     var body: some View {
         let displayWidth = isHovered ? max(widthPt * 1.12, widthPt + 3) : widthPt
         let displayHeight = isHovered ? max(heightPt * 1.12, heightPt + 3) : heightPt
 
-        ZStack(alignment: .top) {
-            markerView(width: displayWidth, height: displayHeight)
-                .frame(width: displayWidth, height: displayHeight)
-                .rotationEffect(.degrees(-rotationDeg))
-                .animation(.spring(response: 0.25, dampingFraction: 0.7), value: isHovered)
-
-            if showHoldID {
-                Text("\(holdID)")
-                    .font(.caption2.monospacedDigit())
-                    .padding(.horizontal, 3)
-                    .padding(.vertical, 1)
-                    .background(Color.black.opacity(isHovered ? 0.9 : 0.65))
-                    .foregroundStyle(.white)
-                    .clipShape(RoundedRectangle(cornerRadius: 3))
-                    .offset(y: -(max(heightPt, widthPt) / 2 + 12))
-            }
-        }
-        .opacity(isDimmed && !isHovered ? 0.40 : 1.0)
-        .shadow(color: isHovered ? markerColor.opacity(0.85) : .clear, radius: 4)
+        markerView(width: displayWidth, height: displayHeight)
+            .frame(width: displayWidth, height: displayHeight)
+            .rotationEffect(.degrees(-rotationDeg))
+            .animation(.spring(response: 0.25, dampingFraction: 0.7), value: isHovered)
+            .opacity(isDimmed && !isHovered ? 0.40 : 1.0)
+            .shadow(color: isHovered ? Color.cyan.opacity(0.85) : .clear, radius: 2.0 / zoomScale)
     }
 
     @ViewBuilder
     private func markerView(width: CGFloat, height: CGFloat) -> some View {
         let cornerRadius = max(3.0, min(width, height) * 0.15)
+        let pencilWidth: CGFloat = (isHovered ? 1.7 : 1.2) / zoomScale
+        let outlineColor: Color = role != nil ? roleColor : (isHovered ? .cyan : .white.opacity(0.55))
+
         switch role {
         case .start:
             RoundedRectangle(cornerRadius: cornerRadius)
-                .fill(markerColor.opacity(0.22))
+                .fill(roleColor.opacity(0.25))
                 .overlay {
-                    RoundedRectangle(cornerRadius: cornerRadius).stroke(markerColor, lineWidth: isHovered ? 2.5 : 2)
+                    RoundedRectangle(cornerRadius: cornerRadius).stroke(outlineColor, lineWidth: pencilWidth)
                 }
         case .hold:
             Ellipse()
-                .fill(markerColor.opacity(0.22))
+                .fill(roleColor.opacity(0.25))
                 .overlay {
-                    Ellipse().stroke(markerColor, lineWidth: isHovered ? 2.5 : 2)
+                    Ellipse().stroke(outlineColor, lineWidth: pencilWidth)
                 }
         case .foothold:
             Diamond()
-                .fill(markerColor.opacity(0.22))
+                .fill(roleColor.opacity(0.25))
                 .overlay {
-                    Diamond().stroke(markerColor, lineWidth: isHovered ? 2.5 : 2)
+                    Diamond().stroke(outlineColor, lineWidth: pencilWidth)
                 }
         case .top:
             RoundedRectangle(cornerRadius: cornerRadius)
-                .fill(markerColor.opacity(0.22))
+                .fill(roleColor.opacity(0.25))
                 .overlay {
-                    RoundedRectangle(cornerRadius: cornerRadius).stroke(markerColor, lineWidth: isHovered ? 2.5 : 2)
+                    RoundedRectangle(cornerRadius: cornerRadius).stroke(outlineColor, lineWidth: pencilWidth)
                 }
         case .none:
             Ellipse()
-                .fill(markerColor.opacity(0.12))
+                .fill(isHovered ? Color.cyan.opacity(0.12) : Color.white.opacity(0.08))
                 .overlay {
-                    Ellipse().stroke(markerColor.opacity(0.4), lineWidth: 1)
+                    Ellipse().stroke(outlineColor, lineWidth: (isHovered ? 1.4 : 0.9) / zoomScale)
                 }
         }
     }
 
-    private var markerColor: Color {
+    private var roleColor: Color {
         switch role {
         case .start:
             return .green

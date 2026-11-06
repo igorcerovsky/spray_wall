@@ -7,355 +7,356 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		022C595B39A7F995752CEEE5 /* RootView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2DB25254A1DD327023A53B13 /* RootView.swift */; };
-		028583A56EBBC0F3C5CE598C /* AppTabView.swift in Sources */ = {isa = PBXBuildFile; fileRef = D11A7DF89B93928D30A4ABC8 /* AppTabView.swift */; };
-		029F143A4BE118D78391ED89 /* SettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 049B015DABBC733A5A9AD78C /* SettingsView.swift */; };
-		0389CC89F0FECCCD156D9E39 /* HoldMarkerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2115163C5A3B599064D2BC17 /* HoldMarkerView.swift */; };
-		04E59B86CB1C3C17A81DAAE9 /* AttemptLoggerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 76A5B2A33738F111297B0B71 /* AttemptLoggerView.swift */; };
-		0A9A6027AC3419B89E64FEEC /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 722D531ADA7FD2F595331849 /* Assets.xcassets */; };
-		0B46094EB31A118F864EF6DA /* HoldEditorView.swift in Sources */ = {isa = PBXBuildFile; fileRef = CA5CC1E9A3543FF2B5775A00 /* HoldEditorView.swift */; };
-		0BC5EB954F7CB2687ACA1837 /* HoldBackwardTransformService.swift in Sources */ = {isa = PBXBuildFile; fileRef = EA9E90A47CCFF0DB646C555D /* HoldBackwardTransformService.swift */; };
-		0BF1E1BFF309118812CE51BB /* Boulder.swift in Sources */ = {isa = PBXBuildFile; fileRef = 107AAD6A20D3C5204865AC46 /* Boulder.swift */; };
-		0CE5333A07D19DE26C94D651 /* RouteDetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 677AE15D5A45B223F0623C62 /* RouteDetailView.swift */; };
-		12303A63D267AAAA081DAE15 /* WallZoomTransform.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6892861A331D0DFD2C9E74A0 /* WallZoomTransform.swift */; };
-		13204A3400225EEA02306D13 /* ProjectArchiveService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 475D83A6CDDBA19C21332232 /* ProjectArchiveService.swift */; };
-		13772FC2ABBE10121F630465 /* WallProjectPaths.swift in Sources */ = {isa = PBXBuildFile; fileRef = B6CC08F3002B08E2484DAB8D /* WallProjectPaths.swift */; };
-		150774AB07692DEF9A9CB0D8 /* WallZoomTransformTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7A781DC49B365CA524E2C4DB /* WallZoomTransformTests.swift */; };
-		178271BAC7F53D1DEDD267AA /* InteractiveCalibrationEditor.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5F76821E6C9430DD5E71D492 /* InteractiveCalibrationEditor.swift */; };
-		1B98BB4FE824D0E17912657C /* SprayWallApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = BFA9538E570D4FEA728CE0D5 /* SprayWallApp.swift */; };
-		1C129488110FC79AE36B82D0 /* CalibrationZoomTransformTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 512D6BD934EF65A759C004FE /* CalibrationZoomTransformTests.swift */; };
-		1CBCA1A3CFD24EEB387AEDF2 /* BoulderMigrationService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 360AED1F91AB06A94F6BB04A /* BoulderMigrationService.swift */; };
-		21AA0CAB3001B0CE562CAD5A /* CalibrationView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5288B1DAD58A0EAE296960C3 /* CalibrationView.swift */; };
-		2273AB79014897B181640235 /* CSVIntCodecTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = ABF57F4C9DF766E6E7B8A620 /* CSVIntCodecTests.swift */; };
-		255F5F720358D9CB1B69D3E9 /* IDService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4F7F3A5D9B1AC264B33B626D /* IDService.swift */; };
-		350F9ADA24EE61B3F33023E0 /* DomainEnums.swift in Sources */ = {isa = PBXBuildFile; fileRef = E927C0CBDBBC55A754F896ED /* DomainEnums.swift */; };
-		36057DD8E2CA8B40FB9093FB /* 281026_dd.jpeg in Resources */ = {isa = PBXBuildFile; fileRef = C0E163C81E96A0301A3B9A2C /* 281026_dd.jpeg */; };
-		39465B685B355ABBA4C3B587 /* HoldLoupeConfig.swift in Sources */ = {isa = PBXBuildFile; fileRef = A2CCF1CEB936E64E26C722C5 /* HoldLoupeConfig.swift */; };
-		3F9EE3CD92EA8DD0447D439C /* ImageRectificationService.swift in Sources */ = {isa = PBXBuildFile; fileRef = DF844D613449401B94DDC091 /* ImageRectificationService.swift */; };
-		413D03E1D76A416ED34F57CF /* WallCalibration.swift in Sources */ = {isa = PBXBuildFile; fileRef = 93195F32D705119F50AF3A36 /* WallCalibration.swift */; };
-		42417D7D0C12A78D4730129A /* BoulderEditorView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7CF61912D62B518B260FD3C1 /* BoulderEditorView.swift */; };
-		46369DF67C1884EAC01AD00B /* HoldLoupeConfig.swift in Sources */ = {isa = PBXBuildFile; fileRef = A2CCF1CEB936E64E26C722C5 /* HoldLoupeConfig.swift */; };
-		4671973B9613D6C10294B475 /* WallSpec.swift in Sources */ = {isa = PBXBuildFile; fileRef = 21814B0F6702F56A74F62737 /* WallSpec.swift */; };
-		46A02B48C828F447571E8082 /* SprayWallApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = BFA9538E570D4FEA728CE0D5 /* SprayWallApp.swift */; };
-		46B197D082557CD464445250 /* CalibrationPoint.swift in Sources */ = {isa = PBXBuildFile; fileRef = BF77052A7C34ACA288FDCBB8 /* CalibrationPoint.swift */; };
-		48D61321530F52A1FD2A4E05 /* Hold.swift in Sources */ = {isa = PBXBuildFile; fileRef = 44C3B701C9232B3E1BDFED34 /* Hold.swift */; };
-		49FA1312790348D5DB45F760 /* DiamondShape.swift in Sources */ = {isa = PBXBuildFile; fileRef = 294A2E79D958AED4DF501D21 /* DiamondShape.swift */; };
-		4C1C80C89FC00FC2F6BC5D45 /* HoldBackwardTransformServiceTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 86EA771B982ADC767121C720 /* HoldBackwardTransformServiceTests.swift */; };
-		5A9CBDECBAF4B90E21F896FD /* HoldMigrationService.swift in Sources */ = {isa = PBXBuildFile; fileRef = D55D23B65AB19111E1C043CE /* HoldMigrationService.swift */; };
-		5BA3773925BE4A855B3D53AB /* HoldMarkerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2115163C5A3B599064D2BC17 /* HoldMarkerView.swift */; };
-		5CD6BC51CE4C8B14C9DE43E5 /* BoulderListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = ADC9ADDB040E638B525E236E /* BoulderListView.swift */; };
-		5D97BA66AC3A7699911EA38E /* DomainEnums.swift in Sources */ = {isa = PBXBuildFile; fileRef = E927C0CBDBBC55A754F896ED /* DomainEnums.swift */; };
-		5DE8472D292186819DA4D5BE /* HoldDetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9170F53310B0A2B455B78C89 /* HoldDetailView.swift */; };
-		5EF2D1BD681C705B6E6988F4 /* KeychainService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7D8C18DCF76B077C1D3ECA19 /* KeychainService.swift */; };
-		5FAE6C1F4DE0D4B7EBFA2D7C /* HoldBackwardTransformService.swift in Sources */ = {isa = PBXBuildFile; fileRef = EA9E90A47CCFF0DB646C555D /* HoldBackwardTransformService.swift */; };
-		604515358B251221F9837DC3 /* RootView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2DB25254A1DD327023A53B13 /* RootView.swift */; };
-		622FB9A48B3D82C948801F23 /* AuthView.swift in Sources */ = {isa = PBXBuildFile; fileRef = CC02E31E14687B000A0B0C79 /* AuthView.swift */; };
-		6588CF309B3B4253C039305B /* AuthView.swift in Sources */ = {isa = PBXBuildFile; fileRef = CC02E31E14687B000A0B0C79 /* AuthView.swift */; };
-		67E418E4A4746B38EE1DBE0C /* HoldMigrationService.swift in Sources */ = {isa = PBXBuildFile; fileRef = D55D23B65AB19111E1C043CE /* HoldMigrationService.swift */; };
-		6AED40BF9F5E872A0558D1E1 /* ProjectArchiveService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 475D83A6CDDBA19C21332232 /* ProjectArchiveService.swift */; };
-		6B2A7D92FBDE12F4B602BE5C /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 09BF382DA98446E356F774A9 /* Foundation.framework */; };
-		6F11FCD639A7A18596D3FD10 /* HoldEllipseGeometryTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = D4680FF1022C63D57B229C48 /* HoldEllipseGeometryTests.swift */; };
-		6F2E5277E42843D895B406F7 /* ScrollWheelZoomModifier.swift in Sources */ = {isa = PBXBuildFile; fileRef = DCF7CBA61AF239DC2A5228E8 /* ScrollWheelZoomModifier.swift */; };
-		6F5D62BF484C81B138EB5B52 /* 281026_dd.jpeg in Resources */ = {isa = PBXBuildFile; fileRef = C0E163C81E96A0301A3B9A2C /* 281026_dd.jpeg */; };
-		70F3E53C951DB834ABA28519 /* BoulderListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = ADC9ADDB040E638B525E236E /* BoulderListView.swift */; };
-		7C1B2E45CF5149A58C3ED3D7 /* Route.swift in Sources */ = {isa = PBXBuildFile; fileRef = C8CFB49D6A1BEF8F9CB40563 /* Route.swift */; };
-		7CF2C9945D9266835A44051F /* LegacyStoreMigrationService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4E0BF204609E9AFA1A746176 /* LegacyStoreMigrationService.swift */; };
-		80DC0243E8B462464543105D /* CSVIntCodec.swift in Sources */ = {isa = PBXBuildFile; fileRef = F3B30B2F88C1E7C2D86EF9C6 /* CSVIntCodec.swift */; };
-		83F00E3FEF09C6DF6785029E /* AuthService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 892B007B4A0D19B4BE6DA235 /* AuthService.swift */; };
-		83F5F288D6ED554BCC299E2F /* WallCalibration.swift in Sources */ = {isa = PBXBuildFile; fileRef = 93195F32D705119F50AF3A36 /* WallCalibration.swift */; };
-		84EC35D1D1DB76FCFCB2206B /* CalibrationPoint.swift in Sources */ = {isa = PBXBuildFile; fileRef = BF77052A7C34ACA288FDCBB8 /* CalibrationPoint.swift */; };
-		8D8F82304922067C44C2F630 /* WallProjectPathsTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8B325D947F132071D10314A9 /* WallProjectPathsTests.swift */; };
-		8DC235FD2A118ABB54F58235 /* CalibrationZoomTransform.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3442096554EF22BD2C71E321 /* CalibrationZoomTransform.swift */; };
-		8E89D76158566C139A53A881 /* SettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 049B015DABBC733A5A9AD78C /* SettingsView.swift */; };
-		91E0CE448FAFFC0C66A48AF0 /* WallSpec.swift in Sources */ = {isa = PBXBuildFile; fileRef = 21814B0F6702F56A74F62737 /* WallSpec.swift */; };
-		960DB51C5FC3014BF80EA119 /* KeychainService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7D8C18DCF76B077C1D3ECA19 /* KeychainService.swift */; };
-		9E5A6A6D28968CD8CA510468 /* LegacyStoreMigrationService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4E0BF204609E9AFA1A746176 /* LegacyStoreMigrationService.swift */; };
-		A11A0EB0BD871AB48585B19E /* AttemptLoggerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 76A5B2A33738F111297B0B71 /* AttemptLoggerView.swift */; };
-		A54ACCE5C9E784D878EBBFFB /* UserAccount.swift in Sources */ = {isa = PBXBuildFile; fileRef = 073D9092EECE25223FE7F06F /* UserAccount.swift */; };
-		A694E9A4D8CBE9E26BE454F1 /* WallZoomControlsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DA17C769F9792AE96CBECD4D /* WallZoomControlsView.swift */; };
-		A9BD5434F0FA418EBB933DC9 /* AppTabView.swift in Sources */ = {isa = PBXBuildFile; fileRef = D11A7DF89B93928D30A4ABC8 /* AppTabView.swift */; };
-		B4E34489FE775D6B64D46E83 /* Cocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = E96ED5FD6B820F1CEF303022 /* Cocoa.framework */; };
-		B5DB73BAA8558112FD61E495 /* RouteDetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 677AE15D5A45B223F0623C62 /* RouteDetailView.swift */; };
-		B90D167A60212B6D77044EB5 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 09BF382DA98446E356F774A9 /* Foundation.framework */; };
-		BB942D5E8D3C587D13418129 /* OriginalPhotoLoader.swift in Sources */ = {isa = PBXBuildFile; fileRef = 08354F9D567DA25F7E504129 /* OriginalPhotoLoader.swift */; };
-		BD978608F37214C166DF5025 /* AdminPermissionsTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 74A5B575E956A6B9BCADA4E6 /* AdminPermissionsTests.swift */; };
-		BDE2889FB3DB468A13972B10 /* CSVIntCodec.swift in Sources */ = {isa = PBXBuildFile; fileRef = F3B30B2F88C1E7C2D86EF9C6 /* CSVIntCodec.swift */; };
-		BF00A3947402EC9898F991E3 /* Hold.swift in Sources */ = {isa = PBXBuildFile; fileRef = 44C3B701C9232B3E1BDFED34 /* Hold.swift */; };
-		C0DE76434A2F4827CC0024B8 /* Attempt.swift in Sources */ = {isa = PBXBuildFile; fileRef = 464C2565441EBD54E903FB9C /* Attempt.swift */; };
-		C49EAC9C79B58D99A1F0916E /* InteractiveCalibrationEditor.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5F76821E6C9430DD5E71D492 /* InteractiveCalibrationEditor.swift */; };
-		C5DEDF7377CB5F337DDC87A3 /* WallBackgroundView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1913DAA2E95A4278AF46A1A4 /* WallBackgroundView.swift */; };
-		C744AF112E896B725A67DB7F /* RouteEditorView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37B43A2EC2077B697F2DE94F /* RouteEditorView.swift */; };
-		C81CE037C872582BDC99CDFE /* Boulder.swift in Sources */ = {isa = PBXBuildFile; fileRef = 107AAD6A20D3C5204865AC46 /* Boulder.swift */; };
-		CCF7EBAEF6C5B0F4401D29F3 /* HoldLoupeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 294398FB7EB4CDE213D0DB33 /* HoldLoupeView.swift */; };
-		CFF0D2382917547BB6D4E823 /* HoldEditorView.swift in Sources */ = {isa = PBXBuildFile; fileRef = CA5CC1E9A3543FF2B5775A00 /* HoldEditorView.swift */; };
-		D22B856F00CA8059D12944CF /* WallZoomTransform.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6892861A331D0DFD2C9E74A0 /* WallZoomTransform.swift */; };
-		D6269E427C560924E40C589E /* BoulderEditorView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7CF61912D62B518B260FD3C1 /* BoulderEditorView.swift */; };
-		D640C95439B00C019D397462 /* UserAccount.swift in Sources */ = {isa = PBXBuildFile; fileRef = 073D9092EECE25223FE7F06F /* UserAccount.swift */; };
-		D6639D212ED329A87197D2E3 /* WallBackgroundView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1913DAA2E95A4278AF46A1A4 /* WallBackgroundView.swift */; };
-		D6CF5778165A807978FF2C31 /* RouteEditorView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37B43A2EC2077B697F2DE94F /* RouteEditorView.swift */; };
-		D8082BE91672B875494F5BAC /* AppModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4E202494D54B15AD439CA134 /* AppModel.swift */; };
-		DD115C833B43BC50FA4BE829 /* Attempt.swift in Sources */ = {isa = PBXBuildFile; fileRef = 464C2565441EBD54E903FB9C /* Attempt.swift */; };
-		E021E48B6993DFFCD7B0B0BF /* Route.swift in Sources */ = {isa = PBXBuildFile; fileRef = C8CFB49D6A1BEF8F9CB40563 /* Route.swift */; };
-		E1C3557B157E5D0787B4385B /* ImageRectificationService.swift in Sources */ = {isa = PBXBuildFile; fileRef = DF844D613449401B94DDC091 /* ImageRectificationService.swift */; };
-		E6C833B36A2FB6757E791544 /* OriginalPhotoLoader.swift in Sources */ = {isa = PBXBuildFile; fileRef = 08354F9D567DA25F7E504129 /* OriginalPhotoLoader.swift */; };
-		E762D22F17B6368E27680528 /* HoldDetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9170F53310B0A2B455B78C89 /* HoldDetailView.swift */; };
-		E7E6F51FF7FFC70715D83F29 /* IDService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4F7F3A5D9B1AC264B33B626D /* IDService.swift */; };
-		E88B87AAF832CFF281FEAB86 /* AppModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4E202494D54B15AD439CA134 /* AppModel.swift */; };
-		EBD3ADBC9B318D5AC6B45E24 /* CalibrationView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5288B1DAD58A0EAE296960C3 /* CalibrationView.swift */; };
-		EFB20D506F5C67BD0D6D79EE /* AuthService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 892B007B4A0D19B4BE6DA235 /* AuthService.swift */; };
-		F00F098099A419360FD76239 /* ImageRectificationServiceTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = FEF16791EEEA29E8FC7AC7DD /* ImageRectificationServiceTests.swift */; };
-		F2FE08AB1DD120520EFF095C /* DiamondShape.swift in Sources */ = {isa = PBXBuildFile; fileRef = 294A2E79D958AED4DF501D21 /* DiamondShape.swift */; };
-		F3F727A057FD530E03C81268 /* ScrollWheelZoomModifier.swift in Sources */ = {isa = PBXBuildFile; fileRef = DCF7CBA61AF239DC2A5228E8 /* ScrollWheelZoomModifier.swift */; };
-		F5F3B109FE0C316160794296 /* WallZoomControlsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DA17C769F9792AE96CBECD4D /* WallZoomControlsView.swift */; };
-		F72533D9FD9DEB229AC1E909 /* WallProjectPaths.swift in Sources */ = {isa = PBXBuildFile; fileRef = B6CC08F3002B08E2484DAB8D /* WallProjectPaths.swift */; };
-		F77D32E73F99E96CFB79F558 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 722D531ADA7FD2F595331849 /* Assets.xcassets */; };
-		F839C344FB0230CEC6A27916 /* BoulderMigrationService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 360AED1F91AB06A94F6BB04A /* BoulderMigrationService.swift */; };
-		FDA8E25990923668A1EB5B08 /* HoldLoupeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 294398FB7EB4CDE213D0DB33 /* HoldLoupeView.swift */; };
-		FFB168A68DCEF449F5AF183D /* CalibrationZoomTransform.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3442096554EF22BD2C71E321 /* CalibrationZoomTransform.swift */; };
+		0154BB73B36BF95F22AE90E3 /* SprayWallApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = F6572D2D5C6850806A161608 /* SprayWallApp.swift */; };
+		015A2B4007A460A41A44B78C /* RouteEditorView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6DA761588CD4755616503C33 /* RouteEditorView.swift */; };
+		03D91F4C897EAF59E5AB13B7 /* Boulder.swift in Sources */ = {isa = PBXBuildFile; fileRef = DAD372D54605BD4A9523CED4 /* Boulder.swift */; };
+		05DEFD602B165F651A9B5CBE /* CSVIntCodecTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6FF224600ADEF4C6CA55507B /* CSVIntCodecTests.swift */; };
+		0626476B160007A51EB7DDF7 /* HoldEditorView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F228A98EA88DE96F59705891 /* HoldEditorView.swift */; };
+		068333FF4F2832B94237B793 /* WallProjectPaths.swift in Sources */ = {isa = PBXBuildFile; fileRef = 79470D6F71F4CBCE676BFFDA /* WallProjectPaths.swift */; };
+		0AB647FB5CFBF7E100B12DB8 /* HoldLoupeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2EC50AEA6AADE210F914A5E8 /* HoldLoupeView.swift */; };
+		0BF6DB46754AE4074284DC70 /* HoldBackwardTransformServiceTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6168E7643D07931B5B76C103 /* HoldBackwardTransformServiceTests.swift */; };
+		0DAED5FDE4B2B9E034A9E5E7 /* AuthService.swift in Sources */ = {isa = PBXBuildFile; fileRef = E68F704B58E6EBFC12F19436 /* AuthService.swift */; };
+		1015E1B9747C31CCD2B1C56D /* WallCalibration.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0BAFD409AC680A33EDEBBD8C /* WallCalibration.swift */; };
+		17DFE699F16CF976DF65D1DF /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = D28FA04CC3E248100F56EB2F /* Assets.xcassets */; };
+		1853216D81993ADD4A92DC01 /* BoulderEditorView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F96D07A04F387963280A433B /* BoulderEditorView.swift */; };
+		185FEFD710274C82B10976C7 /* HoldMarkerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9BE89D01CF97A236AB5FD354 /* HoldMarkerView.swift */; };
+		19FAFFECC5585A01F7F5D209 /* WallZoomControlsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 573E5B3A2B275A447E82C444 /* WallZoomControlsView.swift */; };
+		1C91DF7DEE8F0DD9AFB57BC4 /* WallProjectPathsTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3FE29C9171EEF06B9070975B /* WallProjectPathsTests.swift */; };
+		1DD0F496D8BE6ACE8893CD04 /* WallProjectPaths.swift in Sources */ = {isa = PBXBuildFile; fileRef = 79470D6F71F4CBCE676BFFDA /* WallProjectPaths.swift */; };
+		1F5703AEA4BB7CB245C80FDC /* RouteDetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DB87042297189398EAE10E06 /* RouteDetailView.swift */; };
+		2458211EC84826E1120B4FB7 /* RouteEditorView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6DA761588CD4755616503C33 /* RouteEditorView.swift */; };
+		277502B1C950003F140A2793 /* AttemptLoggerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 13CEA0E7E8A83A81C1FE0FB1 /* AttemptLoggerView.swift */; };
+		28A0F9C06CAEE0FCCCE90663 /* WallSpec.swift in Sources */ = {isa = PBXBuildFile; fileRef = 12977A188E025F74447099CB /* WallSpec.swift */; };
+		2EF8740BF2A51615977DA88C /* AppTabView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5228017F87C49D642D1CE6E8 /* AppTabView.swift */; };
+		35C289EF35108539FCBA2E5C /* AttemptLoggerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 13CEA0E7E8A83A81C1FE0FB1 /* AttemptLoggerView.swift */; };
+		3D0C87C6D742E3AB7D80A213 /* HoldDetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5D0AA4EEBEC902219F51A9B6 /* HoldDetailView.swift */; };
+		4120D6190F1BE35328170203 /* Boulder.swift in Sources */ = {isa = PBXBuildFile; fileRef = DAD372D54605BD4A9523CED4 /* Boulder.swift */; };
+		424C41A4B80B538A48CDDFAE /* RootView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5ED2C8C11CE2FB96524516AD /* RootView.swift */; };
+		468E9FB7D24F6C5F2869BC71 /* WallCalibration.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0BAFD409AC680A33EDEBBD8C /* WallCalibration.swift */; };
+		4716BC7BF711804E6934513F /* Attempt.swift in Sources */ = {isa = PBXBuildFile; fileRef = 43454DE10338DA20CF522A18 /* Attempt.swift */; };
+		480A0F349AD4011D2DD648E9 /* DomainEnums.swift in Sources */ = {isa = PBXBuildFile; fileRef = 010AC90E0B98EC5AADBF967A /* DomainEnums.swift */; };
+		4910BC1FE8FB82482F58F207 /* DomainEnums.swift in Sources */ = {isa = PBXBuildFile; fileRef = 010AC90E0B98EC5AADBF967A /* DomainEnums.swift */; };
+		4B6C0D205C33BBF278D3F7DB /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = D28FA04CC3E248100F56EB2F /* Assets.xcassets */; };
+		4E0541F26759EE9B6A10A227 /* LegacyStoreMigrationService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 261CFA6C4A791F3092C9270B /* LegacyStoreMigrationService.swift */; };
+		4E3A2999F3AA931F353DEB24 /* OriginalPhotoLoader.swift in Sources */ = {isa = PBXBuildFile; fileRef = 78FB05A2224EC09990E236BB /* OriginalPhotoLoader.swift */; };
+		5024B7C891D9DABF7E45A95B /* ScrollWheelZoomModifier.swift in Sources */ = {isa = PBXBuildFile; fileRef = BE40961AFABCDDBB1FC319DD /* ScrollWheelZoomModifier.swift */; };
+		5623656797D28F690F9DF773 /* AuthView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B59054F589B0056684E8701C /* AuthView.swift */; };
+		5A6EC9AD515695466530CF42 /* CalibrationZoomTransform.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8DA3DCF51CB06A8DE7DEF8F9 /* CalibrationZoomTransform.swift */; };
+		5E79BAA0943E4F6CE1943FA5 /* HoldMigrationService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9B0F68A6DFF001A99AEA3B8E /* HoldMigrationService.swift */; };
+		615C1E4CB2B1954EE3C88526 /* CalibrationZoomTransform.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8DA3DCF51CB06A8DE7DEF8F9 /* CalibrationZoomTransform.swift */; };
+		648AE7799E04C6EEF0D75B9B /* Hold.swift in Sources */ = {isa = PBXBuildFile; fileRef = 28696A5D4932AF6E3B4993F8 /* Hold.swift */; };
+		667229A7E33B2C5029477FD0 /* InteractiveCalibrationEditor.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4C944A5BC508E5B0A6FF08CF /* InteractiveCalibrationEditor.swift */; };
+		67677F1CB7172231C90AA0C1 /* ScrollWheelZoomModifier.swift in Sources */ = {isa = PBXBuildFile; fileRef = BE40961AFABCDDBB1FC319DD /* ScrollWheelZoomModifier.swift */; };
+		67DF88AFF131162F471E8BE3 /* WallBackgroundView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1D612F2033D2BE496B4A454E /* WallBackgroundView.swift */; };
+		67FF910B54B9900FB4AEBF0E /* ImageRectificationService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8489EEE8AE01CB2A7E62E998 /* ImageRectificationService.swift */; };
+		6C6DD443E10DB533B8DE6F4C /* WallBackgroundView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1D612F2033D2BE496B4A454E /* WallBackgroundView.swift */; };
+		6CD4177ED97BADC3E88ECE4D /* CSVIntCodec.swift in Sources */ = {isa = PBXBuildFile; fileRef = 53C4060AC102BE3D36A5E29C /* CSVIntCodec.swift */; };
+		6D88B98D684DD8C8DBF18E48 /* UserAccount.swift in Sources */ = {isa = PBXBuildFile; fileRef = 17CC13347CEA48BB9898D277 /* UserAccount.swift */; };
+		720FFA4E4ED40AF5E0EB64D4 /* LegacyStoreMigrationService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 261CFA6C4A791F3092C9270B /* LegacyStoreMigrationService.swift */; };
+		74F8CF7089DEA4736F0AFAB0 /* DiamondShape.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6746DC9F6E0E25BBEBB5AF46 /* DiamondShape.swift */; };
+		7520E4332C8161AFA312E966 /* HoldLoupeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2EC50AEA6AADE210F914A5E8 /* HoldLoupeView.swift */; };
+		79E0ACB51EBEDF214D3A09EB /* SprayWallApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = F6572D2D5C6850806A161608 /* SprayWallApp.swift */; };
+		7EF309CBE9F2692E42FDA349 /* ProjectArchiveService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 61922E1D0773262BF21F77BF /* ProjectArchiveService.swift */; };
+		80F06C323543AD74593BC97F /* WallZoomTransform.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9041BDE21BE4A75D473C6904 /* WallZoomTransform.swift */; };
+		82414D9DF0C89C0C24122193 /* InteractiveCalibrationEditor.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4C944A5BC508E5B0A6FF08CF /* InteractiveCalibrationEditor.swift */; };
+		847BD787E01CEF3823BAD5B4 /* AppModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 016E2B8F6EAC530AAE27B658 /* AppModel.swift */; };
+		8838197024732F5061D956BF /* Cocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 959D3D83AA756AEF91A9111F /* Cocoa.framework */; };
+		8C211D73EA1B1300E3C1CA77 /* UserAccount.swift in Sources */ = {isa = PBXBuildFile; fileRef = 17CC13347CEA48BB9898D277 /* UserAccount.swift */; };
+		8DBF2BD684A2BA13DD8E2189 /* Route.swift in Sources */ = {isa = PBXBuildFile; fileRef = ACE33C29BBF33FB593351345 /* Route.swift */; };
+		8E1994AD96191F8116A85B4F /* HoldEditorView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F228A98EA88DE96F59705891 /* HoldEditorView.swift */; };
+		8F348107740686CE8AFBFDB0 /* WallZoomControlsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 573E5B3A2B275A447E82C444 /* WallZoomControlsView.swift */; };
+		9208F4BC00081C7BAEA9F3B1 /* CalibrationZoomTransformTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 36AF653B2994BE2BAC88A8D3 /* CalibrationZoomTransformTests.swift */; };
+		930D20B113CD81707B962DE7 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 01D78243DB6484DE3885B6F0 /* Foundation.framework */; };
+		942DC5238F316BD1BA5BCDE7 /* CalibrationView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E071A1F131708FF0AA3AC10B /* CalibrationView.swift */; };
+		948C31A5141C06C3C80D45EF /* OriginalPhotoLoader.swift in Sources */ = {isa = PBXBuildFile; fileRef = 78FB05A2224EC09990E236BB /* OriginalPhotoLoader.swift */; };
+		94A41947080D8591C4B0380D /* Hold.swift in Sources */ = {isa = PBXBuildFile; fileRef = 28696A5D4932AF6E3B4993F8 /* Hold.swift */; };
+		9716133C9374D0E322372846 /* DiamondShape.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6746DC9F6E0E25BBEBB5AF46 /* DiamondShape.swift */; };
+		98FF18A7074B9F8CFE764A73 /* HoldLoupeConfig.swift in Sources */ = {isa = PBXBuildFile; fileRef = A2BFA67C48938D32638F5813 /* HoldLoupeConfig.swift */; };
+		9C6D9777B8775A4213C7633A /* BoulderMigrationService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 241DA7D4B854CA3D2B938093 /* BoulderMigrationService.swift */; };
+		A2F6D5ED3807559397DE6229 /* ProjectArchiveService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 61922E1D0773262BF21F77BF /* ProjectArchiveService.swift */; };
+		A46A7F0614C883F181A21049 /* HoldDetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5D0AA4EEBEC902219F51A9B6 /* HoldDetailView.swift */; };
+		A73F372B9BFD6D892536E644 /* HoldBackwardTransformService.swift in Sources */ = {isa = PBXBuildFile; fileRef = B7884DC6659700357E0AE186 /* HoldBackwardTransformService.swift */; };
+		A941D51EF7637275A05A984E /* WallZoomTransformTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 53C017DF53AECAC8D267A563 /* WallZoomTransformTests.swift */; };
+		A957200B55817CD197821666 /* WallSpec.swift in Sources */ = {isa = PBXBuildFile; fileRef = 12977A188E025F74447099CB /* WallSpec.swift */; };
+		AA6A31FF9C7639C0E1129D8A /* AdminPermissionsTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 07F6CD35C7E6B4D90C4E022F /* AdminPermissionsTests.swift */; };
+		AF328998DBF9E8EFB460F7BC /* HoldEllipseGeometryTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4CA176191FBE92878346D321 /* HoldEllipseGeometryTests.swift */; };
+		B4487D963467299CBDAC9987 /* AppTabView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5228017F87C49D642D1CE6E8 /* AppTabView.swift */; };
+		B4E4C92E7A174D3937933AB0 /* ImageRectificationService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8489EEE8AE01CB2A7E62E998 /* ImageRectificationService.swift */; };
+		B58C63145E06CEEB0414F23F /* BoulderMigrationService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 241DA7D4B854CA3D2B938093 /* BoulderMigrationService.swift */; };
+		B594B6F04663A01A8FEB44EC /* Route.swift in Sources */ = {isa = PBXBuildFile; fileRef = ACE33C29BBF33FB593351345 /* Route.swift */; };
+		B96CC424C234B9A7067BAF35 /* WallZoomTransform.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9041BDE21BE4A75D473C6904 /* WallZoomTransform.swift */; };
+		BA512CE300C20677FD207502 /* HoldBackwardTransformService.swift in Sources */ = {isa = PBXBuildFile; fileRef = B7884DC6659700357E0AE186 /* HoldBackwardTransformService.swift */; };
+		BC2C09864A1918B99452FA07 /* AuthView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B59054F589B0056684E8701C /* AuthView.swift */; };
+		BD7CCEBDC4E1D54296BCCF4F /* CSVIntCodec.swift in Sources */ = {isa = PBXBuildFile; fileRef = 53C4060AC102BE3D36A5E29C /* CSVIntCodec.swift */; };
+		BF715A25E70C463010E97486 /* HoldMigrationService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9B0F68A6DFF001A99AEA3B8E /* HoldMigrationService.swift */; };
+		BFA275BFBEEEE3F8B60372CB /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 01D78243DB6484DE3885B6F0 /* Foundation.framework */; };
+		C3B4A04B0E79137FD3DAC185 /* RootView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5ED2C8C11CE2FB96524516AD /* RootView.swift */; };
+		C55996D803ABF99A13BE6401 /* IDService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3E896569C0D89A6463A11C7A /* IDService.swift */; };
+		C93D8B183FBB646837EC95F0 /* HoldLoupeConfig.swift in Sources */ = {isa = PBXBuildFile; fileRef = A2BFA67C48938D32638F5813 /* HoldLoupeConfig.swift */; };
+		CCD7AB27B7B296D222A1F36D /* 281026_dd.jpeg in Resources */ = {isa = PBXBuildFile; fileRef = E5564935C2317A4C7792E502 /* 281026_dd.jpeg */; };
+		CD6CE6DD018FFE7134135093 /* IDService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3E896569C0D89A6463A11C7A /* IDService.swift */; };
+		CE51BB7747CFDD2A9E1B878B /* CalibrationView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E071A1F131708FF0AA3AC10B /* CalibrationView.swift */; };
+		D8DD2F65055C27B9E19604A4 /* Attempt.swift in Sources */ = {isa = PBXBuildFile; fileRef = 43454DE10338DA20CF522A18 /* Attempt.swift */; };
+		D95DD3F64EB5C0235845134D /* BoulderListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A055BC34CA2948C2851B0B3B /* BoulderListView.swift */; };
+		DF95B09A684077A723B86296 /* CalibrationPoint.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0DED4B801BCD58B4B2DD09CE /* CalibrationPoint.swift */; };
+		E6448E1CCDAE701C64593376 /* AuthService.swift in Sources */ = {isa = PBXBuildFile; fileRef = E68F704B58E6EBFC12F19436 /* AuthService.swift */; };
+		EBA3F1B0F81F9D6E3F3C7F57 /* CalibrationPoint.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0DED4B801BCD58B4B2DD09CE /* CalibrationPoint.swift */; };
+		EBBA0FF1CC72D4019031C733 /* RouteDetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DB87042297189398EAE10E06 /* RouteDetailView.swift */; };
+		ED5BFF5E5320F8B9B9A2286F /* KeychainService.swift in Sources */ = {isa = PBXBuildFile; fileRef = B47F5AE2813B48134D07AA5F /* KeychainService.swift */; };
+		ED99A55436C210FD6CDB4BF7 /* ImageRectificationServiceTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3C99576D81D0F59CFCCEA715 /* ImageRectificationServiceTests.swift */; };
+		EF44BC6ACE343574C34793FA /* 281026_dd.jpeg in Resources */ = {isa = PBXBuildFile; fileRef = E5564935C2317A4C7792E502 /* 281026_dd.jpeg */; };
+		F014778263E931AB93D5C06E /* BoulderEditorView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F96D07A04F387963280A433B /* BoulderEditorView.swift */; };
+		F1ABE493667B61935BA5FC59 /* HoldMarkerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9BE89D01CF97A236AB5FD354 /* HoldMarkerView.swift */; };
+		F7D7F8D1C3E35668E0237569 /* AppModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 016E2B8F6EAC530AAE27B658 /* AppModel.swift */; };
+		FA133C1A0633621952B56B98 /* KeychainService.swift in Sources */ = {isa = PBXBuildFile; fileRef = B47F5AE2813B48134D07AA5F /* KeychainService.swift */; };
+		FB33CD2185F2EA707D75EA1A /* SettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0DD450D68D919FDB0C838C79 /* SettingsView.swift */; };
+		FE8FFE5A5B54BCCF7CE4D2ED /* BoulderListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A055BC34CA2948C2851B0B3B /* BoulderListView.swift */; };
+		FECD1EB03D864E6AA587D176 /* SettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0DD450D68D919FDB0C838C79 /* SettingsView.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
-		3453EA4197EAEE2623CB0515 /* PBXContainerItemProxy */ = {
+		FE6AF5F0DE82882DA228C90E /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
-			containerPortal = 5A0C0D4C6CBE5F8C2A1FFDF8 /* Project object */;
+			containerPortal = BC87CCBADC754B82BA4267D7 /* Project object */;
 			proxyType = 1;
-			remoteGlobalIDString = 7B0665AEB783CC9EFF2F105E;
+			remoteGlobalIDString = C462839E7F55564C370A604B;
 			remoteInfo = SprayWall;
 		};
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
-		049B015DABBC733A5A9AD78C /* SettingsView.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = SettingsView.swift; path = Sources/SprayWall/Views/Settings/SettingsView.swift; sourceTree = "<group>"; };
-		056B76B8E715105870351537 /* SprayWall-macOS.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "SprayWall-macOS.app"; sourceTree = BUILT_PRODUCTS_DIR; };
-		073D9092EECE25223FE7F06F /* UserAccount.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = UserAccount.swift; path = Sources/SprayWall/Models/UserAccount.swift; sourceTree = "<group>"; };
-		08354F9D567DA25F7E504129 /* OriginalPhotoLoader.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = OriginalPhotoLoader.swift; path = Sources/SprayWall/Services/OriginalPhotoLoader.swift; sourceTree = "<group>"; };
-		09BF382DA98446E356F774A9 /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS18.0.sdk/System/Library/Frameworks/Foundation.framework; sourceTree = DEVELOPER_DIR; };
-		107AAD6A20D3C5204865AC46 /* Boulder.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = Boulder.swift; path = Sources/SprayWall/Models/Boulder.swift; sourceTree = "<group>"; };
-		1913DAA2E95A4278AF46A1A4 /* WallBackgroundView.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = WallBackgroundView.swift; path = Sources/SprayWall/Views/Shared/WallBackgroundView.swift; sourceTree = "<group>"; };
-		2115163C5A3B599064D2BC17 /* HoldMarkerView.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = HoldMarkerView.swift; path = Sources/SprayWall/Views/Shared/HoldMarkerView.swift; sourceTree = "<group>"; };
-		21814B0F6702F56A74F62737 /* WallSpec.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = WallSpec.swift; path = Sources/SprayWall/Utilities/WallSpec.swift; sourceTree = "<group>"; };
-		294398FB7EB4CDE213D0DB33 /* HoldLoupeView.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = HoldLoupeView.swift; path = Sources/SprayWall/Views/Shared/HoldLoupeView.swift; sourceTree = "<group>"; };
-		294A2E79D958AED4DF501D21 /* DiamondShape.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = DiamondShape.swift; path = Sources/SprayWall/Views/Shared/DiamondShape.swift; sourceTree = "<group>"; };
-		2DB25254A1DD327023A53B13 /* RootView.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = RootView.swift; path = Sources/SprayWall/App/RootView.swift; sourceTree = "<group>"; };
-		3442096554EF22BD2C71E321 /* CalibrationZoomTransform.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = CalibrationZoomTransform.swift; path = Sources/SprayWall/Utilities/CalibrationZoomTransform.swift; sourceTree = "<group>"; };
-		360AED1F91AB06A94F6BB04A /* BoulderMigrationService.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = BoulderMigrationService.swift; path = Sources/SprayWall/Services/BoulderMigrationService.swift; sourceTree = "<group>"; };
-		37B43A2EC2077B697F2DE94F /* RouteEditorView.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = RouteEditorView.swift; path = Sources/SprayWall/Views/Routes/RouteEditorView.swift; sourceTree = "<group>"; };
-		44C3B701C9232B3E1BDFED34 /* Hold.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = Hold.swift; path = Sources/SprayWall/Models/Hold.swift; sourceTree = "<group>"; };
-		464C2565441EBD54E903FB9C /* Attempt.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = Attempt.swift; path = Sources/SprayWall/Models/Attempt.swift; sourceTree = "<group>"; };
-		475D83A6CDDBA19C21332232 /* ProjectArchiveService.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = ProjectArchiveService.swift; path = Sources/SprayWall/Services/ProjectArchiveService.swift; sourceTree = "<group>"; };
-		4E0BF204609E9AFA1A746176 /* LegacyStoreMigrationService.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = LegacyStoreMigrationService.swift; path = Sources/SprayWall/Services/LegacyStoreMigrationService.swift; sourceTree = "<group>"; };
-		4E202494D54B15AD439CA134 /* AppModel.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = AppModel.swift; path = Sources/SprayWall/App/AppModel.swift; sourceTree = "<group>"; };
-		4F7F3A5D9B1AC264B33B626D /* IDService.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = IDService.swift; path = Sources/SprayWall/Services/IDService.swift; sourceTree = "<group>"; };
-		512D6BD934EF65A759C004FE /* CalibrationZoomTransformTests.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = CalibrationZoomTransformTests.swift; path = Tests/SprayWallTests/CalibrationZoomTransformTests.swift; sourceTree = "<group>"; };
-		5288B1DAD58A0EAE296960C3 /* CalibrationView.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = CalibrationView.swift; path = Sources/SprayWall/Views/Calibration/CalibrationView.swift; sourceTree = "<group>"; };
-		5F76821E6C9430DD5E71D492 /* InteractiveCalibrationEditor.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = InteractiveCalibrationEditor.swift; path = Sources/SprayWall/Views/Calibration/InteractiveCalibrationEditor.swift; sourceTree = "<group>"; };
-		677AE15D5A45B223F0623C62 /* RouteDetailView.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = RouteDetailView.swift; path = Sources/SprayWall/Views/Routes/RouteDetailView.swift; sourceTree = "<group>"; };
-		6892861A331D0DFD2C9E74A0 /* WallZoomTransform.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = WallZoomTransform.swift; path = Sources/SprayWall/Utilities/WallZoomTransform.swift; sourceTree = "<group>"; };
-		722D531ADA7FD2F595331849 /* Assets.xcassets */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = folder.assetcatalog; name = Assets.xcassets; path = Resources/Assets.xcassets; sourceTree = "<group>"; };
-		74A5B575E956A6B9BCADA4E6 /* AdminPermissionsTests.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = AdminPermissionsTests.swift; path = Tests/SprayWallTests/AdminPermissionsTests.swift; sourceTree = "<group>"; };
-		76A5B2A33738F111297B0B71 /* AttemptLoggerView.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = AttemptLoggerView.swift; path = Sources/SprayWall/Views/Attempts/AttemptLoggerView.swift; sourceTree = "<group>"; };
-		76A94050CE4D2012C77FD8FD /* SprayWall.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = SprayWall.app; sourceTree = BUILT_PRODUCTS_DIR; };
-		7A781DC49B365CA524E2C4DB /* WallZoomTransformTests.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = WallZoomTransformTests.swift; path = Tests/SprayWallTests/WallZoomTransformTests.swift; sourceTree = "<group>"; };
-		7CF61912D62B518B260FD3C1 /* BoulderEditorView.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = BoulderEditorView.swift; path = Sources/SprayWall/Views/Boulders/BoulderEditorView.swift; sourceTree = "<group>"; };
-		7D8C18DCF76B077C1D3ECA19 /* KeychainService.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = KeychainService.swift; path = Sources/SprayWall/Services/KeychainService.swift; sourceTree = "<group>"; };
-		86EA771B982ADC767121C720 /* HoldBackwardTransformServiceTests.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = HoldBackwardTransformServiceTests.swift; path = Tests/SprayWallTests/HoldBackwardTransformServiceTests.swift; sourceTree = "<group>"; };
-		892B007B4A0D19B4BE6DA235 /* AuthService.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = AuthService.swift; path = Sources/SprayWall/Services/AuthService.swift; sourceTree = "<group>"; };
-		8B325D947F132071D10314A9 /* WallProjectPathsTests.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = WallProjectPathsTests.swift; path = Tests/SprayWallTests/WallProjectPathsTests.swift; sourceTree = "<group>"; };
-		9170F53310B0A2B455B78C89 /* HoldDetailView.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = HoldDetailView.swift; path = Sources/SprayWall/Views/Holds/HoldDetailView.swift; sourceTree = "<group>"; };
-		93195F32D705119F50AF3A36 /* WallCalibration.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = WallCalibration.swift; path = Sources/SprayWall/Models/WallCalibration.swift; sourceTree = "<group>"; };
-		A2CCF1CEB936E64E26C722C5 /* HoldLoupeConfig.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = HoldLoupeConfig.swift; path = Sources/SprayWall/Models/HoldLoupeConfig.swift; sourceTree = "<group>"; };
-		ABF57F4C9DF766E6E7B8A620 /* CSVIntCodecTests.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = CSVIntCodecTests.swift; path = Tests/SprayWallTests/CSVIntCodecTests.swift; sourceTree = "<group>"; };
-		ADC9ADDB040E638B525E236E /* BoulderListView.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = BoulderListView.swift; path = Sources/SprayWall/Views/Boulders/BoulderListView.swift; sourceTree = "<group>"; };
-		B6CC08F3002B08E2484DAB8D /* WallProjectPaths.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = WallProjectPaths.swift; path = Sources/SprayWall/Utilities/WallProjectPaths.swift; sourceTree = "<group>"; };
-		BF77052A7C34ACA288FDCBB8 /* CalibrationPoint.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = CalibrationPoint.swift; path = Sources/SprayWall/Models/CalibrationPoint.swift; sourceTree = "<group>"; };
-		BFA9538E570D4FEA728CE0D5 /* SprayWallApp.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = SprayWallApp.swift; path = Sources/SprayWall/App/SprayWallApp.swift; sourceTree = "<group>"; };
-		C0E163C81E96A0301A3B9A2C /* 281026_dd.jpeg */ = {isa = PBXFileReference; includeInIndex = 1; name = 281026_dd.jpeg; path = resources/281026_dd.jpeg; sourceTree = "<group>"; };
-		C8CFB49D6A1BEF8F9CB40563 /* Route.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = Route.swift; path = Sources/SprayWall/Models/Route.swift; sourceTree = "<group>"; };
-		C939777424A0D883EB01289E /* SprayWallTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = SprayWallTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
-		CA5CC1E9A3543FF2B5775A00 /* HoldEditorView.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = HoldEditorView.swift; path = Sources/SprayWall/Views/Holds/HoldEditorView.swift; sourceTree = "<group>"; };
-		CC02E31E14687B000A0B0C79 /* AuthView.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = AuthView.swift; path = Sources/SprayWall/Views/Authentication/AuthView.swift; sourceTree = "<group>"; };
-		D11A7DF89B93928D30A4ABC8 /* AppTabView.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = AppTabView.swift; path = Sources/SprayWall/App/AppTabView.swift; sourceTree = "<group>"; };
-		D4680FF1022C63D57B229C48 /* HoldEllipseGeometryTests.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = HoldEllipseGeometryTests.swift; path = Tests/SprayWallTests/HoldEllipseGeometryTests.swift; sourceTree = "<group>"; };
-		D55D23B65AB19111E1C043CE /* HoldMigrationService.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = HoldMigrationService.swift; path = Sources/SprayWall/Services/HoldMigrationService.swift; sourceTree = "<group>"; };
-		DA17C769F9792AE96CBECD4D /* WallZoomControlsView.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = WallZoomControlsView.swift; path = Sources/SprayWall/Views/Shared/WallZoomControlsView.swift; sourceTree = "<group>"; };
-		DCF7CBA61AF239DC2A5228E8 /* ScrollWheelZoomModifier.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = ScrollWheelZoomModifier.swift; path = Sources/SprayWall/Utilities/ScrollWheelZoomModifier.swift; sourceTree = "<group>"; };
-		DF844D613449401B94DDC091 /* ImageRectificationService.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = ImageRectificationService.swift; path = Sources/SprayWall/Services/ImageRectificationService.swift; sourceTree = "<group>"; };
-		E927C0CBDBBC55A754F896ED /* DomainEnums.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = DomainEnums.swift; path = Sources/SprayWall/Models/DomainEnums.swift; sourceTree = "<group>"; };
-		E96ED5FD6B820F1CEF303022 /* Cocoa.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Cocoa.framework; path = Platforms/MacOSX.platform/Developer/SDKs/MacOSX15.0.sdk/System/Library/Frameworks/Cocoa.framework; sourceTree = DEVELOPER_DIR; };
-		EA9E90A47CCFF0DB646C555D /* HoldBackwardTransformService.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = HoldBackwardTransformService.swift; path = Sources/SprayWall/Services/HoldBackwardTransformService.swift; sourceTree = "<group>"; };
-		F3B30B2F88C1E7C2D86EF9C6 /* CSVIntCodec.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = CSVIntCodec.swift; path = Sources/SprayWall/Utilities/CSVIntCodec.swift; sourceTree = "<group>"; };
-		FEF16791EEEA29E8FC7AC7DD /* ImageRectificationServiceTests.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = ImageRectificationServiceTests.swift; path = Tests/SprayWallTests/ImageRectificationServiceTests.swift; sourceTree = "<group>"; };
+		010AC90E0B98EC5AADBF967A /* DomainEnums.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = DomainEnums.swift; path = Sources/SprayWall/Models/DomainEnums.swift; sourceTree = "<group>"; };
+		016E2B8F6EAC530AAE27B658 /* AppModel.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = AppModel.swift; path = Sources/SprayWall/App/AppModel.swift; sourceTree = "<group>"; };
+		01D78243DB6484DE3885B6F0 /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS18.0.sdk/System/Library/Frameworks/Foundation.framework; sourceTree = DEVELOPER_DIR; };
+		07F6CD35C7E6B4D90C4E022F /* AdminPermissionsTests.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = AdminPermissionsTests.swift; path = Tests/SprayWallTests/AdminPermissionsTests.swift; sourceTree = "<group>"; };
+		0BAFD409AC680A33EDEBBD8C /* WallCalibration.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = WallCalibration.swift; path = Sources/SprayWall/Models/WallCalibration.swift; sourceTree = "<group>"; };
+		0DD450D68D919FDB0C838C79 /* SettingsView.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = SettingsView.swift; path = Sources/SprayWall/Views/Settings/SettingsView.swift; sourceTree = "<group>"; };
+		0DED4B801BCD58B4B2DD09CE /* CalibrationPoint.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = CalibrationPoint.swift; path = Sources/SprayWall/Models/CalibrationPoint.swift; sourceTree = "<group>"; };
+		12977A188E025F74447099CB /* WallSpec.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = WallSpec.swift; path = Sources/SprayWall/Utilities/WallSpec.swift; sourceTree = "<group>"; };
+		13CEA0E7E8A83A81C1FE0FB1 /* AttemptLoggerView.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = AttemptLoggerView.swift; path = Sources/SprayWall/Views/Attempts/AttemptLoggerView.swift; sourceTree = "<group>"; };
+		17CC13347CEA48BB9898D277 /* UserAccount.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = UserAccount.swift; path = Sources/SprayWall/Models/UserAccount.swift; sourceTree = "<group>"; };
+		1D612F2033D2BE496B4A454E /* WallBackgroundView.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = WallBackgroundView.swift; path = Sources/SprayWall/Views/Shared/WallBackgroundView.swift; sourceTree = "<group>"; };
+		241DA7D4B854CA3D2B938093 /* BoulderMigrationService.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = BoulderMigrationService.swift; path = Sources/SprayWall/Services/BoulderMigrationService.swift; sourceTree = "<group>"; };
+		24C50C0B2F68A6D389F98DC7 /* SprayWallTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = SprayWallTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		261CFA6C4A791F3092C9270B /* LegacyStoreMigrationService.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = LegacyStoreMigrationService.swift; path = Sources/SprayWall/Services/LegacyStoreMigrationService.swift; sourceTree = "<group>"; };
+		28696A5D4932AF6E3B4993F8 /* Hold.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = Hold.swift; path = Sources/SprayWall/Models/Hold.swift; sourceTree = "<group>"; };
+		2EC50AEA6AADE210F914A5E8 /* HoldLoupeView.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = HoldLoupeView.swift; path = Sources/SprayWall/Views/Shared/HoldLoupeView.swift; sourceTree = "<group>"; };
+		36AF653B2994BE2BAC88A8D3 /* CalibrationZoomTransformTests.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = CalibrationZoomTransformTests.swift; path = Tests/SprayWallTests/CalibrationZoomTransformTests.swift; sourceTree = "<group>"; };
+		3C99576D81D0F59CFCCEA715 /* ImageRectificationServiceTests.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = ImageRectificationServiceTests.swift; path = Tests/SprayWallTests/ImageRectificationServiceTests.swift; sourceTree = "<group>"; };
+		3E896569C0D89A6463A11C7A /* IDService.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = IDService.swift; path = Sources/SprayWall/Services/IDService.swift; sourceTree = "<group>"; };
+		3FE29C9171EEF06B9070975B /* WallProjectPathsTests.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = WallProjectPathsTests.swift; path = Tests/SprayWallTests/WallProjectPathsTests.swift; sourceTree = "<group>"; };
+		43454DE10338DA20CF522A18 /* Attempt.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = Attempt.swift; path = Sources/SprayWall/Models/Attempt.swift; sourceTree = "<group>"; };
+		4C944A5BC508E5B0A6FF08CF /* InteractiveCalibrationEditor.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = InteractiveCalibrationEditor.swift; path = Sources/SprayWall/Views/Calibration/InteractiveCalibrationEditor.swift; sourceTree = "<group>"; };
+		4CA176191FBE92878346D321 /* HoldEllipseGeometryTests.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = HoldEllipseGeometryTests.swift; path = Tests/SprayWallTests/HoldEllipseGeometryTests.swift; sourceTree = "<group>"; };
+		5228017F87C49D642D1CE6E8 /* AppTabView.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = AppTabView.swift; path = Sources/SprayWall/App/AppTabView.swift; sourceTree = "<group>"; };
+		53C017DF53AECAC8D267A563 /* WallZoomTransformTests.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = WallZoomTransformTests.swift; path = Tests/SprayWallTests/WallZoomTransformTests.swift; sourceTree = "<group>"; };
+		53C4060AC102BE3D36A5E29C /* CSVIntCodec.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = CSVIntCodec.swift; path = Sources/SprayWall/Utilities/CSVIntCodec.swift; sourceTree = "<group>"; };
+		573E5B3A2B275A447E82C444 /* WallZoomControlsView.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = WallZoomControlsView.swift; path = Sources/SprayWall/Views/Shared/WallZoomControlsView.swift; sourceTree = "<group>"; };
+		5D0AA4EEBEC902219F51A9B6 /* HoldDetailView.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = HoldDetailView.swift; path = Sources/SprayWall/Views/Holds/HoldDetailView.swift; sourceTree = "<group>"; };
+		5ED2C8C11CE2FB96524516AD /* RootView.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = RootView.swift; path = Sources/SprayWall/App/RootView.swift; sourceTree = "<group>"; };
+		6168E7643D07931B5B76C103 /* HoldBackwardTransformServiceTests.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = HoldBackwardTransformServiceTests.swift; path = Tests/SprayWallTests/HoldBackwardTransformServiceTests.swift; sourceTree = "<group>"; };
+		61922E1D0773262BF21F77BF /* ProjectArchiveService.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = ProjectArchiveService.swift; path = Sources/SprayWall/Services/ProjectArchiveService.swift; sourceTree = "<group>"; };
+		6746DC9F6E0E25BBEBB5AF46 /* DiamondShape.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = DiamondShape.swift; path = Sources/SprayWall/Views/Shared/DiamondShape.swift; sourceTree = "<group>"; };
+		6A5A3083367745BC15420FE9 /* SprayWall-macOS.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "SprayWall-macOS.app"; sourceTree = BUILT_PRODUCTS_DIR; };
+		6DA761588CD4755616503C33 /* RouteEditorView.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = RouteEditorView.swift; path = Sources/SprayWall/Views/Routes/RouteEditorView.swift; sourceTree = "<group>"; };
+		6FF224600ADEF4C6CA55507B /* CSVIntCodecTests.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = CSVIntCodecTests.swift; path = Tests/SprayWallTests/CSVIntCodecTests.swift; sourceTree = "<group>"; };
+		78FB05A2224EC09990E236BB /* OriginalPhotoLoader.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = OriginalPhotoLoader.swift; path = Sources/SprayWall/Services/OriginalPhotoLoader.swift; sourceTree = "<group>"; };
+		79470D6F71F4CBCE676BFFDA /* WallProjectPaths.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = WallProjectPaths.swift; path = Sources/SprayWall/Utilities/WallProjectPaths.swift; sourceTree = "<group>"; };
+		8489EEE8AE01CB2A7E62E998 /* ImageRectificationService.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = ImageRectificationService.swift; path = Sources/SprayWall/Services/ImageRectificationService.swift; sourceTree = "<group>"; };
+		8DA3DCF51CB06A8DE7DEF8F9 /* CalibrationZoomTransform.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = CalibrationZoomTransform.swift; path = Sources/SprayWall/Utilities/CalibrationZoomTransform.swift; sourceTree = "<group>"; };
+		9041BDE21BE4A75D473C6904 /* WallZoomTransform.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = WallZoomTransform.swift; path = Sources/SprayWall/Utilities/WallZoomTransform.swift; sourceTree = "<group>"; };
+		959D3D83AA756AEF91A9111F /* Cocoa.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Cocoa.framework; path = Platforms/MacOSX.platform/Developer/SDKs/MacOSX15.0.sdk/System/Library/Frameworks/Cocoa.framework; sourceTree = DEVELOPER_DIR; };
+		9B0F68A6DFF001A99AEA3B8E /* HoldMigrationService.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = HoldMigrationService.swift; path = Sources/SprayWall/Services/HoldMigrationService.swift; sourceTree = "<group>"; };
+		9BE89D01CF97A236AB5FD354 /* HoldMarkerView.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = HoldMarkerView.swift; path = Sources/SprayWall/Views/Shared/HoldMarkerView.swift; sourceTree = "<group>"; };
+		A055BC34CA2948C2851B0B3B /* BoulderListView.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = BoulderListView.swift; path = Sources/SprayWall/Views/Boulders/BoulderListView.swift; sourceTree = "<group>"; };
+		A2BFA67C48938D32638F5813 /* HoldLoupeConfig.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = HoldLoupeConfig.swift; path = Sources/SprayWall/Models/HoldLoupeConfig.swift; sourceTree = "<group>"; };
+		A647FB664A04D9287EC8A7F8 /* SprayWall.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = SprayWall.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		ACE33C29BBF33FB593351345 /* Route.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = Route.swift; path = Sources/SprayWall/Models/Route.swift; sourceTree = "<group>"; };
+		B47F5AE2813B48134D07AA5F /* KeychainService.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = KeychainService.swift; path = Sources/SprayWall/Services/KeychainService.swift; sourceTree = "<group>"; };
+		B59054F589B0056684E8701C /* AuthView.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = AuthView.swift; path = Sources/SprayWall/Views/Authentication/AuthView.swift; sourceTree = "<group>"; };
+		B7884DC6659700357E0AE186 /* HoldBackwardTransformService.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = HoldBackwardTransformService.swift; path = Sources/SprayWall/Services/HoldBackwardTransformService.swift; sourceTree = "<group>"; };
+		BE40961AFABCDDBB1FC319DD /* ScrollWheelZoomModifier.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = ScrollWheelZoomModifier.swift; path = Sources/SprayWall/Utilities/ScrollWheelZoomModifier.swift; sourceTree = "<group>"; };
+		D28FA04CC3E248100F56EB2F /* Assets.xcassets */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = folder.assetcatalog; name = Assets.xcassets; path = Resources/Assets.xcassets; sourceTree = "<group>"; };
+		DAD372D54605BD4A9523CED4 /* Boulder.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = Boulder.swift; path = Sources/SprayWall/Models/Boulder.swift; sourceTree = "<group>"; };
+		DB87042297189398EAE10E06 /* RouteDetailView.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = RouteDetailView.swift; path = Sources/SprayWall/Views/Routes/RouteDetailView.swift; sourceTree = "<group>"; };
+		E071A1F131708FF0AA3AC10B /* CalibrationView.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = CalibrationView.swift; path = Sources/SprayWall/Views/Calibration/CalibrationView.swift; sourceTree = "<group>"; };
+		E5564935C2317A4C7792E502 /* 281026_dd.jpeg */ = {isa = PBXFileReference; includeInIndex = 1; name = 281026_dd.jpeg; path = resources/281026_dd.jpeg; sourceTree = "<group>"; };
+		E68F704B58E6EBFC12F19436 /* AuthService.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = AuthService.swift; path = Sources/SprayWall/Services/AuthService.swift; sourceTree = "<group>"; };
+		F228A98EA88DE96F59705891 /* HoldEditorView.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = HoldEditorView.swift; path = Sources/SprayWall/Views/Holds/HoldEditorView.swift; sourceTree = "<group>"; };
+		F6572D2D5C6850806A161608 /* SprayWallApp.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = SprayWallApp.swift; path = Sources/SprayWall/App/SprayWallApp.swift; sourceTree = "<group>"; };
+		F96D07A04F387963280A433B /* BoulderEditorView.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = BoulderEditorView.swift; path = Sources/SprayWall/Views/Boulders/BoulderEditorView.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
-		373F16617B792785A594CC99 /* Frameworks */ = {
+		51230F19160F29777A5A8101 /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				6B2A7D92FBDE12F4B602BE5C /* Foundation.framework in Frameworks */,
+				930D20B113CD81707B962DE7 /* Foundation.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
-		4602628C114939392B2167A9 /* Frameworks */ = {
+		BD3A5F512F251B03A58AC4AF /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				B4E34489FE775D6B64D46E83 /* Cocoa.framework in Frameworks */,
+				BFA275BFBEEEE3F8B60372CB /* Foundation.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
-		4A712F4F8DBF1FB05131FF99 /* Frameworks */ = {
+		EA574E13A81BED15A2F94951 /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				B90D167A60212B6D77044EB5 /* Foundation.framework in Frameworks */,
+				8838197024732F5061D956BF /* Cocoa.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
-		1B9D32BE1282DE0B755B66DC /* Products */ = {
+		02D7EEBF4CA70743EF3DBF1F /* Products */ = {
 			isa = PBXGroup;
 			children = (
-				76A94050CE4D2012C77FD8FD /* SprayWall.app */,
-				056B76B8E715105870351537 /* SprayWall-macOS.app */,
-				C939777424A0D883EB01289E /* SprayWallTests.xctest */,
+				A647FB664A04D9287EC8A7F8 /* SprayWall.app */,
+				6A5A3083367745BC15420FE9 /* SprayWall-macOS.app */,
+				24C50C0B2F68A6D389F98DC7 /* SprayWallTests.xctest */,
 			);
 			name = Products;
 			sourceTree = "<group>";
 		};
-		5422EA7B9667099CC737A493 /* Sources */ = {
+		1780DE5BEAE8CD2D1DD729A8 /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				3D011F0B3FBFC278A0AD2F3E /* iOS */,
+				1AAADD3E345A3E67C6305989 /* OS X */,
+			);
+			name = Frameworks;
+			sourceTree = "<group>";
+		};
+		1AAADD3E345A3E67C6305989 /* OS X */ = {
+			isa = PBXGroup;
+			children = (
+				959D3D83AA756AEF91A9111F /* Cocoa.framework */,
+			);
+			name = "OS X";
+			sourceTree = "<group>";
+		};
+		3D011F0B3FBFC278A0AD2F3E /* iOS */ = {
+			isa = PBXGroup;
+			children = (
+				01D78243DB6484DE3885B6F0 /* Foundation.framework */,
+			);
+			name = iOS;
+			sourceTree = "<group>";
+		};
+		603E28A450AEEB23F9FCED14 /* Sources */ = {
 			isa = PBXGroup;
 			children = (
 			);
 			name = Sources;
 			sourceTree = "<group>";
 		};
-		810F3CB1CD06F9FF21D86D6F /* Tests */ = {
+		7F2C695CF960B72172C1C6B8 = {
+			isa = PBXGroup;
+			children = (
+				02D7EEBF4CA70743EF3DBF1F /* Products */,
+				1780DE5BEAE8CD2D1DD729A8 /* Frameworks */,
+				603E28A450AEEB23F9FCED14 /* Sources */,
+				D7F27328FE67B426E99B493B /* Tests */,
+				016E2B8F6EAC530AAE27B658 /* AppModel.swift */,
+				5228017F87C49D642D1CE6E8 /* AppTabView.swift */,
+				5ED2C8C11CE2FB96524516AD /* RootView.swift */,
+				F6572D2D5C6850806A161608 /* SprayWallApp.swift */,
+				43454DE10338DA20CF522A18 /* Attempt.swift */,
+				DAD372D54605BD4A9523CED4 /* Boulder.swift */,
+				0DED4B801BCD58B4B2DD09CE /* CalibrationPoint.swift */,
+				010AC90E0B98EC5AADBF967A /* DomainEnums.swift */,
+				28696A5D4932AF6E3B4993F8 /* Hold.swift */,
+				A2BFA67C48938D32638F5813 /* HoldLoupeConfig.swift */,
+				ACE33C29BBF33FB593351345 /* Route.swift */,
+				17CC13347CEA48BB9898D277 /* UserAccount.swift */,
+				0BAFD409AC680A33EDEBBD8C /* WallCalibration.swift */,
+				E68F704B58E6EBFC12F19436 /* AuthService.swift */,
+				241DA7D4B854CA3D2B938093 /* BoulderMigrationService.swift */,
+				B7884DC6659700357E0AE186 /* HoldBackwardTransformService.swift */,
+				9B0F68A6DFF001A99AEA3B8E /* HoldMigrationService.swift */,
+				3E896569C0D89A6463A11C7A /* IDService.swift */,
+				8489EEE8AE01CB2A7E62E998 /* ImageRectificationService.swift */,
+				B47F5AE2813B48134D07AA5F /* KeychainService.swift */,
+				261CFA6C4A791F3092C9270B /* LegacyStoreMigrationService.swift */,
+				78FB05A2224EC09990E236BB /* OriginalPhotoLoader.swift */,
+				61922E1D0773262BF21F77BF /* ProjectArchiveService.swift */,
+				53C4060AC102BE3D36A5E29C /* CSVIntCodec.swift */,
+				8DA3DCF51CB06A8DE7DEF8F9 /* CalibrationZoomTransform.swift */,
+				BE40961AFABCDDBB1FC319DD /* ScrollWheelZoomModifier.swift */,
+				79470D6F71F4CBCE676BFFDA /* WallProjectPaths.swift */,
+				12977A188E025F74447099CB /* WallSpec.swift */,
+				9041BDE21BE4A75D473C6904 /* WallZoomTransform.swift */,
+				13CEA0E7E8A83A81C1FE0FB1 /* AttemptLoggerView.swift */,
+				B59054F589B0056684E8701C /* AuthView.swift */,
+				F96D07A04F387963280A433B /* BoulderEditorView.swift */,
+				A055BC34CA2948C2851B0B3B /* BoulderListView.swift */,
+				E071A1F131708FF0AA3AC10B /* CalibrationView.swift */,
+				4C944A5BC508E5B0A6FF08CF /* InteractiveCalibrationEditor.swift */,
+				5D0AA4EEBEC902219F51A9B6 /* HoldDetailView.swift */,
+				F228A98EA88DE96F59705891 /* HoldEditorView.swift */,
+				DB87042297189398EAE10E06 /* RouteDetailView.swift */,
+				6DA761588CD4755616503C33 /* RouteEditorView.swift */,
+				0DD450D68D919FDB0C838C79 /* SettingsView.swift */,
+				6746DC9F6E0E25BBEBB5AF46 /* DiamondShape.swift */,
+				2EC50AEA6AADE210F914A5E8 /* HoldLoupeView.swift */,
+				9BE89D01CF97A236AB5FD354 /* HoldMarkerView.swift */,
+				1D612F2033D2BE496B4A454E /* WallBackgroundView.swift */,
+				573E5B3A2B275A447E82C444 /* WallZoomControlsView.swift */,
+				07F6CD35C7E6B4D90C4E022F /* AdminPermissionsTests.swift */,
+				6FF224600ADEF4C6CA55507B /* CSVIntCodecTests.swift */,
+				36AF653B2994BE2BAC88A8D3 /* CalibrationZoomTransformTests.swift */,
+				6168E7643D07931B5B76C103 /* HoldBackwardTransformServiceTests.swift */,
+				4CA176191FBE92878346D321 /* HoldEllipseGeometryTests.swift */,
+				3C99576D81D0F59CFCCEA715 /* ImageRectificationServiceTests.swift */,
+				3FE29C9171EEF06B9070975B /* WallProjectPathsTests.swift */,
+				53C017DF53AECAC8D267A563 /* WallZoomTransformTests.swift */,
+				D28FA04CC3E248100F56EB2F /* Assets.xcassets */,
+				E5564935C2317A4C7792E502 /* 281026_dd.jpeg */,
+			);
+			sourceTree = "<group>";
+		};
+		D7F27328FE67B426E99B493B /* Tests */ = {
 			isa = PBXGroup;
 			children = (
 			);
 			name = Tests;
 			sourceTree = "<group>";
 		};
-		963FD0B83C1FA7E0B4A28B26 /* Frameworks */ = {
-			isa = PBXGroup;
-			children = (
-				F7B2DA5D509A9CE091BDDA54 /* iOS */,
-				CE7324DF063FB974D9563011 /* OS X */,
-			);
-			name = Frameworks;
-			sourceTree = "<group>";
-		};
-		CE7324DF063FB974D9563011 /* OS X */ = {
-			isa = PBXGroup;
-			children = (
-				E96ED5FD6B820F1CEF303022 /* Cocoa.framework */,
-			);
-			name = "OS X";
-			sourceTree = "<group>";
-		};
-		EAC9A6E95DFA334CAF25C526 = {
-			isa = PBXGroup;
-			children = (
-				1B9D32BE1282DE0B755B66DC /* Products */,
-				963FD0B83C1FA7E0B4A28B26 /* Frameworks */,
-				5422EA7B9667099CC737A493 /* Sources */,
-				810F3CB1CD06F9FF21D86D6F /* Tests */,
-				4E202494D54B15AD439CA134 /* AppModel.swift */,
-				D11A7DF89B93928D30A4ABC8 /* AppTabView.swift */,
-				2DB25254A1DD327023A53B13 /* RootView.swift */,
-				BFA9538E570D4FEA728CE0D5 /* SprayWallApp.swift */,
-				464C2565441EBD54E903FB9C /* Attempt.swift */,
-				107AAD6A20D3C5204865AC46 /* Boulder.swift */,
-				BF77052A7C34ACA288FDCBB8 /* CalibrationPoint.swift */,
-				E927C0CBDBBC55A754F896ED /* DomainEnums.swift */,
-				44C3B701C9232B3E1BDFED34 /* Hold.swift */,
-				A2CCF1CEB936E64E26C722C5 /* HoldLoupeConfig.swift */,
-				C8CFB49D6A1BEF8F9CB40563 /* Route.swift */,
-				073D9092EECE25223FE7F06F /* UserAccount.swift */,
-				93195F32D705119F50AF3A36 /* WallCalibration.swift */,
-				892B007B4A0D19B4BE6DA235 /* AuthService.swift */,
-				360AED1F91AB06A94F6BB04A /* BoulderMigrationService.swift */,
-				EA9E90A47CCFF0DB646C555D /* HoldBackwardTransformService.swift */,
-				D55D23B65AB19111E1C043CE /* HoldMigrationService.swift */,
-				4F7F3A5D9B1AC264B33B626D /* IDService.swift */,
-				DF844D613449401B94DDC091 /* ImageRectificationService.swift */,
-				7D8C18DCF76B077C1D3ECA19 /* KeychainService.swift */,
-				4E0BF204609E9AFA1A746176 /* LegacyStoreMigrationService.swift */,
-				08354F9D567DA25F7E504129 /* OriginalPhotoLoader.swift */,
-				475D83A6CDDBA19C21332232 /* ProjectArchiveService.swift */,
-				F3B30B2F88C1E7C2D86EF9C6 /* CSVIntCodec.swift */,
-				3442096554EF22BD2C71E321 /* CalibrationZoomTransform.swift */,
-				DCF7CBA61AF239DC2A5228E8 /* ScrollWheelZoomModifier.swift */,
-				B6CC08F3002B08E2484DAB8D /* WallProjectPaths.swift */,
-				21814B0F6702F56A74F62737 /* WallSpec.swift */,
-				6892861A331D0DFD2C9E74A0 /* WallZoomTransform.swift */,
-				76A5B2A33738F111297B0B71 /* AttemptLoggerView.swift */,
-				CC02E31E14687B000A0B0C79 /* AuthView.swift */,
-				7CF61912D62B518B260FD3C1 /* BoulderEditorView.swift */,
-				ADC9ADDB040E638B525E236E /* BoulderListView.swift */,
-				5288B1DAD58A0EAE296960C3 /* CalibrationView.swift */,
-				5F76821E6C9430DD5E71D492 /* InteractiveCalibrationEditor.swift */,
-				9170F53310B0A2B455B78C89 /* HoldDetailView.swift */,
-				CA5CC1E9A3543FF2B5775A00 /* HoldEditorView.swift */,
-				677AE15D5A45B223F0623C62 /* RouteDetailView.swift */,
-				37B43A2EC2077B697F2DE94F /* RouteEditorView.swift */,
-				049B015DABBC733A5A9AD78C /* SettingsView.swift */,
-				294A2E79D958AED4DF501D21 /* DiamondShape.swift */,
-				294398FB7EB4CDE213D0DB33 /* HoldLoupeView.swift */,
-				2115163C5A3B599064D2BC17 /* HoldMarkerView.swift */,
-				1913DAA2E95A4278AF46A1A4 /* WallBackgroundView.swift */,
-				DA17C769F9792AE96CBECD4D /* WallZoomControlsView.swift */,
-				74A5B575E956A6B9BCADA4E6 /* AdminPermissionsTests.swift */,
-				ABF57F4C9DF766E6E7B8A620 /* CSVIntCodecTests.swift */,
-				512D6BD934EF65A759C004FE /* CalibrationZoomTransformTests.swift */,
-				86EA771B982ADC767121C720 /* HoldBackwardTransformServiceTests.swift */,
-				D4680FF1022C63D57B229C48 /* HoldEllipseGeometryTests.swift */,
-				FEF16791EEEA29E8FC7AC7DD /* ImageRectificationServiceTests.swift */,
-				8B325D947F132071D10314A9 /* WallProjectPathsTests.swift */,
-				7A781DC49B365CA524E2C4DB /* WallZoomTransformTests.swift */,
-				722D531ADA7FD2F595331849 /* Assets.xcassets */,
-				C0E163C81E96A0301A3B9A2C /* 281026_dd.jpeg */,
-			);
-			sourceTree = "<group>";
-		};
-		F7B2DA5D509A9CE091BDDA54 /* iOS */ = {
-			isa = PBXGroup;
-			children = (
-				09BF382DA98446E356F774A9 /* Foundation.framework */,
-			);
-			name = iOS;
-			sourceTree = "<group>";
-		};
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
-		1E58A6E94B6BB8750600D0E0 /* SprayWall-macOS */ = {
+		20A23E67A7545E05EBF32341 /* SprayWallTests */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = BD4682167D54697C71C5E26F /* Build configuration list for PBXNativeTarget "SprayWall-macOS" */;
+			buildConfigurationList = 0FB67D65D92CC35A71401EEB /* Build configuration list for PBXNativeTarget "SprayWallTests" */;
 			buildPhases = (
-				D49957D2E4A354008AF4BCCF /* Sources */,
-				4602628C114939392B2167A9 /* Frameworks */,
-				52208D717B058483459AC0E9 /* Resources */,
+				7E620284E7D966DD119A220B /* Sources */,
+				BD3A5F512F251B03A58AC4AF /* Frameworks */,
+				9754E02BDD6398B674B2F163 /* Resources */,
 			);
 			buildRules = (
 			);
 			dependencies = (
+				161AB741C7023A6284C8CA94 /* PBXTargetDependency */,
 			);
-			name = "SprayWall-macOS";
-			productName = "SprayWall-macOS";
-			productReference = 056B76B8E715105870351537 /* SprayWall-macOS.app */;
-			productType = "com.apple.product-type.application";
+			name = SprayWallTests;
+			productName = SprayWallTests;
+			productReference = 24C50C0B2F68A6D389F98DC7 /* SprayWallTests.xctest */;
+			productType = "com.apple.product-type.bundle.unit-test";
 		};
-		7B0665AEB783CC9EFF2F105E /* SprayWall */ = {
+		C462839E7F55564C370A604B /* SprayWall */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = 5CC977ACE4392CF01A8E08E2 /* Build configuration list for PBXNativeTarget "SprayWall" */;
+			buildConfigurationList = 1ECDE86DA7FBBE16B6903113 /* Build configuration list for PBXNativeTarget "SprayWall" */;
 			buildPhases = (
-				6F95950B2E9758F122C56FAF /* Sources */,
-				373F16617B792785A594CC99 /* Frameworks */,
-				7149AA776CE2A8328BE06CDB /* Resources */,
+				F6DC6CD9F4293332ABA1DE4A /* Sources */,
+				51230F19160F29777A5A8101 /* Frameworks */,
+				FF2F7A03BF59B12182EC7FAB /* Resources */,
 			);
 			buildRules = (
 			);
@@ -363,37 +364,36 @@
 			);
 			name = SprayWall;
 			productName = SprayWall;
-			productReference = 76A94050CE4D2012C77FD8FD /* SprayWall.app */;
+			productReference = A647FB664A04D9287EC8A7F8 /* SprayWall.app */;
 			productType = "com.apple.product-type.application";
 		};
-		84F9470FC705F48A20795C14 /* SprayWallTests */ = {
+		CDE6071C7331D6F0B3B30A69 /* SprayWall-macOS */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = D2C634755EB8E37F20B2068B /* Build configuration list for PBXNativeTarget "SprayWallTests" */;
+			buildConfigurationList = B893F10A54F7B9C0CF220138 /* Build configuration list for PBXNativeTarget "SprayWall-macOS" */;
 			buildPhases = (
-				E194BCA6E1F0CC083A895637 /* Sources */,
-				4A712F4F8DBF1FB05131FF99 /* Frameworks */,
-				6CC9E8594EA049B0FAA7C0D0 /* Resources */,
+				3971476946213960971CA350 /* Sources */,
+				EA574E13A81BED15A2F94951 /* Frameworks */,
+				5A199AB26F70884876906B4D /* Resources */,
 			);
 			buildRules = (
 			);
 			dependencies = (
-				2CC2734BD1DC8F00A368536E /* PBXTargetDependency */,
 			);
-			name = SprayWallTests;
-			productName = SprayWallTests;
-			productReference = C939777424A0D883EB01289E /* SprayWallTests.xctest */;
-			productType = "com.apple.product-type.bundle.unit-test";
+			name = "SprayWall-macOS";
+			productName = "SprayWall-macOS";
+			productReference = 6A5A3083367745BC15420FE9 /* SprayWall-macOS.app */;
+			productType = "com.apple.product-type.application";
 		};
 /* End PBXNativeTarget section */
 
 /* Begin PBXProject section */
-		5A0C0D4C6CBE5F8C2A1FFDF8 /* Project object */ = {
+		BC87CCBADC754B82BA4267D7 /* Project object */ = {
 			isa = PBXProject;
 			attributes = {
 				LastSwiftUpdateCheck = 2640;
 				LastUpgradeCheck = 2640;
 			};
-			buildConfigurationList = A2335B531BE18C12467A2665 /* Build configuration list for PBXProject "SprayWall" */;
+			buildConfigurationList = 78511E72DA174A09488155A5 /* Build configuration list for PBXProject "SprayWall" */;
 			compatibilityVersion = "Xcode 3.2";
 			developmentRegion = en;
 			hasScannedForEncodings = 0;
@@ -401,269 +401,181 @@
 				en,
 				Base,
 			);
-			mainGroup = EAC9A6E95DFA334CAF25C526;
+			mainGroup = 7F2C695CF960B72172C1C6B8;
 			minimizedProjectReferenceProxies = 0;
 			preferredProjectObjectVersion = 77;
-			productRefGroup = 1B9D32BE1282DE0B755B66DC /* Products */;
+			productRefGroup = 02D7EEBF4CA70743EF3DBF1F /* Products */;
 			projectDirPath = "";
 			projectRoot = "";
 			targets = (
-				7B0665AEB783CC9EFF2F105E /* SprayWall */,
-				1E58A6E94B6BB8750600D0E0 /* SprayWall-macOS */,
-				84F9470FC705F48A20795C14 /* SprayWallTests */,
+				C462839E7F55564C370A604B /* SprayWall */,
+				CDE6071C7331D6F0B3B30A69 /* SprayWall-macOS */,
+				20A23E67A7545E05EBF32341 /* SprayWallTests */,
 			);
 		};
 /* End PBXProject section */
 
 /* Begin PBXResourcesBuildPhase section */
-		52208D717B058483459AC0E9 /* Resources */ = {
+		5A199AB26F70884876906B4D /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				0A9A6027AC3419B89E64FEEC /* Assets.xcassets in Resources */,
-				6F5D62BF484C81B138EB5B52 /* 281026_dd.jpeg in Resources */,
+				17DFE699F16CF976DF65D1DF /* Assets.xcassets in Resources */,
+				CCD7AB27B7B296D222A1F36D /* 281026_dd.jpeg in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
-		6CC9E8594EA049B0FAA7C0D0 /* Resources */ = {
+		9754E02BDD6398B674B2F163 /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
-		7149AA776CE2A8328BE06CDB /* Resources */ = {
+		FF2F7A03BF59B12182EC7FAB /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				F77D32E73F99E96CFB79F558 /* Assets.xcassets in Resources */,
-				36057DD8E2CA8B40FB9093FB /* 281026_dd.jpeg in Resources */,
+				4B6C0D205C33BBF278D3F7DB /* Assets.xcassets in Resources */,
+				EF44BC6ACE343574C34793FA /* 281026_dd.jpeg in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
-		6F95950B2E9758F122C56FAF /* Sources */ = {
+		3971476946213960971CA350 /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				E88B87AAF832CFF281FEAB86 /* AppModel.swift in Sources */,
-				A9BD5434F0FA418EBB933DC9 /* AppTabView.swift in Sources */,
-				022C595B39A7F995752CEEE5 /* RootView.swift in Sources */,
-				1B98BB4FE824D0E17912657C /* SprayWallApp.swift in Sources */,
-				C0DE76434A2F4827CC0024B8 /* Attempt.swift in Sources */,
-				C81CE037C872582BDC99CDFE /* Boulder.swift in Sources */,
-				84EC35D1D1DB76FCFCB2206B /* CalibrationPoint.swift in Sources */,
-				350F9ADA24EE61B3F33023E0 /* DomainEnums.swift in Sources */,
-				BF00A3947402EC9898F991E3 /* Hold.swift in Sources */,
-				39465B685B355ABBA4C3B587 /* HoldLoupeConfig.swift in Sources */,
-				7C1B2E45CF5149A58C3ED3D7 /* Route.swift in Sources */,
-				D640C95439B00C019D397462 /* UserAccount.swift in Sources */,
-				413D03E1D76A416ED34F57CF /* WallCalibration.swift in Sources */,
-				EFB20D506F5C67BD0D6D79EE /* AuthService.swift in Sources */,
-				1CBCA1A3CFD24EEB387AEDF2 /* BoulderMigrationService.swift in Sources */,
-				0BC5EB954F7CB2687ACA1837 /* HoldBackwardTransformService.swift in Sources */,
-				5A9CBDECBAF4B90E21F896FD /* HoldMigrationService.swift in Sources */,
-				E7E6F51FF7FFC70715D83F29 /* IDService.swift in Sources */,
-				E1C3557B157E5D0787B4385B /* ImageRectificationService.swift in Sources */,
-				960DB51C5FC3014BF80EA119 /* KeychainService.swift in Sources */,
-				7CF2C9945D9266835A44051F /* LegacyStoreMigrationService.swift in Sources */,
-				BB942D5E8D3C587D13418129 /* OriginalPhotoLoader.swift in Sources */,
-				13204A3400225EEA02306D13 /* ProjectArchiveService.swift in Sources */,
-				BDE2889FB3DB468A13972B10 /* CSVIntCodec.swift in Sources */,
-				FFB168A68DCEF449F5AF183D /* CalibrationZoomTransform.swift in Sources */,
-				6F2E5277E42843D895B406F7 /* ScrollWheelZoomModifier.swift in Sources */,
-				13772FC2ABBE10121F630465 /* WallProjectPaths.swift in Sources */,
-				4671973B9613D6C10294B475 /* WallSpec.swift in Sources */,
-				12303A63D267AAAA081DAE15 /* WallZoomTransform.swift in Sources */,
-				04E59B86CB1C3C17A81DAAE9 /* AttemptLoggerView.swift in Sources */,
-				622FB9A48B3D82C948801F23 /* AuthView.swift in Sources */,
-				42417D7D0C12A78D4730129A /* BoulderEditorView.swift in Sources */,
-				70F3E53C951DB834ABA28519 /* BoulderListView.swift in Sources */,
-				21AA0CAB3001B0CE562CAD5A /* CalibrationView.swift in Sources */,
-				178271BAC7F53D1DEDD267AA /* InteractiveCalibrationEditor.swift in Sources */,
-				5DE8472D292186819DA4D5BE /* HoldDetailView.swift in Sources */,
-				0B46094EB31A118F864EF6DA /* HoldEditorView.swift in Sources */,
-				B5DB73BAA8558112FD61E495 /* RouteDetailView.swift in Sources */,
-				C744AF112E896B725A67DB7F /* RouteEditorView.swift in Sources */,
-				8E89D76158566C139A53A881 /* SettingsView.swift in Sources */,
-				F2FE08AB1DD120520EFF095C /* DiamondShape.swift in Sources */,
-				CCF7EBAEF6C5B0F4401D29F3 /* HoldLoupeView.swift in Sources */,
-				0389CC89F0FECCCD156D9E39 /* HoldMarkerView.swift in Sources */,
-				C5DEDF7377CB5F337DDC87A3 /* WallBackgroundView.swift in Sources */,
-				F5F3B109FE0C316160794296 /* WallZoomControlsView.swift in Sources */,
+				F7D7F8D1C3E35668E0237569 /* AppModel.swift in Sources */,
+				B4487D963467299CBDAC9987 /* AppTabView.swift in Sources */,
+				C3B4A04B0E79137FD3DAC185 /* RootView.swift in Sources */,
+				0154BB73B36BF95F22AE90E3 /* SprayWallApp.swift in Sources */,
+				D8DD2F65055C27B9E19604A4 /* Attempt.swift in Sources */,
+				4120D6190F1BE35328170203 /* Boulder.swift in Sources */,
+				EBA3F1B0F81F9D6E3F3C7F57 /* CalibrationPoint.swift in Sources */,
+				480A0F349AD4011D2DD648E9 /* DomainEnums.swift in Sources */,
+				648AE7799E04C6EEF0D75B9B /* Hold.swift in Sources */,
+				C93D8B183FBB646837EC95F0 /* HoldLoupeConfig.swift in Sources */,
+				8DBF2BD684A2BA13DD8E2189 /* Route.swift in Sources */,
+				6D88B98D684DD8C8DBF18E48 /* UserAccount.swift in Sources */,
+				468E9FB7D24F6C5F2869BC71 /* WallCalibration.swift in Sources */,
+				E6448E1CCDAE701C64593376 /* AuthService.swift in Sources */,
+				B58C63145E06CEEB0414F23F /* BoulderMigrationService.swift in Sources */,
+				BA512CE300C20677FD207502 /* HoldBackwardTransformService.swift in Sources */,
+				5E79BAA0943E4F6CE1943FA5 /* HoldMigrationService.swift in Sources */,
+				CD6CE6DD018FFE7134135093 /* IDService.swift in Sources */,
+				B4E4C92E7A174D3937933AB0 /* ImageRectificationService.swift in Sources */,
+				ED5BFF5E5320F8B9B9A2286F /* KeychainService.swift in Sources */,
+				720FFA4E4ED40AF5E0EB64D4 /* LegacyStoreMigrationService.swift in Sources */,
+				4E3A2999F3AA931F353DEB24 /* OriginalPhotoLoader.swift in Sources */,
+				A2F6D5ED3807559397DE6229 /* ProjectArchiveService.swift in Sources */,
+				6CD4177ED97BADC3E88ECE4D /* CSVIntCodec.swift in Sources */,
+				615C1E4CB2B1954EE3C88526 /* CalibrationZoomTransform.swift in Sources */,
+				5024B7C891D9DABF7E45A95B /* ScrollWheelZoomModifier.swift in Sources */,
+				1DD0F496D8BE6ACE8893CD04 /* WallProjectPaths.swift in Sources */,
+				A957200B55817CD197821666 /* WallSpec.swift in Sources */,
+				B96CC424C234B9A7067BAF35 /* WallZoomTransform.swift in Sources */,
+				35C289EF35108539FCBA2E5C /* AttemptLoggerView.swift in Sources */,
+				5623656797D28F690F9DF773 /* AuthView.swift in Sources */,
+				1853216D81993ADD4A92DC01 /* BoulderEditorView.swift in Sources */,
+				FE8FFE5A5B54BCCF7CE4D2ED /* BoulderListView.swift in Sources */,
+				CE51BB7747CFDD2A9E1B878B /* CalibrationView.swift in Sources */,
+				667229A7E33B2C5029477FD0 /* InteractiveCalibrationEditor.swift in Sources */,
+				3D0C87C6D742E3AB7D80A213 /* HoldDetailView.swift in Sources */,
+				0626476B160007A51EB7DDF7 /* HoldEditorView.swift in Sources */,
+				EBBA0FF1CC72D4019031C733 /* RouteDetailView.swift in Sources */,
+				2458211EC84826E1120B4FB7 /* RouteEditorView.swift in Sources */,
+				FB33CD2185F2EA707D75EA1A /* SettingsView.swift in Sources */,
+				74F8CF7089DEA4736F0AFAB0 /* DiamondShape.swift in Sources */,
+				0AB647FB5CFBF7E100B12DB8 /* HoldLoupeView.swift in Sources */,
+				F1ABE493667B61935BA5FC59 /* HoldMarkerView.swift in Sources */,
+				67DF88AFF131162F471E8BE3 /* WallBackgroundView.swift in Sources */,
+				8F348107740686CE8AFBFDB0 /* WallZoomControlsView.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
-		D49957D2E4A354008AF4BCCF /* Sources */ = {
+		7E620284E7D966DD119A220B /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				D8082BE91672B875494F5BAC /* AppModel.swift in Sources */,
-				028583A56EBBC0F3C5CE598C /* AppTabView.swift in Sources */,
-				604515358B251221F9837DC3 /* RootView.swift in Sources */,
-				46A02B48C828F447571E8082 /* SprayWallApp.swift in Sources */,
-				DD115C833B43BC50FA4BE829 /* Attempt.swift in Sources */,
-				0BF1E1BFF309118812CE51BB /* Boulder.swift in Sources */,
-				46B197D082557CD464445250 /* CalibrationPoint.swift in Sources */,
-				5D97BA66AC3A7699911EA38E /* DomainEnums.swift in Sources */,
-				48D61321530F52A1FD2A4E05 /* Hold.swift in Sources */,
-				46369DF67C1884EAC01AD00B /* HoldLoupeConfig.swift in Sources */,
-				E021E48B6993DFFCD7B0B0BF /* Route.swift in Sources */,
-				A54ACCE5C9E784D878EBBFFB /* UserAccount.swift in Sources */,
-				83F5F288D6ED554BCC299E2F /* WallCalibration.swift in Sources */,
-				83F00E3FEF09C6DF6785029E /* AuthService.swift in Sources */,
-				F839C344FB0230CEC6A27916 /* BoulderMigrationService.swift in Sources */,
-				5FAE6C1F4DE0D4B7EBFA2D7C /* HoldBackwardTransformService.swift in Sources */,
-				67E418E4A4746B38EE1DBE0C /* HoldMigrationService.swift in Sources */,
-				255F5F720358D9CB1B69D3E9 /* IDService.swift in Sources */,
-				3F9EE3CD92EA8DD0447D439C /* ImageRectificationService.swift in Sources */,
-				5EF2D1BD681C705B6E6988F4 /* KeychainService.swift in Sources */,
-				9E5A6A6D28968CD8CA510468 /* LegacyStoreMigrationService.swift in Sources */,
-				E6C833B36A2FB6757E791544 /* OriginalPhotoLoader.swift in Sources */,
-				6AED40BF9F5E872A0558D1E1 /* ProjectArchiveService.swift in Sources */,
-				80DC0243E8B462464543105D /* CSVIntCodec.swift in Sources */,
-				8DC235FD2A118ABB54F58235 /* CalibrationZoomTransform.swift in Sources */,
-				F3F727A057FD530E03C81268 /* ScrollWheelZoomModifier.swift in Sources */,
-				F72533D9FD9DEB229AC1E909 /* WallProjectPaths.swift in Sources */,
-				91E0CE448FAFFC0C66A48AF0 /* WallSpec.swift in Sources */,
-				D22B856F00CA8059D12944CF /* WallZoomTransform.swift in Sources */,
-				A11A0EB0BD871AB48585B19E /* AttemptLoggerView.swift in Sources */,
-				6588CF309B3B4253C039305B /* AuthView.swift in Sources */,
-				D6269E427C560924E40C589E /* BoulderEditorView.swift in Sources */,
-				5CD6BC51CE4C8B14C9DE43E5 /* BoulderListView.swift in Sources */,
-				EBD3ADBC9B318D5AC6B45E24 /* CalibrationView.swift in Sources */,
-				C49EAC9C79B58D99A1F0916E /* InteractiveCalibrationEditor.swift in Sources */,
-				E762D22F17B6368E27680528 /* HoldDetailView.swift in Sources */,
-				CFF0D2382917547BB6D4E823 /* HoldEditorView.swift in Sources */,
-				0CE5333A07D19DE26C94D651 /* RouteDetailView.swift in Sources */,
-				D6CF5778165A807978FF2C31 /* RouteEditorView.swift in Sources */,
-				029F143A4BE118D78391ED89 /* SettingsView.swift in Sources */,
-				49FA1312790348D5DB45F760 /* DiamondShape.swift in Sources */,
-				FDA8E25990923668A1EB5B08 /* HoldLoupeView.swift in Sources */,
-				5BA3773925BE4A855B3D53AB /* HoldMarkerView.swift in Sources */,
-				D6639D212ED329A87197D2E3 /* WallBackgroundView.swift in Sources */,
-				A694E9A4D8CBE9E26BE454F1 /* WallZoomControlsView.swift in Sources */,
+				AA6A31FF9C7639C0E1129D8A /* AdminPermissionsTests.swift in Sources */,
+				05DEFD602B165F651A9B5CBE /* CSVIntCodecTests.swift in Sources */,
+				9208F4BC00081C7BAEA9F3B1 /* CalibrationZoomTransformTests.swift in Sources */,
+				0BF6DB46754AE4074284DC70 /* HoldBackwardTransformServiceTests.swift in Sources */,
+				AF328998DBF9E8EFB460F7BC /* HoldEllipseGeometryTests.swift in Sources */,
+				ED99A55436C210FD6CDB4BF7 /* ImageRectificationServiceTests.swift in Sources */,
+				1C91DF7DEE8F0DD9AFB57BC4 /* WallProjectPathsTests.swift in Sources */,
+				A941D51EF7637275A05A984E /* WallZoomTransformTests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
-		E194BCA6E1F0CC083A895637 /* Sources */ = {
+		F6DC6CD9F4293332ABA1DE4A /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				BD978608F37214C166DF5025 /* AdminPermissionsTests.swift in Sources */,
-				2273AB79014897B181640235 /* CSVIntCodecTests.swift in Sources */,
-				1C129488110FC79AE36B82D0 /* CalibrationZoomTransformTests.swift in Sources */,
-				4C1C80C89FC00FC2F6BC5D45 /* HoldBackwardTransformServiceTests.swift in Sources */,
-				6F11FCD639A7A18596D3FD10 /* HoldEllipseGeometryTests.swift in Sources */,
-				F00F098099A419360FD76239 /* ImageRectificationServiceTests.swift in Sources */,
-				8D8F82304922067C44C2F630 /* WallProjectPathsTests.swift in Sources */,
-				150774AB07692DEF9A9CB0D8 /* WallZoomTransformTests.swift in Sources */,
+				847BD787E01CEF3823BAD5B4 /* AppModel.swift in Sources */,
+				2EF8740BF2A51615977DA88C /* AppTabView.swift in Sources */,
+				424C41A4B80B538A48CDDFAE /* RootView.swift in Sources */,
+				79E0ACB51EBEDF214D3A09EB /* SprayWallApp.swift in Sources */,
+				4716BC7BF711804E6934513F /* Attempt.swift in Sources */,
+				03D91F4C897EAF59E5AB13B7 /* Boulder.swift in Sources */,
+				DF95B09A684077A723B86296 /* CalibrationPoint.swift in Sources */,
+				4910BC1FE8FB82482F58F207 /* DomainEnums.swift in Sources */,
+				94A41947080D8591C4B0380D /* Hold.swift in Sources */,
+				98FF18A7074B9F8CFE764A73 /* HoldLoupeConfig.swift in Sources */,
+				B594B6F04663A01A8FEB44EC /* Route.swift in Sources */,
+				8C211D73EA1B1300E3C1CA77 /* UserAccount.swift in Sources */,
+				1015E1B9747C31CCD2B1C56D /* WallCalibration.swift in Sources */,
+				0DAED5FDE4B2B9E034A9E5E7 /* AuthService.swift in Sources */,
+				9C6D9777B8775A4213C7633A /* BoulderMigrationService.swift in Sources */,
+				A73F372B9BFD6D892536E644 /* HoldBackwardTransformService.swift in Sources */,
+				BF715A25E70C463010E97486 /* HoldMigrationService.swift in Sources */,
+				C55996D803ABF99A13BE6401 /* IDService.swift in Sources */,
+				67FF910B54B9900FB4AEBF0E /* ImageRectificationService.swift in Sources */,
+				FA133C1A0633621952B56B98 /* KeychainService.swift in Sources */,
+				4E0541F26759EE9B6A10A227 /* LegacyStoreMigrationService.swift in Sources */,
+				948C31A5141C06C3C80D45EF /* OriginalPhotoLoader.swift in Sources */,
+				7EF309CBE9F2692E42FDA349 /* ProjectArchiveService.swift in Sources */,
+				BD7CCEBDC4E1D54296BCCF4F /* CSVIntCodec.swift in Sources */,
+				5A6EC9AD515695466530CF42 /* CalibrationZoomTransform.swift in Sources */,
+				67677F1CB7172231C90AA0C1 /* ScrollWheelZoomModifier.swift in Sources */,
+				068333FF4F2832B94237B793 /* WallProjectPaths.swift in Sources */,
+				28A0F9C06CAEE0FCCCE90663 /* WallSpec.swift in Sources */,
+				80F06C323543AD74593BC97F /* WallZoomTransform.swift in Sources */,
+				277502B1C950003F140A2793 /* AttemptLoggerView.swift in Sources */,
+				BC2C09864A1918B99452FA07 /* AuthView.swift in Sources */,
+				F014778263E931AB93D5C06E /* BoulderEditorView.swift in Sources */,
+				D95DD3F64EB5C0235845134D /* BoulderListView.swift in Sources */,
+				942DC5238F316BD1BA5BCDE7 /* CalibrationView.swift in Sources */,
+				82414D9DF0C89C0C24122193 /* InteractiveCalibrationEditor.swift in Sources */,
+				A46A7F0614C883F181A21049 /* HoldDetailView.swift in Sources */,
+				8E1994AD96191F8116A85B4F /* HoldEditorView.swift in Sources */,
+				1F5703AEA4BB7CB245C80FDC /* RouteDetailView.swift in Sources */,
+				015A2B4007A460A41A44B78C /* RouteEditorView.swift in Sources */,
+				FECD1EB03D864E6AA587D176 /* SettingsView.swift in Sources */,
+				9716133C9374D0E322372846 /* DiamondShape.swift in Sources */,
+				7520E4332C8161AFA312E966 /* HoldLoupeView.swift in Sources */,
+				185FEFD710274C82B10976C7 /* HoldMarkerView.swift in Sources */,
+				6C6DD443E10DB533B8DE6F4C /* WallBackgroundView.swift in Sources */,
+				19FAFFECC5585A01F7F5D209 /* WallZoomControlsView.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXSourcesBuildPhase section */
 
 /* Begin PBXTargetDependency section */
-		2CC2734BD1DC8F00A368536E /* PBXTargetDependency */ = {
+		161AB741C7023A6284C8CA94 /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
 			name = SprayWall;
-			target = 7B0665AEB783CC9EFF2F105E /* SprayWall */;
-			targetProxy = 3453EA4197EAEE2623CB0515 /* PBXContainerItemProxy */;
+			target = C462839E7F55564C370A604B /* SprayWall */;
+			targetProxy = FE6AF5F0DE82882DA228C90E /* PBXContainerItemProxy */;
 		};
 /* End PBXTargetDependency section */
 
 /* Begin XCBuildConfiguration section */
-		3524371B784589EE95FE8C14 /* Debug */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
-				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
-				CLANG_ENABLE_OBJC_WEAK = NO;
-				CODE_SIGN_STYLE = Automatic;
-				GENERATE_INFOPLIST_FILE = YES;
-				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
-				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
-				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
-				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
-				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
-				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
-				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
-				PRODUCT_BUNDLE_IDENTIFIER = com.spraywall.app;
-				PRODUCT_NAME = SprayWall;
-				SDKROOT = iphoneos;
-				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
-				SWIFT_EMIT_LOC_STRINGS = YES;
-				SWIFT_VERSION = 6.0;
-				TARGETED_DEVICE_FAMILY = "1,2";
-			};
-			name = Debug;
-		};
-		594FCA8D0F743D0425C9B80F /* Release */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				BUNDLE_LOADER = "$(TEST_HOST)";
-				CLANG_ENABLE_OBJC_WEAK = NO;
-				CODE_SIGN_STYLE = Automatic;
-				GENERATE_INFOPLIST_FILE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
-				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
-				PRODUCT_BUNDLE_IDENTIFIER = com.spraywall.app.tests;
-				PRODUCT_NAME = SprayWallTests;
-				SDKROOT = iphoneos;
-				SWIFT_VERSION = 6.0;
-				TARGETED_DEVICE_FAMILY = "1,2";
-				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/SprayWall.app/SprayWall";
-				VALIDATE_PRODUCT = YES;
-			};
-			name = Release;
-		};
-		7695536096EBC2286E066E67 /* Release */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
-				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
-				CLANG_ENABLE_OBJC_WEAK = NO;
-				CODE_SIGN_STYLE = Automatic;
-				GENERATE_INFOPLIST_FILE = YES;
-				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
-				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
-				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
-				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
-				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
-				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
-				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
-				PRODUCT_BUNDLE_IDENTIFIER = com.spraywall.app;
-				PRODUCT_NAME = SprayWall;
-				SDKROOT = iphoneos;
-				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
-				SWIFT_EMIT_LOC_STRINGS = YES;
-				SWIFT_VERSION = 6.0;
-				TARGETED_DEVICE_FAMILY = "1,2";
-				VALIDATE_PRODUCT = YES;
-			};
-			name = Release;
-		};
-		857FCF576F04488F1B9A8D96 /* Release */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
-				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
-				CODE_SIGN_STYLE = Automatic;
-				COMBINE_HIDPI_IMAGES = YES;
-				GENERATE_INFOPLIST_FILE = YES;
-				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks";
-				MACOSX_DEPLOYMENT_TARGET = 14.0;
-				PRODUCT_BUNDLE_IDENTIFIER = com.spraywall.app.macos;
-				PRODUCT_NAME = "SprayWall-macOS";
-				SDKROOT = macosx;
-				SUPPORTED_PLATFORMS = macosx;
-				SWIFT_VERSION = 6.0;
-			};
-			name = Release;
-		};
-		A1F6BC4718F6149B9E23196C /* Release */ = {
+		61BA30E813BFFD93414BF5D5 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
@@ -717,7 +629,25 @@
 			};
 			name = Release;
 		};
-		A3C5675E2E65BFE9521C7ED3 /* Debug */ = {
+		76C3DED88B188FF76645D80A /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_STYLE = Automatic;
+				COMBINE_HIDPI_IMAGES = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks";
+				MACOSX_DEPLOYMENT_TARGET = 14.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.spraywall.app.macos;
+				PRODUCT_NAME = "SprayWall-macOS";
+				SDKROOT = macosx;
+				SUPPORTED_PLATFORMS = macosx;
+				SWIFT_VERSION = 6.0;
+			};
+			name = Debug;
+		};
+		83E6B787CFC91C462D6D6A8B /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
@@ -778,7 +708,26 @@
 			};
 			name = Debug;
 		};
-		AE5A3540FE7C9F5C57E193FF /* Debug */ = {
+		86EA8AB1002630DAB1A2C198 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CLANG_ENABLE_OBJC_WEAK = NO;
+				CODE_SIGN_STYLE = Automatic;
+				GENERATE_INFOPLIST_FILE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
+				PRODUCT_BUNDLE_IDENTIFIER = com.spraywall.app.tests;
+				PRODUCT_NAME = SprayWallTests;
+				SDKROOT = iphoneos;
+				SWIFT_VERSION = 6.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/SprayWall.app/SprayWall";
+				VALIDATE_PRODUCT = YES;
+			};
+			name = Release;
+		};
+		E3BB806D24A875AB0D4826EB /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
@@ -794,9 +743,34 @@
 				SUPPORTED_PLATFORMS = macosx;
 				SWIFT_VERSION = 6.0;
 			};
+			name = Release;
+		};
+		E68DFBC17250F7C43B99AE52 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CLANG_ENABLE_OBJC_WEAK = NO;
+				CODE_SIGN_STYLE = Automatic;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
+				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
+				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
+				PRODUCT_BUNDLE_IDENTIFIER = com.spraywall.app;
+				PRODUCT_NAME = SprayWall;
+				SDKROOT = iphoneos;
+				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 6.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
 			name = Debug;
 		};
-		F7C6BD87392F00242950F32C /* Debug */ = {
+		E6EA8BA4F1A31A09FDC12D16 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				BUNDLE_LOADER = "$(TEST_HOST)";
@@ -814,46 +788,72 @@
 			};
 			name = Debug;
 		};
+		EA634BAB3B864772715C3DB4 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CLANG_ENABLE_OBJC_WEAK = NO;
+				CODE_SIGN_STYLE = Automatic;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
+				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
+				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
+				PRODUCT_BUNDLE_IDENTIFIER = com.spraywall.app;
+				PRODUCT_NAME = SprayWall;
+				SDKROOT = iphoneos;
+				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 6.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				VALIDATE_PRODUCT = YES;
+			};
+			name = Release;
+		};
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
-		5CC977ACE4392CF01A8E08E2 /* Build configuration list for PBXNativeTarget "SprayWall" */ = {
+		0FB67D65D92CC35A71401EEB /* Build configuration list for PBXNativeTarget "SprayWallTests" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
-				7695536096EBC2286E066E67 /* Release */,
-				3524371B784589EE95FE8C14 /* Debug */,
+				86EA8AB1002630DAB1A2C198 /* Release */,
+				E6EA8BA4F1A31A09FDC12D16 /* Debug */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		A2335B531BE18C12467A2665 /* Build configuration list for PBXProject "SprayWall" */ = {
+		1ECDE86DA7FBBE16B6903113 /* Build configuration list for PBXNativeTarget "SprayWall" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
-				A3C5675E2E65BFE9521C7ED3 /* Debug */,
-				A1F6BC4718F6149B9E23196C /* Release */,
+				EA634BAB3B864772715C3DB4 /* Release */,
+				E68DFBC17250F7C43B99AE52 /* Debug */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		BD4682167D54697C71C5E26F /* Build configuration list for PBXNativeTarget "SprayWall-macOS" */ = {
+		78511E72DA174A09488155A5 /* Build configuration list for PBXProject "SprayWall" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
-				857FCF576F04488F1B9A8D96 /* Release */,
-				AE5A3540FE7C9F5C57E193FF /* Debug */,
+				83E6B787CFC91C462D6D6A8B /* Debug */,
+				61BA30E813BFFD93414BF5D5 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		D2C634755EB8E37F20B2068B /* Build configuration list for PBXNativeTarget "SprayWallTests" */ = {
+		B893F10A54F7B9C0CF220138 /* Build configuration list for PBXNativeTarget "SprayWall-macOS" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
-				594FCA8D0F743D0425C9B80F /* Release */,
-				F7C6BD87392F00242950F32C /* Debug */,
+				E3BB806D24A875AB0D4826EB /* Release */,
+				76C3DED88B188FF76645D80A /* Debug */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
 	};
-	rootObject = 5A0C0D4C6CBE5F8C2A1FFDF8 /* Project object */;
+	rootObject = BC87CCBADC754B82BA4267D7 /* Project object */;
 }
