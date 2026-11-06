@@ -5,7 +5,7 @@
 </p>
 
 <p align="center">
-  <strong>High-Precision Homography Rectification, Geometric Hold Mapping & Boulder Setter for Climbing Spray Walls</strong>
+  <strong>Homography Rectification, Geometric Hold Mapping & Boulder Setter for Climbing Spray Walls</strong>
 </p>
 
 <p align="center">
@@ -26,9 +26,9 @@
 
 ## Overview
 
-**SprayWall** is a native, professional macOS and iOS application designed for home and commercial climbing spray walls. It transforms raw, perspective-distorted wall photos into geometrically calibrated, millimeter-accurate 2D climbing canvases. 
+**SprayWall** is a native macOS and iOS application for climbing spray walls. It transforms perspective-distorted wall photos into calibrated 2D climbing canvases. 
 
-Setters and climbers can accurately map physical holds as rotatable ellipses, inspect holds at high resolution using a projective magnifying loupe, define boulders with industry-standard role color-coding, track ascents, and filter problems by difficulty.
+Setters and climbers can map physical holds as rotatable ellipses, inspect holds using a projective magnifying loupe, define boulders with role color-coding, track ascents, and filter problems by difficulty.
 
 ---
 
@@ -36,23 +36,23 @@ Setters and climbers can accurately map physical holds as rotatable ellipses, in
 
 ### 📐 Geometric Wall Calibration & Image Rectification
 - **8-Point Perspective Calibration**: Maps raw photo coordinates to real-world centimeters across multi-angle wall structures (inclined main wall and 90° kickboard).
-- **Sub-Pixel Loupe Precision**: Interactive calibration editor with real-time magnifying loupe, coordinate inspection, and edge-aware cropping.
+- **Loupe-Assisted Placement**: Interactive calibration editor with magnifying loupe, coordinate inspection, and edge-aware cropping.
 - **Joint-Point Synchronization**: Single-toggle joint adjustment for shared seam boundary points between the kickboard and main wall.
-- **Planar Homography Pipeline**: Real-time perspective correction engine outputting high-resolution rectified PNGs (`main_wall_rectified.png` and `kickboard_rectified.png`).
-- **Flexible Photo Import**: Import high-resolution wall photos directly from the **Apple Photos Library** or browse the **Computer Filesystem** (`.jpg`, `.jpeg`, `.png`, `.heic`, `.dng`).
+- **Planar Homography Pipeline**: Perspective correction engine outputting rectified PNGs (`main_wall_rectified.png` and `kickboard_rectified.png`).
+- **Photo Import**: Import wall photos from the **Apple Photos Library** or the **Computer Filesystem** (`.jpg`, `.jpeg`, `.png`, `.heic`, `.dng`).
 
 ### 🎯 Parametric Hold Modeling & Interactive Editing
-- **True Ellipse Geometry**: Holds are modeled with distinct major axis ($cm$), minor axis ($cm$), and planar rotation angle ($^\circ$).
-- **Dual-Action Direct Manipulation**:
-  - **Normal Drag**: Smoothly moves the hold's central bolt-hole position.
-  - **Shift + Drag**: Activates visual axis handles for intuitive real-time resizing and rotation.
-- **Scale-Invariant Pencil Rendering**: Marker lines and handles maintain crisp, constant on-screen stroke width ($1.2\text{ pt} / \text{zoomScale}$), avoiding visual clutter when zooming into dense hold clusters.
-- **Side-Positioned Non-Occluding Loupe**: The magnifying loupe automatically docks to the opposite screen gutter during hold editing, ensuring visual handles and holds remain fully visible.
+- **Ellipse Geometry**: Holds are modeled with major axis ($cm$), minor axis ($cm$), and planar rotation angle ($^\circ$).
+- **Direct Manipulation**:
+  - **Normal Drag**: Moves the hold's central bolt-hole position.
+  - **Shift + Drag**: Activates visual axis handles for resizing and rotation.
+- **Scale-Invariant Line Rendering**: Marker lines and handles maintain a constant on-screen stroke width ($1.2\text{ pt} / \text{zoomScale}$), avoiding visual clutter when zooming into dense hold clusters.
+- **Side-Positioned Loupe**: The magnifying loupe automatically docks to the opposite screen gutter during hold editing, keeping visual handles and holds visible.
 
 ### 🔍 Projective Backward Homography Loupe
 - **Perspective-Corrected Loupe Projection**: Projects the hold's physical planar geometry through the camera homography matrix, aligning the hold ellipse and rotated bounding box with the tilted perspective photo.
-- **Multiple Loupe Geometries**: Configurable circle and rounded rectangle loupe shapes with real-time edge clamping and zoom levels.
-- **Active Hover Feedback**: Seamless hover highlighting across all holds, operating smoothly whether the loupe preview is enabled or disabled.
+- **Multiple Loupe Geometries**: Configurable circle and rounded rectangle loupe shapes with edge clamping and zoom levels.
+- **Hover Feedback**: Hover highlighting across all holds, operating with the loupe enabled or disabled.
 
 ### 🧗 Boulder Definition & Tick List
 - **Standardized Hold Roles & Color Hierarchy**:
@@ -62,15 +62,15 @@ Setters and climbers can accurately map physical holds as rotatable ellipses, in
   | **Top** | Rounded Rectangle | Red (`Color.red`) | Cyan Halo + Thickened Stroke |
   | **Handhold** | Ellipse | Blue (`Color.blue`) | Cyan Halo + Thickened Stroke |
   | **Foothold** | Diamond | Yellow (`Color.yellow`) | Cyan Halo + Thickened Stroke |
-  | **Unselected** | Ellipse | White (`Color.white.opacity(0.55)`) | Vibrant Cyan (`Color.cyan`) |
-- **Rotated Bounding Box Symbols**: Holds in the boulder view are rendered with their symbols oriented inside the hold's true physical bounding box.
-- **Draft & Established Lifecycles**: Protect completed boulders from accidental edits while allowing rapid iteration in draft mode.
-- **Grade Filtering & Ascension Logging**: Dynamic grade range slider filter, 5-star quality ratings, setter attribution, and single-click ascent logging.
+  | **Unselected** | Ellipse | White (`Color.white.opacity(0.55)`) | Cyan (`Color.cyan`) |
+- **Rotated Bounding Box Symbols**: Holds in the boulder view are rendered with symbols oriented inside the hold's physical bounding box.
+- **Draft & Established States**: Separates editable drafts from established boulders.
+- **Grade Filtering & Ascent Logging**: Grade range slider filter, 5-star quality ratings, setter attribution, and ascent logging.
 
 ### 🔒 Security, Reliability & Persistence
-- **SwiftData SQLite Storage**: Fully relational, atomic local database tracking holds, grips, boulders, routes, ascents, and calibrations.
-- **Keychain Security**: Secure user authentication and credentials management.
-- **Project Archives**: Full JSON export and import capabilities for backup and team synchronization.
+- **SwiftData SQLite Storage**: Relational local database tracking holds, grips, boulders, routes, ascents, and calibrations.
+- **Keychain Security**: User authentication and credential management.
+- **Project Archives**: JSON export and import for backup and transfer.
 
 ---
 
