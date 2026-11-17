@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <title>SprayWall — Boulders</title>
+  <link rel="icon" type="image/png" href="./images/main_wall_rectified.png">
+  <link rel="stylesheet" href="./styles.css">
+</head>
+<body>
+  <div id="app" class="app-shell">
+    <!-- Left / Master: Boulder List -->
+    <aside id="sidebar" class="sidebar" aria-label="Boulder List">
+      <header class="sidebar-header">
+        <div class="brand">
+          <span class="brand-icon" aria-hidden="true">🧗</span>
+          <div>
+            <h1>SprayWall</h1>
+            <p class="subtitle">Pick a boulder to climb</p>
+          </div>
+        </div>
+      </header>
+
+      <div class="filters">
+        <div class="search-row">
+          <label class="visually-hidden" for="search-input">Search boulders</label>
+          <input
+            id="search-input"
+            type="search"
+            placeholder="Search boulder or setter..."
+            autocomplete="off"
+          >
+        </div>
+
+        <div class="filter-row">
+          <div class="segmented" role="group" aria-label="Status filter">
+            <button type="button" class="seg-btn is-active" data-status="all">All</button>
+            <button type="button" class="seg-btn" data-status="established">Established</button>
+          </div>
+        </div>
+
+        <div class="grade-filter">
+          <div class="grade-select-group">
+            <label for="min-grade">From</label>
+            <select id="min-grade"></select>
+          </div>
+          <div class="grade-select-group">
+            <label for="max-grade">To</label>
+            <select id="max-grade"></select>
+          </div>
+        </div>
+      </div>
+
+      <div id="boulder-list" class="boulder-list" role="list">
+        <div class="empty-state">Loading boulders...</div>
+      </div>
+    </aside>
+
+    <!-- Right / Detail: Wall & Boulder Viewer -->
+    <main id="viewer" class="viewer">
+      <header class="viewer-header">
+        <div class="viewer-title-group">
+          <button id="back-btn" type="button" class="icon-btn mobile-only" aria-label="Back to boulder list">
+            ← Boulders
+          </button>
+          <div id="active-boulder-meta" class="boulder-meta">
+            <span class="meta-name">Select a boulder</span>
+          </div>
+        </div>
+
+        <div class="viewer-controls">
+          <label class="toggle-chip" title="Show unselected holds on the wall">
+            <input id="show-all-holds" type="checkbox">
+            <span>All holds</span>
+          </label>
+          <div class="zoom-bar" role="group" aria-label="Zoom controls">
+            <button id="zoom-out-btn" type="button" class="icon-btn" aria-label="Zoom out">−</button>
+            <button id="zoom-reset-btn" type="button" class="zoom-readout" aria-label="Reset zoom">100%</button>
+            <button id="zoom-in-btn" type="button" class="icon-btn" aria-label="Zoom in">+</button>
+          </div>
+        </div>
+      </header>
+
+      <div id="wall-viewport" class="wall-viewport">
+        <div id="wall-stage" class="wall-stage">
+          <div class="wall-images">
+            <img
+              src="./images/main_wall_rectified.png"
+              alt="Rectified main climbing wall"
+              class="wall-img-main"
+              draggable="false"
+            >
+            <div class="wall-seam" aria-hidden="true"></div>
+            <img
+              src="./images/kickboard_rectified.png"
+              alt="Rectified kickboard"
+              class="wall-img-kickboard"
+              draggable="false"
+            >
+          </div>
+          <svg
+            id="holds-overlay"
+            class="holds-overlay"
+            viewBox="0 0 360 360"
+            preserveAspectRatio="none"
+            aria-label="Boulder holds overlay"
+          ></svg>
+        </div>
+      </div>
+
+      <footer class="legend-bar" aria-label="Hold role legend">
+        <div class="legend-item">
+          <span class="swatch swatch-start"></span>
+          <span>Start</span>
+        </div>
+        <div class="legend-item">
+          <span class="swatch swatch-hold"></span>
+          <span>Hold</span>
+        </div>
+        <div class="legend-item">
+          <span class="swatch swatch-foot"></span>
+          <span>Foothold</span>
+        </div>
+        <div class="legend-item">
+          <span class="swatch swatch-top"></span>
+          <span>Top</span>
+        </div>
+      </footer>
+    </main>
+  </div>
+
+  <script type="module" src="./app.js"></script>
+</body>
+</html>

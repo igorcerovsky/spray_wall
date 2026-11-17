@@ -1,0 +1,907 @@
+{
+  "wall": {
+    "widthCm": 360.0,
+    "mainWallHeightCm": 320.0,
+    "kickboardHeightCm": 40.0,
+    "totalHeightCm": 360.0
+  },
+  "availableGrades": [
+    "1",
+    "2",
+    "3",
+    "4",
+    "5a",
+    "5b",
+    "5c",
+    "6a",
+    "6a+",
+    "6b",
+    "6b+",
+    "6c",
+    "6c+",
+    "7a",
+    "7a+",
+    "7b",
+    "7b+",
+    "7c",
+    "7c+",
+    "8a",
+    "8a+",
+    "8b",
+    "8b+",
+    "8c",
+    "8c+",
+    "9a"
+  ],
+  "holds": [
+    {
+      "id": 1,
+      "xCm": 17.046750091441744,
+      "yCm": 29.55077744728897,
+      "majorCm": 8.0,
+      "minorCm": 3.7,
+      "rotationDeg": 137.0,
+      "plane": "kickboard"
+    },
+    {
+      "id": 2,
+      "xCm": 37.34572784810126,
+      "yCm": 29.62533905967449,
+      "majorCm": 8.0,
+      "minorCm": 3.9,
+      "rotationDeg": 0.0,
+      "plane": "kickboard"
+    },
+    {
+      "id": 3,
+      "xCm": 57.89274412296564,
+      "yCm": 28.40981012658228,
+      "majorCm": 8.0,
+      "minorCm": 3.9,
+      "rotationDeg": 0.0,
+      "plane": "kickboard"
+    },
+    {
+      "id": 4,
+      "xCm": 78.3559379301917,
+      "yCm": 28.68885613619367,
+      "majorCm": 8.0,
+      "minorCm": 3.6,
+      "rotationDeg": 132.0,
+      "plane": "kickboard"
+    },
+    {
+      "id": 5,
+      "xCm": 97.99306520478218,
+      "yCm": 28.167944191170363,
+      "majorCm": 8.0,
+      "minorCm": 3.8,
+      "rotationDeg": 0.0,
+      "plane": "kickboard"
+    },
+    {
+      "id": 6,
+      "xCm": 116.59015866473848,
+      "yCm": 28.88039420532593,
+      "majorCm": 9.9,
+      "minorCm": 3.3,
+      "rotationDeg": 0.0,
+      "plane": "kickboard"
+    },
+    {
+      "id": 7,
+      "xCm": 179.9471927753327,
+      "yCm": 28.431085276800708,
+      "majorCm": 8.8,
+      "minorCm": 3.5,
+      "rotationDeg": 0.0,
+      "plane": "kickboard"
+    },
+    {
+      "id": 8,
+      "xCm": 208.0460065245804,
+      "yCm": 29.203502817273446,
+      "majorCm": 8.0,
+      "minorCm": 5.0,
+      "rotationDeg": 34.0,
+      "plane": "kickboard"
+    },
+    {
+      "id": 9,
+      "xCm": 237.22065559671123,
+      "yCm": 28.659319891888238,
+      "majorCm": 8.0,
+      "minorCm": 3.1,
+      "rotationDeg": 0.0,
+      "plane": "kickboard"
+    },
+    {
+      "id": 10,
+      "xCm": 260.1506265925059,
+      "yCm": 29.263470343590537,
+      "majorCm": 8.0,
+      "minorCm": 4.0,
+      "rotationDeg": 29.0,
+      "plane": "kickboard"
+    },
+    {
+      "id": 11,
+      "xCm": 280.5198947107889,
+      "yCm": 28.6825908722501,
+      "majorCm": 8.0,
+      "minorCm": 4.5,
+      "rotationDeg": 0.0,
+      "plane": "kickboard"
+    },
+    {
+      "id": 12,
+      "xCm": 299.99152350813745,
+      "yCm": 29.159979656419527,
+      "majorCm": 8.0,
+      "minorCm": 4.4,
+      "rotationDeg": 0.0,
+      "plane": "kickboard"
+    },
+    {
+      "id": 13,
+      "xCm": 320.9254769206391,
+      "yCm": 29.295691701014697,
+      "majorCm": 8.0,
+      "minorCm": 5.0,
+      "rotationDeg": 33.0,
+      "plane": "kickboard"
+    },
+    {
+      "id": 14,
+      "xCm": 339.21378237194756,
+      "yCm": 29.153380705724764,
+      "majorCm": 8.0,
+      "minorCm": 3.7,
+      "rotationDeg": 35.0,
+      "plane": "kickboard"
+    },
+    {
+      "id": 15,
+      "xCm": 73.6997061482821,
+      "yCm": 57.40449819168175,
+      "majorCm": 8.0,
+      "minorCm": 8.0,
+      "rotationDeg": 0.0,
+      "plane": "main"
+    },
+    {
+      "id": 16,
+      "xCm": 125.67246835443038,
+      "yCm": 58.1978978300181,
+      "majorCm": 8.0,
+      "minorCm": 8.0,
+      "rotationDeg": 0.0,
+      "plane": "main"
+    },
+    {
+      "id": 17,
+      "xCm": 200.75828959923666,
+      "yCm": 58.101741412213755,
+      "majorCm": 8.0,
+      "minorCm": 8.0,
+      "rotationDeg": 0.0,
+      "plane": "main"
+    },
+    {
+      "id": 18,
+      "xCm": 258.94322519083966,
+      "yCm": 57.00679866412215,
+      "majorCm": 8.0,
+      "minorCm": 8.0,
+      "rotationDeg": 0.0,
+      "plane": "main"
+    },
+    {
+      "id": 19,
+      "xCm": 321.65016698473283,
+      "yCm": 55.82329437022899,
+      "majorCm": 8.0,
+      "minorCm": 8.0,
+      "rotationDeg": 0.0,
+      "plane": "main"
+    },
+    {
+      "id": 20,
+      "xCm": 54.973400068621146,
+      "yCm": 113.79182087358329,
+      "majorCm": 20.0,
+      "minorCm": 8.0,
+      "rotationDeg": 48.0,
+      "plane": "main"
+    },
+    {
+      "id": 21,
+      "xCm": 38.67469183523581,
+      "yCm": 137.59781897472334,
+      "majorCm": 14.2,
+      "minorCm": 12.5,
+      "rotationDeg": 0.0,
+      "plane": "main"
+    },
+    {
+      "id": 22,
+      "xCm": 97.0920128451707,
+      "yCm": 119.10376225550773,
+      "majorCm": 13.4,
+      "minorCm": 10.6,
+      "rotationDeg": 13.0,
+      "plane": "main"
+    },
+    {
+      "id": 23,
+      "xCm": 137.32631402383691,
+      "yCm": 97.46555525582659,
+      "majorCm": 13.2,
+      "minorCm": 8.0,
+      "rotationDeg": 343.0,
+      "plane": "main"
+    },
+    {
+      "id": 24,
+      "xCm": 157.98050110109972,
+      "yCm": 117.30270987594324,
+      "majorCm": 16.2,
+      "minorCm": 8.0,
+      "rotationDeg": 345.0,
+      "plane": "main"
+    },
+    {
+      "id": 25,
+      "xCm": 178.73291302005052,
+      "yCm": 113.5652689293835,
+      "majorCm": 8.0,
+      "minorCm": 20.7,
+      "rotationDeg": 0.0,
+      "plane": "main"
+    },
+    {
+      "id": 26,
+      "xCm": 206.08066406249998,
+      "yCm": 115.64648437500001,
+      "majorCm": 16.8,
+      "minorCm": 11.9,
+      "rotationDeg": 19.0,
+      "plane": "main"
+    },
+    {
+      "id": 27,
+      "xCm": 273.18486820990205,
+      "yCm": 115.59982702548182,
+      "majorCm": 19.3,
+      "minorCm": 12.0,
+      "rotationDeg": 0.0,
+      "plane": "main"
+    },
+    {
+      "id": 28,
+      "xCm": 299.84646034698704,
+      "yCm": 138.12852385788347,
+      "majorCm": 13.6,
+      "minorCm": 11.4,
+      "rotationDeg": 31.0,
+      "plane": "main"
+    },
+    {
+      "id": 29,
+      "xCm": 324.05087462106985,
+      "yCm": 152.95787517136245,
+      "majorCm": 11.5,
+      "minorCm": 8.0,
+      "rotationDeg": 94.0,
+      "plane": "main"
+    },
+    {
+      "id": 30,
+      "xCm": 303.96802093547166,
+      "yCm": 174.40449036934848,
+      "majorCm": 21.8,
+      "minorCm": 7.7,
+      "rotationDeg": 132.0,
+      "plane": "main"
+    },
+    {
+      "id": 31,
+      "xCm": 303.5896091766166,
+      "yCm": 198.99546846674335,
+      "majorCm": 14.4,
+      "minorCm": 8.0,
+      "rotationDeg": 24.0,
+      "plane": "main"
+    },
+    {
+      "id": 32,
+      "xCm": 264.5595703125,
+      "yCm": 152.940234375,
+      "majorCm": 80.0,
+      "minorCm": 7.6,
+      "rotationDeg": 60.0,
+      "plane": "main"
+    },
+    {
+      "id": 33,
+      "xCm": 234.36280020073278,
+      "yCm": 143.12837725420368,
+      "majorCm": 10.2,
+      "minorCm": 4.5,
+      "rotationDeg": 152.0,
+      "plane": "main"
+    },
+    {
+      "id": 34,
+      "xCm": 222.88347619878172,
+      "yCm": 148.50038067878256,
+      "majorCm": 15.4,
+      "minorCm": 8.0,
+      "rotationDeg": 94.0,
+      "plane": "main"
+    },
+    {
+      "id": 35,
+      "xCm": 203.29804687499998,
+      "yCm": 138.53671874999998,
+      "majorCm": 23.6,
+      "minorCm": 12.0,
+      "rotationDeg": 127.0,
+      "plane": "main"
+    },
+    {
+      "id": 36,
+      "xCm": 177.90650680513824,
+      "yCm": 144.36263425108882,
+      "majorCm": 10.5,
+      "minorCm": 5.7,
+      "rotationDeg": 0.0,
+      "plane": "main"
+    },
+    {
+      "id": 37,
+      "xCm": 178.5892941786044,
+      "yCm": 135.5859734060984,
+      "majorCm": 11.5,
+      "minorCm": 2.0,
+      "rotationDeg": 0.0,
+      "plane": "main"
+    },
+    {
+      "id": 38,
+      "xCm": 177.9510080798918,
+      "yCm": 158.1214386607644,
+      "majorCm": 19.7,
+      "minorCm": 11.5,
+      "rotationDeg": 0.0,
+      "plane": "main"
+    },
+    {
+      "id": 39,
+      "xCm": 158.5112236119056,
+      "yCm": 151.1607745916337,
+      "majorCm": 11.7,
+      "minorCm": 8.0,
+      "rotationDeg": 0.0,
+      "plane": "main"
+    },
+    {
+      "id": 40,
+      "xCm": 139.9921875,
+      "yCm": 140.5775390625,
+      "majorCm": 46.8,
+      "minorCm": 6.7,
+      "rotationDeg": 89.0,
+      "plane": "main"
+    },
+    {
+      "id": 41,
+      "xCm": 121.721484375,
+      "yCm": 140.276953125,
+      "majorCm": 8.0,
+      "minorCm": 8.0,
+      "rotationDeg": 0.0,
+      "plane": "main"
+    },
+    {
+      "id": 42,
+      "xCm": 95.69059860627088,
+      "yCm": 141.82511786273523,
+      "majorCm": 8.0,
+      "minorCm": 15.1,
+      "rotationDeg": 0.0,
+      "plane": "main"
+    },
+    {
+      "id": 43,
+      "xCm": 72.720703125,
+      "yCm": 164.077734375,
+      "majorCm": 80.0,
+      "minorCm": 8.0,
+      "rotationDeg": 92.0,
+      "plane": "main"
+    },
+    {
+      "id": 44,
+      "xCm": 94.83752026771309,
+      "yCm": 170.8468228916263,
+      "majorCm": 14.6,
+      "minorCm": 11.9,
+      "rotationDeg": 0.0,
+      "plane": "main"
+    },
+    {
+      "id": 45,
+      "xCm": 118.6716796875,
+      "yCm": 160.1455078125,
+      "majorCm": 22.8,
+      "minorCm": 8.0,
+      "rotationDeg": 27.0,
+      "plane": "main"
+    },
+    {
+      "id": 46,
+      "xCm": 151.68750336770657,
+      "yCm": 167.81784340446794,
+      "majorCm": 12.9,
+      "minorCm": 8.0,
+      "rotationDeg": 54.0,
+      "plane": "main"
+    },
+    {
+      "id": 47,
+      "xCm": 178.1976088687111,
+      "yCm": 176.61688037310523,
+      "majorCm": 18.8,
+      "minorCm": 13.0,
+      "rotationDeg": 0.0,
+      "plane": "main"
+    },
+    {
+      "id": 48,
+      "xCm": 211.6084208015267,
+      "yCm": 176.5273139312977,
+      "majorCm": 16.5,
+      "minorCm": 11.6,
+      "rotationDeg": 0.0,
+      "plane": "main"
+    },
+    {
+      "id": 49,
+      "xCm": 205.73951175445106,
+      "yCm": 160.56561716216723,
+      "majorCm": 8.0,
+      "minorCm": 8.0,
+      "rotationDeg": 0.0,
+      "plane": "main"
+    },
+    {
+      "id": 50,
+      "xCm": 240.0623287109611,
+      "yCm": 159.96531247441746,
+      "majorCm": 13.7,
+      "minorCm": 8.0,
+      "rotationDeg": 354.0,
+      "plane": "main"
+    },
+    {
+      "id": 51,
+      "xCm": 241.66022162713165,
+      "yCm": 178.15161942872447,
+      "majorCm": 15.3,
+      "minorCm": 14.0,
+      "rotationDeg": 24.0,
+      "plane": "main"
+    },
+    {
+      "id": 52,
+      "xCm": 258.3498107275799,
+      "yCm": 171.70168086576032,
+      "majorCm": 11.0,
+      "minorCm": 3.6,
+      "rotationDeg": 0.0,
+      "plane": "main"
+    },
+    {
+      "id": 53,
+      "xCm": 271.4209413892991,
+      "yCm": 202.26784025925753,
+      "majorCm": 17.4,
+      "minorCm": 10.0,
+      "rotationDeg": 0.0,
+      "plane": "main"
+    },
+    {
+      "id": 54,
+      "xCm": 259.3514572426326,
+      "yCm": 220.7848988499692,
+      "majorCm": 13.6,
+      "minorCm": 9.8,
+      "rotationDeg": 161.0,
+      "plane": "main"
+    },
+    {
+      "id": 55,
+      "xCm": 269.89042691165326,
+      "yCm": 242.2950948311888,
+      "majorCm": 9.7,
+      "minorCm": 6.7,
+      "rotationDeg": 142.0,
+      "plane": "main"
+    },
+    {
+      "id": 56,
+      "xCm": 272.9168724776149,
+      "yCm": 262.7540617008876,
+      "majorCm": 12.2,
+      "minorCm": 9.3,
+      "rotationDeg": 90.0,
+      "plane": "main"
+    },
+    {
+      "id": 57,
+      "xCm": 241.2901220614828,
+      "yCm": 261.67947558770345,
+      "majorCm": 16.6,
+      "minorCm": 17.0,
+      "rotationDeg": 0.0,
+      "plane": "main"
+    },
+    {
+      "id": 58,
+      "xCm": 271.30429687500003,
+      "yCm": 318.7423828125,
+      "majorCm": 57.6,
+      "minorCm": 8.5,
+      "rotationDeg": 90.0,
+      "plane": "main"
+    },
+    {
+      "id": 59,
+      "xCm": 222.16773244586722,
+      "yCm": 236.71090468456325,
+      "majorCm": 80.0,
+      "minorCm": 8.0,
+      "rotationDeg": 111.0,
+      "plane": "main"
+    },
+    {
+      "id": 60,
+      "xCm": 217.65173019533518,
+      "yCm": 201.22444970812913,
+      "majorCm": 8.0,
+      "minorCm": 27.2,
+      "rotationDeg": 0.0,
+      "plane": "main"
+    },
+    {
+      "id": 61,
+      "xCm": 203.71076608919762,
+      "yCm": 218.47485816960187,
+      "majorCm": 18.3,
+      "minorCm": 11.3,
+      "rotationDeg": 19.0,
+      "plane": "main"
+    },
+    {
+      "id": 62,
+      "xCm": 178.7238910399717,
+      "yCm": 202.6873954740126,
+      "majorCm": 15.7,
+      "minorCm": 14.3,
+      "rotationDeg": 0.0,
+      "plane": "main"
+    },
+    {
+      "id": 63,
+      "xCm": 118.19698033707866,
+      "yCm": 239.97542134831457,
+      "majorCm": 16.0,
+      "minorCm": 12.7,
+      "rotationDeg": 0.0,
+      "plane": "main"
+    },
+    {
+      "id": 64,
+      "xCm": 136.39107783956825,
+      "yCm": 221.69731878600362,
+      "majorCm": 21.2,
+      "minorCm": 8.0,
+      "rotationDeg": 158.0,
+      "plane": "main"
+    },
+    {
+      "id": 65,
+      "xCm": 137.16976064398457,
+      "yCm": 201.47215173842292,
+      "majorCm": 26.9,
+      "minorCm": 8.0,
+      "rotationDeg": 91.0,
+      "plane": "main"
+    },
+    {
+      "id": 66,
+      "xCm": 135.22277546360905,
+      "yCm": 179.60797018511815,
+      "majorCm": 8.0,
+      "minorCm": 8.0,
+      "rotationDeg": 0.0,
+      "plane": "main"
+    },
+    {
+      "id": 67,
+      "xCm": 117.06166452837817,
+      "yCm": 180.30887510977774,
+      "majorCm": 17.9,
+      "minorCm": 8.0,
+      "rotationDeg": 351.0,
+      "plane": "main"
+    },
+    {
+      "id": 68,
+      "xCm": 112.97270266824044,
+      "yCm": 198.5981306280876,
+      "majorCm": 15.3,
+      "minorCm": 8.0,
+      "rotationDeg": 0.0,
+      "plane": "main"
+    },
+    {
+      "id": 69,
+      "xCm": 95.96226045086446,
+      "yCm": 219.74665437491893,
+      "majorCm": 12.8,
+      "minorCm": 8.0,
+      "rotationDeg": 2.0,
+      "plane": "main"
+    },
+    {
+      "id": 70,
+      "xCm": 50.71512218798386,
+      "yCm": 178.50856446167114,
+      "majorCm": 8.0,
+      "minorCm": 8.0,
+      "rotationDeg": 0.0,
+      "plane": "main"
+    },
+    {
+      "id": 71,
+      "xCm": 70.04213483146067,
+      "yCm": 241.1990870786517,
+      "majorCm": 80.0,
+      "minorCm": 3.5,
+      "rotationDeg": 54.0,
+      "plane": "main"
+    },
+    {
+      "id": 72,
+      "xCm": 151.17025115473442,
+      "yCm": 242.58949191685912,
+      "majorCm": 8.9,
+      "minorCm": 19.6,
+      "rotationDeg": 0.0,
+      "plane": "main"
+    },
+    {
+      "id": 73,
+      "xCm": 178.3620809976071,
+      "yCm": 225.02417394004434,
+      "majorCm": 23.3,
+      "minorCm": 8.0,
+      "rotationDeg": 0.0,
+      "plane": "main"
+    },
+    {
+      "id": 74,
+      "xCm": 177.33250122338163,
+      "yCm": 240.29964787144553,
+      "majorCm": 20.9,
+      "minorCm": 12.4,
+      "rotationDeg": 0.0,
+      "plane": "main"
+    },
+    {
+      "id": 75,
+      "xCm": 203.40517893631406,
+      "yCm": 283.78288127828074,
+      "majorCm": 16.8,
+      "minorCm": 8.0,
+      "rotationDeg": 21.0,
+      "plane": "main"
+    },
+    {
+      "id": 76,
+      "xCm": 136.70145515267177,
+      "yCm": 263.0492604961832,
+      "majorCm": 16.8,
+      "minorCm": 8.0,
+      "rotationDeg": 62.0,
+      "plane": "main"
+    },
+    {
+      "id": 77,
+      "xCm": 137.2798828125,
+      "yCm": 303.88359375,
+      "majorCm": 52.2,
+      "minorCm": 8.0,
+      "rotationDeg": 92.0,
+      "plane": "main"
+    },
+    {
+      "id": 78,
+      "xCm": 176.99913394919167,
+      "yCm": 314.92205542725173,
+      "majorCm": 27.3,
+      "minorCm": 8.0,
+      "rotationDeg": 0.0,
+      "plane": "main"
+    },
+    {
+      "id": 79,
+      "xCm": 176.48250181453326,
+      "yCm": 303.38947362044456,
+      "majorCm": 10.1,
+      "minorCm": 5.0,
+      "rotationDeg": 0.0,
+      "plane": "main"
+    },
+    {
+      "id": 80,
+      "xCm": 73.40279926393903,
+      "yCm": 283.48473007169264,
+      "majorCm": 11.0,
+      "minorCm": 4.0,
+      "rotationDeg": 30.0,
+      "plane": "main"
+    },
+    {
+      "id": 81,
+      "xCm": 271.0985533453888,
+      "yCm": 284.9627034358047,
+      "majorCm": 12.3,
+      "minorCm": 5.1,
+      "rotationDeg": 358.0,
+      "plane": "main"
+    }
+  ],
+  "boulders": [
+    {
+      "id": 16,
+      "name": "Neviem",
+      "grade": "6b",
+      "setter": "igi",
+      "status": "draft",
+      "rating": 0,
+      "tags": "",
+      "notes": "",
+      "startHoldIDs": [
+        29
+      ],
+      "holdIDs": [
+        50,
+        35,
+        45,
+        63,
+        76
+      ],
+      "footholdIDs": [
+        13,
+        11,
+        9,
+        7,
+        6,
+        15,
+        41,
+        52
+      ],
+      "topHoldIDs": [
+        57
+      ],
+      "updatedAt": 815768553.678278
+    },
+    {
+      "id": 15,
+      "name": "Haha",
+      "grade": "1",
+      "setter": "igi",
+      "status": "draft",
+      "rating": 0,
+      "tags": "",
+      "notes": "",
+      "startHoldIDs": [
+        27,
+        28
+      ],
+      "holdIDs": [
+        64,
+        51,
+        59
+      ],
+      "footholdIDs": [
+        32,
+        25,
+        17
+      ],
+      "topHoldIDs": [
+        78
+      ],
+      "updatedAt": 815400897.47615
+    },
+    {
+      "id": 13,
+      "name": "Limetka",
+      "grade": "1",
+      "setter": "igi",
+      "status": "draft",
+      "rating": 0,
+      "tags": "",
+      "notes": "",
+      "startHoldIDs": [
+        27
+      ],
+      "holdIDs": [
+        34,
+        59
+      ],
+      "footholdIDs": [
+        10,
+        11,
+        18,
+        50,
+        51
+      ],
+      "topHoldIDs": [
+        76
+      ],
+      "updatedAt": 815323134.682674
+    },
+    {
+      "id": 14,
+      "name": "Lykozrut",
+      "grade": "6c",
+      "setter": "igi",
+      "status": "established",
+      "rating": 5,
+      "tags": "",
+      "notes": "",
+      "startHoldIDs": [
+        21
+      ],
+      "holdIDs": [
+        70,
+        69,
+        73,
+        57
+      ],
+      "footholdIDs": [
+        1,
+        3,
+        23,
+        31
+      ],
+      "topHoldIDs": [
+        58
+      ],
+      "updatedAt": 815050758.989189
+    },
+    {
+      "id": 3,
+      "name": "aaa",
+      "grade": "",
+      "setter": "igi",
+      "status": "draft",
+      "rating": 0,
+      "tags": "",
+      "notes": "",
+      "startHoldIDs": [],
+      "holdIDs": [
+        8
+      ],
+      "footholdIDs": [
+        11
+      ],
+      "topHoldIDs": [],
+      "updatedAt": 798492220.512922
+    }
+  ]
+}
