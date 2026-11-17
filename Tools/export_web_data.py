@@ -17,6 +17,7 @@ KICKBOARD_IMG = WALL_PROJECT_DIR / "kickboard_rectified.png"
 REPO_ROOT = Path(__file__).resolve().parent.parent
 WEB_DIR = REPO_ROOT / "web"
 WEB_DATA_PATH = WEB_DIR / "data" / "boulders.json"
+WEB_DATA_JS_PATH = WEB_DIR / "data" / "boulders.js"
 WEB_IMAGES_DIR = WEB_DIR / "images"
 
 AVAILABLE_GRADES = [
@@ -125,6 +126,11 @@ def main() -> None:
 
     with open(WEB_DATA_PATH, "w", encoding="utf-8") as f:
         json.dump(payload, f, indent=2, ensure_ascii=False)
+
+    with open(WEB_DATA_JS_PATH, "w", encoding="utf-8") as f:
+        f.write("window.SPRAYWALL_DATA = ")
+        json.dump(payload, f, ensure_ascii=False)
+        f.write(";\n")
 
     for src, name in [(MAIN_WALL_IMG, "main_wall_rectified.png"), (KICKBOARD_IMG, "kickboard_rectified.png")]:
         if src.exists():

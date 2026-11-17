@@ -1,4 +1,7 @@
-const SVG_NS = "http://www.w3.org/2000/svg";
+(() => {
+  "use strict";
+
+  const SVG_NS = "http://www.w3.org/2000/svg";
 
 const state = {
   wall: { widthCm: 360, mainWallHeightCm: 320, kickboardHeightCm: 40, totalHeightCm: 360 },
@@ -35,12 +38,16 @@ const els = {
 };
 
 async function init() {
+  initTheme();
   try {
-    const response = await fetch("./data/boulders.json", { cache: "no-cache" });
-    if (!response.ok) {
-      throw new Error(`HTTP ${response.status}`);
+    let data = window.SPRAYWALL_DATA;
+    if (!data) {
+      const response = await fetch("./data/boulders.json", { cache: "no-cache" });
+      if (!response.ok) {
+        throw new Error(`HTTP ${response.status}`);
+      }
+      data = await response.json();
     }
-    const data = await response.json();
 
     state.wall = data.wall || state.wall;
     state.availableGrades = Array.isArray(data.availableGrades) ? data.availableGrades : [];
@@ -139,7 +146,54 @@ function bindEvents() {
   els.zoomOutBtn.addEventListener("click", () => setZoom(state.zoom / 1.35));
   els.zoomResetBtn.addEventListener("click", resetZoom);
 
+  document.querySelectorAll("[data-theme-toggle]").forEach((btn) => {
+    btn.addEventListener("click", toggleTheme);
+  });
+
   setupPanAndZoomGestures();
+}
+
+function getSavedTheme() {
+  try {
+    return localStorage.getItem("spraywall.theme");
+  } catch {
+    return null;
+  }
+}
+
+function saveTheme(theme) {
+  try {
+    localStorage.setItem("spraywall.theme", theme);
+  } catch {
+    // Ignore storage errors on restricted file:// origins
+  }
+}
+
+function applyTheme(theme) {
+  document.documentElement.dataset.theme = theme;
+  const icon = theme === "dark" ? "☀️" : "🌙";
+  const label = theme === "dark" ? "Switch to light theme" : "Switch to dark theme";
+  document.querySelectorAll("[data-theme-toggle]").forEach((btn) => {
+    btn.textContent = icon;
+    btn.setAttribute("aria-label", label);
+    btn.title = label;
+  });
+}
+
+function initTheme() {
+  const saved = getSavedTheme();
+  const prefersDark =
+    typeof window.matchMedia === "function" &&
+    window.matchMedia("(prefers-color-scheme: dark)").matches;
+  const initial = saved === "dark" || saved === "light" ? saved : prefersDark ? "dark" : "light";
+  applyTheme(initial);
+}
+
+function toggleTheme() {
+  const current = document.documentElement.dataset.theme === "dark" ? "dark" : "light";
+  const next = current === "dark" ? "light" : "dark";
+  applyTheme(next);
+  saveTheme(next);
 }
 
 function getFilteredBoulders() {
@@ -508,3 +562,4 @@ function createEmptyState(text) {
 }
 
 init();
+})();

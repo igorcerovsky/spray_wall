@@ -21,6 +21,9 @@
             <p class="subtitle">Pick a boulder to climb</p>
           </div>
         </div>
+        <button type="button" class="theme-toggle-btn mobile-only" data-theme-toggle aria-label="Toggle light or dark theme">
+          🌙
+        </button>
       </header>
 
       <div class="filters">
@@ -80,6 +83,9 @@
             <button id="zoom-reset-btn" type="button" class="zoom-readout" aria-label="Reset zoom">100%</button>
             <button id="zoom-in-btn" type="button" class="icon-btn" aria-label="Zoom in">+</button>
           </div>
+          <button type="button" class="theme-toggle-btn" data-theme-toggle aria-label="Toggle light or dark theme">
+            🌙
+          </button>
         </div>
       </header>
 
@@ -131,6 +137,7 @@
     </main>
   </div>
 
-  <script type="module" src="./app.js"></script>
+  <script src="./data/boulders.js"></script>
+  <script src="./app.js"></script>
 </body>
 </html>
