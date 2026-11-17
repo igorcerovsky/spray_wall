@@ -16,6 +16,10 @@
   <img src="https://img.shields.io/badge/Tests-37%20Passed-brightgreen?style=flat-square" alt="Tests">
 </p>
 
+<p align="center">
+  <a href="https://igorcerovsky.github.io/spray_wall/"><strong>Open Web Boulder Viewer (Tablet)</strong></a>
+</p>
+
 ---
 
 <p align="center">
@@ -29,6 +33,8 @@
 **SprayWall** is a native macOS and iOS application for climbing spray walls. It transforms perspective-distorted wall photos into calibrated 2D climbing canvases. 
 
 Setters and climbers can map physical holds as rotatable ellipses, inspect holds using a projective magnifying loupe, define boulders with role color-coding, track ascents, and filter problems by difficulty.
+
+A lightweight, tablet-friendly **Web Boulder Viewer** is deployed on GitHub Pages at [igorcerovsky.github.io/spray_wall](https://igorcerovsky.github.io/spray_wall/) (`web/`), allowing kids and climbers to browse boulders, filter by grade, pinch-to-zoom, and switch between light and dark themes. To refresh the web data from the local SQLite store, run `python3 Tools/export_web_data.py`.
 
 ---
 
